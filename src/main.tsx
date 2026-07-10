@@ -555,6 +555,18 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: (u: AppUser) => void })
   // Determined at module load time from vite.config.ts define / .env
   const isGsiConfigured = !!import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
+  // Set body background/color dynamically for light color scheme
+  useEffect(() => {
+    const prevBg = document.body.style.backgroundColor;
+    const prevColor = document.body.style.color;
+    document.body.style.backgroundColor = '#f8fafc';
+    document.body.style.color = '#0f172a';
+    return () => {
+      document.body.style.backgroundColor = prevBg;
+      document.body.style.color = prevColor;
+    };
+  }, []);
+
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError(null);
@@ -603,35 +615,35 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: (u: AppUser) => void })
 
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-[#050609] overflow-hidden text-white font-sans antialiased">
+    <div className="relative flex min-h-screen items-center justify-center bg-[#f8fafc] overflow-hidden text-slate-900 font-sans antialiased">
       {/* Drifting Aura Lights */}
-      <div className="pointer-events-none absolute -top-40 left-1/4 h-[600px] w-[600px] rounded-full bg-violet-600/10 blur-[130px] animate-float-slow z-0" />
-      <div className="pointer-events-none absolute bottom-[-10%] right-[-10%] h-[600px] w-[600px] rounded-full bg-cyan-600/5 blur-[150px] animate-float-medium z-0" />
+      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-blue-100/50 blur-[130px] z-0" />
+      <div className="pointer-events-none absolute bottom-[-10%] right-[-10%] h-[600px] w-[600px] rounded-full bg-indigo-50/70 blur-[150px] z-0" />
 
       {/* Grid Pattern Pattern Mask */}
-      <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-30 z-0" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(circle_at_50%_30%,black_60%,transparent_100%)] opacity-80 z-0" />
 
       <div className="relative z-10 w-full max-w-md p-6">
-        <div className="glass rounded-[2rem] border border-white/5 p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden backdrop-blur-2xl animate-fadeIn">
+        <div className="bg-white border border-slate-200/80 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.05)] relative overflow-hidden backdrop-blur-2xl animate-fadeIn">
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-[0_0_20px_rgba(124,58,237,0.35)] mb-5">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 shadow-[0_4px_12px_rgba(37,99,235,0.2)] mb-5">
               <Bot size={28} className="text-white" />
             </div>
-            <h1 className="font-display text-3xl font-extrabold tracking-tight text-white">
-              Copilot<span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">X</span>
+            <h1 className="font-display text-3xl font-extrabold tracking-tight text-slate-900">
+              Copilot<span className="text-blue-600">X</span>
             </h1>
-            <p className="mt-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <p className="mt-2.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
               Interview OS Console
             </p>
-            <p className="mt-2 text-sm text-slate-500 leading-relaxed max-w-xs">
+            <p className="mt-2 text-sm text-slate-500 leading-relaxed max-w-xs font-medium">
               Real-time AI Copilot, resume intelligence matching, and custom knowledge base triggers.
             </p>
           </div>
 
-          <div className="h-px bg-white/5 my-7" />
+          <div className="h-px bg-slate-100 my-7" />
 
           {error && (
-            <div className="mb-5 rounded-xl border border-red-500/20 bg-red-500/5 p-3.5 text-xs text-red-400 flex items-center gap-2 animate-shake">
+            <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs text-red-600 flex items-center gap-2 animate-shake">
               <AlertCircle size={16} />
               <span>{error}</span>
             </div>
@@ -639,32 +651,32 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: (u: AppUser) => void })
 
           {!isFirebaseConfigured && !isGsiConfigured && (
             <div className="mb-6 space-y-4 animate-fadeIn text-left">
-              <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4 mb-2">
-                <p className="text-xs font-bold text-violet-300 uppercase tracking-wide mb-1 flex items-center gap-1.5">
+              <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-4 mb-2">
+                <p className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-1 flex items-center gap-1.5">
                   ✨ Developer Mode Fallback
                 </p>
-                <p className="text-[11px] text-slate-400 leading-relaxed font-medium">
+                <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
                   Firebase / GSI is not configured on this host. Enter a developer Gmail and Candidate Name to access the console locally.
                 </p>
               </div>
               <div>
-                <label className="mb-2 block text-xs font-bold text-slate-400 uppercase tracking-wider">Gmail Address</label>
+                <label className="mb-2 block text-xs font-bold text-slate-500 uppercase tracking-wider">Gmail Address</label>
                 <input
                   type="email"
                   placeholder="e.g. candidate@gmail.com"
                   value={devEmail}
                   onChange={e => setDevEmail(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-white/5 bg-[#0a0b14]/50 px-3.5 py-3 outline-none focus:border-violet-500/40 text-white placeholder:text-slate-700 transition-all font-semibold"
+                  className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500/50 text-slate-950 placeholder:text-slate-400 transition-all font-semibold"
                 />
               </div>
               <div>
-                <label className="mb-2 block text-xs font-bold text-slate-400 uppercase tracking-wider">Candidate Name</label>
+                <label className="mb-2 block text-xs font-bold text-slate-500 uppercase tracking-wider">Candidate Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Alex Rivera"
                   value={devName}
                   onChange={e => setDevName(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-white/5 bg-[#0a0b14]/50 px-3.5 py-3 outline-none focus:border-violet-500/40 text-white placeholder:text-slate-700 transition-all font-semibold"
+                  className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500/50 text-slate-950 placeholder:text-slate-400 transition-all font-semibold"
                 />
               </div>
             </div>
@@ -673,12 +685,12 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: (u: AppUser) => void })
           <button
             onClick={handleGoogleSignIn}
             disabled={loading || (!isFirebaseConfigured && !isGsiConfigured && (!devEmail.trim() || !devName.trim()))}
-            className="w-full flex items-center justify-center gap-3 rounded-xl border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] active:scale-98 px-5 py-3.5 text-xs font-bold uppercase tracking-wider text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer group"
+            className="w-full flex items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 active:scale-98 px-5 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 shadow-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer group"
           >
             {loading ? (
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-slate-700 border-t-transparent" />
             ) : (
-              <svg className="h-5 w-5 text-white transition-transform group-hover:scale-105" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="h-5 w-5 transition-transform group-hover:scale-105" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
@@ -688,7 +700,7 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: (u: AppUser) => void })
             <span>{loading ? 'Authenticating...' : 'Sign in with Google'}</span>
           </button>
 
-          <p className="mt-6 text-center text-[10px] text-slate-500 leading-normal font-semibold">
+          <p className="mt-6 text-center text-[10px] text-slate-400 leading-normal font-semibold">
             Secure Google authentication protocol active. Data synced with your active local dashboard profile.
           </p>
         </div>
@@ -1417,11 +1429,11 @@ function App() {
   const isSessionStarted = isSessionActive || isMockSessionActive;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#050609] text-slate-100 font-sans relative">
+    <div className="flex h-screen overflow-hidden bg-[#f8fafc] text-slate-900 font-sans relative">
       {/* Drifting Aura Lights for Dashboard / App */}
-      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-violet-600/5 blur-[130px] animate-float-slow z-0" />
-      <div className="pointer-events-none absolute bottom-20 right-1/4 h-[500px] w-[500px] rounded-full bg-cyan-600/5 blur-[120px] animate-float-medium z-0" />
-      <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-30 z-0" />
+      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-blue-100/50 blur-[130px] z-0" />
+      <div className="pointer-events-none absolute bottom-20 right-1/4 h-[500px] w-[500px] rounded-full bg-indigo-50/50 blur-[120px] z-0" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(circle_at_50%_30%,black_60%,transparent_100%)] opacity-80 z-0" />
 
       {!isSessionStarted && (
         <Sidebar
@@ -1982,18 +1994,45 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
   const [answerLength, setAnswerLength] = useState(0);
   const [simulatorState, setSimulatorState] = useState<'idle' | 'typing' | 'thinking' | 'streaming'>('idle');
 
-  // Resume scorer state
-  const [scorerResume, setScorerResume] = useState<'lead_fe' | 'staff_be' | 'ml_eng'>('lead_fe');
-  const [scorerCompany, setScorerCompany] = useState<'Google' | 'Netflix' | 'Stripe'>('Google');
-  const [scorerProgress, setScorerProgress] = useState(0);
-  const [scorerScore, setScorerScore] = useState<number | null>(null);
-  const [scorerState, setScorerState] = useState<'idle' | 'running' | 'done'>('idle');
-
   // Pricing state
   const [pricingPeriod, setPricingPeriod] = useState<'monthly' | 'annual'>('annual');
 
-  // FAQ state
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  // Set body background/color dynamically for light color scheme
+  useEffect(() => {
+    const prevBg = document.body.style.backgroundColor;
+    const prevColor = document.body.style.color;
+    document.body.style.backgroundColor = '#f8fafc';
+    document.body.style.color = '#0f172a';
+    return () => {
+      document.body.style.backgroundColor = prevBg;
+      document.body.style.color = prevColor;
+    };
+  }, []);
+
+  // Handle click on feature cards
+  const handleLearnMore = (scenario: 'system' | 'sql' | 'react' | 'insights') => {
+    if (scenario === 'insights') {
+      setActiveScenario('system');
+      const element = document.getElementById('simulator');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Flash metrics container
+        const metricsContainer = document.getElementById('mockup-metrics');
+        if (metricsContainer) {
+          metricsContainer.classList.add('ring-4', 'ring-blue-500/50', 'ring-offset-2');
+          setTimeout(() => {
+            metricsContainer.classList.remove('ring-4', 'ring-blue-500/50', 'ring-offset-2');
+          }, 1500);
+        }
+      }
+    } else {
+      setActiveScenario(scenario);
+      const element = document.getElementById('simulator');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
 
   // Preview Simulator Engine
   useEffect(() => {
@@ -2046,791 +2085,703 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
     };
   }, [activeScenario]);
 
-  // Resume Scorer Simulation Handler
-  const runResumeAnalysis = () => {
-    setScorerState('running');
-    setScorerProgress(0);
-    setScorerScore(null);
-
-    let targetScore = 80;
-    if (scorerResume === 'lead_fe') {
-      if (scorerCompany === 'Google') targetScore = 84;
-      else if (scorerCompany === 'Netflix') targetScore = 96;
-      else targetScore = 89;
-    } else if (scorerResume === 'staff_be') {
-      if (scorerCompany === 'Google') targetScore = 91;
-      else if (scorerCompany === 'Stripe') targetScore = 97;
-      else targetScore = 86;
-    } else { // ml_eng
-      if (scorerCompany === 'Google') targetScore = 95;
-      else if (scorerCompany === 'Netflix') targetScore = 81;
-      else targetScore = 90;
-    }
-
-    const duration = 1200; // ms
-    const stepTime = 25;
-    const totalSteps = duration / stepTime;
-    let currentStep = 0;
-
-    const progressInterval = setInterval(() => {
-      currentStep++;
-      const currentProgress = Math.min(100, Math.round((currentStep / totalSteps) * 100));
-      setScorerProgress(currentProgress);
-
-      if (currentProgress >= 100) {
-        clearInterval(progressInterval);
-        setScorerScore(targetScore);
-        setScorerState('done');
-      }
-    }, stepTime);
-  };
-
-  const getScorerFeedback = () => {
-    if (scorerResume === 'lead_fe') {
-      if (scorerCompany === 'Netflix') {
-        return "✨ Stellar match! Outstanding framework optimization & CDN asset delivery experiences line up perfectly with Netflix's media scaling requirements.";
-      }
-      return "💡 Good layout fit. Recommendation: Expand details on web vitals logging & asynchronous service workers to push score higher.";
-    }
-    if (scorerResume === 'staff_be') {
-      if (scorerCompany === 'Stripe') {
-        return "✨ Elite fit! Deep background in distributed transaction synchronization, idempotency keys, and PCI APIs maps perfectly to Stripe's core team.";
-      }
-      return "💡 Excellent infrastructure fit. Recommendation: Highlight database partitioning projects and zero-downtime ledger migration schemas.";
-    }
-    // ml_eng
-    if (scorerCompany === 'Google') {
-      return "✨ Incredible research fit! High-end model architecture adjustments, custom LLM fine-tuning, and TPU compute layouts mesh directly with Google Brain initiatives.";
-    }
-    return "💡 Strong math & ML fit. Recommendation: Emphasize memory footprints optimization and real-time model inference acceleration details.";
-  };
-
-  const faqs = [
-    {
-      q: "How does CopilotX capture meeting audio?",
-      a: "CopilotX integrates directly using browser-native screen audio-sharing capture capabilities or via our standalone desktop app. It aggregates tab sound feeds and your microphone signals seamlessly to run local transcriptions without hardware delays."
-    },
-    {
-      q: "Does it personalize answers to my background?",
-      a: "Yes. By importing your resumes, active JD postings, and notes, the AI filters all suggestions, architecture advice, and coding models to utilize your actual historical stacks and tech background."
-    },
-    {
-      q: "Is it safe to run alongside test programs?",
-      a: "Absolutely. CopilotX executes in an isolated web layout or local container thread, prioritizing background audio analysis without injecting files, hooking screen processes, or running intrusive local packages."
-    },
-    {
-      q: "Which AI models power the suggestions?",
-      a: "CopilotX leverages advanced LLM systems including GPT-4o, Gemini 2.5 Pro, and Llama 3.3. It routes queries dynamically using an optimization mesh to ensure answers generate in under 1.2 seconds."
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-[#050609] text-slate-100 flex flex-col relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col relative overflow-hidden font-sans">
       
       {/* Drifting Aura Lights */}
-      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-violet-600/10 blur-[130px] animate-float-slow" />
-      <div className="pointer-events-none absolute top-1/3 -right-20 h-[600px] w-[600px] rounded-full bg-cyan-600/10 blur-[150px] animate-float-medium" />
-      <div className="pointer-events-none absolute -bottom-20 left-1/3 h-[500px] w-[500px] rounded-full bg-emerald-600/5 blur-[120px] animate-float-slow" />
+      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-blue-100/50 blur-[130px]" />
+      <div className="pointer-events-none absolute top-1/3 -right-20 h-[600px] w-[600px] rounded-full bg-indigo-50/70 blur-[150px]" />
+      <div className="pointer-events-none absolute -bottom-20 left-1/3 h-[500px] w-[500px] rounded-full bg-purple-50/50 blur-[120px]" />
 
       {/* Grid Pattern Mask */}
-      <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-60" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(circle_at_50%_30%,black_60%,transparent_100%)] opacity-80" />
 
-      {/* Floating Glass Navbar */}
-      <header className="relative z-50 mx-4 my-4 max-w-6xl md:mx-auto md:w-[94%] glass-navbar rounded-2xl flex items-center justify-between px-6 py-4 transition-all">
+      {/* Navbar */}
+      <header className="relative z-50 mx-auto w-full max-w-7xl px-6 py-5 flex items-center justify-between transition-all">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-[0_0_15px_rgba(124,58,237,0.4)]">
-            <Bot size={18} className="text-white animate-pulse" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 shadow-[0_4px_12px_rgba(37,99,235,0.2)]">
+            <Bot size={18} className="text-white" />
           </div>
-          <span className="font-display text-lg font-bold tracking-tight text-white">Copilot<span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">X</span></span>
+          <span className="font-display text-lg font-bold tracking-tight text-slate-900">
+            Copilot<span className="text-blue-600">X</span>
+          </span>
         </div>
 
-        <nav className="hidden md:flex items-center gap-8 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          <a href="#simulator" className="hover:text-white transition-colors cursor-pointer">Live Demo</a>
-          <a href="#scorer" className="hover:text-white transition-colors cursor-pointer">Resume Scorer</a>
-          <a href="#features" className="hover:text-white transition-colors cursor-pointer">Features</a>
-          <a href="#pricing" className="hover:text-white transition-colors cursor-pointer">Pricing</a>
-          <a href="#faq" className="hover:text-white transition-colors cursor-pointer">FAQ</a>
+        <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+          <a href="#simulator" className="hover:text-blue-600 transition-colors cursor-pointer">Live Interview</a>
+          <a href="#features" className="hover:text-blue-600 transition-colors cursor-pointer">Mock Interview</a>
+          <a href="#features" className="hover:text-blue-600 transition-colors cursor-pointer">Resumes</a>
+          <a href="#features" className="hover:text-blue-600 transition-colors cursor-pointer">Knowledge Base</a>
+          <a href="#pricing" className="hover:text-blue-600 transition-colors cursor-pointer">Pricing</a>
+          <div className="flex items-center gap-1 hover:text-blue-600 transition-colors cursor-pointer group">
+            <span>Resources</span>
+            <ChevronDown size={14} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
+          </div>
         </nav>
 
-        <div className="flex gap-3">
-          <button onClick={onSignIn} className="rounded-xl px-4 py-2 text-xs font-bold text-slate-300 hover:text-white transition-all cursor-pointer">Sign In</button>
-          <button onClick={onStart} className="btn-gradient rounded-xl px-5 py-2 text-xs font-bold text-white cursor-pointer">Launch Console</button>
+        <div className="flex items-center gap-4">
+          <button onClick={onSignIn} className="text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors cursor-pointer">
+            Log in
+          </button>
+          <button onClick={onStart} className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl px-5 py-2.5 text-sm font-bold shadow-[0_4px_14px_rgba(37,99,235,0.2)] transition-all cursor-pointer">
+            Start Free Session →
+          </button>
         </div>
       </header>
 
       {/* Main Container */}
-      <main className="relative z-10 mx-auto w-full max-w-6xl px-6 py-12 flex-1">
+      <main className="relative z-10 flex-1">
         
         {/* Hero Section */}
-        <section className="grid items-center gap-12 lg:grid-cols-[1.15fr_.85fr] py-8">
+        <section className="relative z-10 mx-auto w-full max-w-7xl px-6 py-12 md:py-20 grid items-center gap-12 lg:grid-cols-[1.1fr_.9fr]">
           <div className="flex flex-col items-start text-left">
             <div className="mb-6 flex flex-wrap gap-2 animate-fadeIn">
-              <span className="inline-flex items-center gap-1 rounded-full border border-violet-500/20 bg-violet-950/20 px-3 py-1 text-[11px] font-bold text-violet-300 backdrop-blur-md shadow-[0_0_15px_rgba(139,92,246,0.1)]">
-                <Sparkles size={11} className="text-violet-400" /> Resume-aware Context
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-full border border-cyan-500/20 bg-cyan-950/20 px-3 py-1 text-[11px] font-bold text-cyan-300 backdrop-blur-md shadow-[0_0_15px_rgba(6,182,212,0.1)]">
-                <Globe size={11} className="text-cyan-400" /> Company Target Tuned
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/25 bg-emerald-950/20 px-3 py-1 text-[11px] font-bold text-emerald-400 backdrop-blur-md shadow-[0_0_15px_rgba(16,185,129,0.15)] animate-pulse">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Real-time Listening
+              <span className="inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600">
+                <Sparkles size={11} className="text-blue-500" />
+                + AI-Powered Interview Preparation
               </span>
             </div>
 
-            <h1 className="font-display text-[46px] sm:text-[62px] lg:text-[74px] font-extrabold leading-[1.08] tracking-tight bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
-              The AI Operating <br className="hidden sm:inline" />
-              System for <span className="bg-gradient-to-r from-violet-400 via-indigo-300 to-cyan-400 bg-clip-text text-transparent">Interviews</span>.
+            <h1 className="font-display text-5xl sm:text-6xl lg:text-[70px] font-black leading-[1.08] tracking-tight text-slate-900">
+              Ace Your Next <br />
+              <span className="text-blue-600">Interview</span> with AI
             </h1>
             
-            <p className="mt-6 max-w-xl text-[16px] sm:text-[18px] leading-relaxed text-slate-400 font-medium">
-              Transcribe conversations on-the-fly, stream tailor-made coding scripts, run automated webcam voice mock trials, and inspect resume scorecards. Optimized for modern developers.
+            <p className="mt-6 max-w-xl text-slate-600 text-base sm:text-lg leading-relaxed font-medium">
+              CopilotX helps you practice smarter with real-time AI interviews, personalized feedback, and role-specific preparation.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4 w-full sm:w-auto">
-              <button onClick={onSignIn} className="btn-gradient inline-flex items-center justify-center gap-2 rounded-xl px-7 py-4 text-sm font-bold text-white shadow-xl w-full sm:w-auto cursor-pointer">
-                <span>Start Free Console</span> <ArrowRight size={16} />
+              <button onClick={onStart} className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl px-7 py-4 text-sm font-bold shadow-[0_8px_20px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2 cursor-pointer transition-all">
+                <span>Start Free Session</span> <ArrowRight size={16} />
               </button>
-              <a href="#simulator" className="btn-glass inline-flex items-center justify-center gap-2 rounded-xl px-6 py-4 text-sm font-bold text-slate-200 w-full sm:w-auto cursor-pointer">
-                <PlayCircle size={16} /> Simulate Live Session
+              <a href="#simulator" className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-6 py-4 text-sm font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                <PlayCircle size={16} className="text-slate-500" /> Watch Demo
               </a>
             </div>
 
-            {/* Quick stats widgets */}
-            <div className="mt-12 grid grid-cols-3 gap-6 w-full border-t border-white/5 pt-8">
-              <div>
-                <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Avg LLM Latency</div>
-                <div className="text-xl font-black text-violet-400 mt-1 flex items-center gap-1.5">
-                  <Cpu size={16} className="text-violet-400 animate-pulse" /> 1.2s
-                </div>
+            {/* Trust elements */}
+            <div className="mt-12 flex items-center gap-4">
+              <div className="flex -space-x-3">
+                <img className="h-9 w-9 rounded-full border-2 border-white object-cover shadow-sm animate-fadeIn" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80" alt="Learner 1" />
+                <img className="h-9 w-9 rounded-full border-2 border-white object-cover shadow-sm animate-fadeIn" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80" alt="Learner 2" />
+                <img className="h-9 w-9 rounded-full border-2 border-white object-cover shadow-sm animate-fadeIn" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80" alt="Learner 3" />
+                <img className="h-9 w-9 rounded-full border-2 border-white object-cover shadow-sm animate-fadeIn" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&h=100&q=80" alt="Learner 4" />
               </div>
-              <div>
-                <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Audio Sync Speed</div>
-                <div className="text-xl font-black text-cyan-400 mt-1 flex items-center gap-1.5">
-                  <Activity size={16} className="text-cyan-400 animate-pulse" /> Real-time
+              <div className="flex flex-col items-start">
+                <div className="flex gap-0.5 text-yellow-400">
+                  <span className="text-sm font-semibold">★</span>
+                  <span className="text-sm font-semibold">★</span>
+                  <span className="text-sm font-semibold">★</span>
+                  <span className="text-sm font-semibold">★</span>
+                  <span className="text-sm font-semibold">★</span>
                 </div>
-              </div>
-              <div>
-                <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Answer Accuracy</div>
-                <div className="text-xl font-black text-emerald-400 mt-1 flex items-center gap-1.5">
-                  <CheckCircle2 size={16} className="text-emerald-400" /> 96.8%
-                </div>
+                <span className="text-xs text-slate-500 font-semibold mt-0.5">Trusted by 12,000+ learners</span>
               </div>
             </div>
           </div>
 
-          {/* Isometric Dashboard Render */}
-          <div className="relative group w-full flex justify-center">
-            <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-violet-600 to-cyan-500 opacity-20 blur-xl transition-all group-hover:opacity-30" />
+          {/* Right Column: Premium Mockup */}
+          <div id="simulator" className="relative group w-full flex justify-center">
+            {/* Subtle blue/indigo background glow */}
+            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-blue-500 to-indigo-500 opacity-[0.08] blur-2xl" />
             
-            <div className="relative glass-card rounded-2xl p-5 w-full max-w-[460px] overflow-hidden border-t-white/10">
-              <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-red-500" />
-                  <span className="h-2 w-2 rounded-full bg-yellow-500" />
-                  <span className="h-2 w-2 rounded-full bg-green-500" />
-                  <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider ml-1">Session-Monitor-V2</span>
-                </div>
-                <div className="flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.15)]">
-                  <span className="h-1 w-1 rounded-full bg-emerald-400 animate-ping" /> active
-                </div>
-              </div>
-
-              <div className="space-y-4 text-xs">
-                <div>
-                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Target Role</div>
-                  <div className="text-slate-200 font-bold bg-white/[0.03] border border-white/5 px-2.5 py-1.5 rounded-lg">Staff Software Engineer (Backend)</div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Target Profile</div>
-                    <div className="text-slate-300 bg-white/[0.03] border border-white/5 px-2.5 py-1.5 rounded-lg font-semibold">Stripe Inc</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">LLM Engine</div>
-                    <div className="text-slate-300 bg-white/[0.03] border border-white/5 px-2.5 py-1.5 rounded-lg font-semibold flex items-center gap-1">
-                      <Zap size={10} className="text-violet-400" /> Gemini Pro 2.5
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Knowledge Base References</div>
-                  <div className="flex flex-wrap gap-1.5">
-                    <span className="bg-violet-950/20 border border-violet-800/30 text-violet-300 text-[10px] px-2 py-0.5 rounded-md font-semibold">stripe-pci-compliance.pdf</span>
-                    <span className="bg-cyan-950/20 border border-cyan-800/30 text-cyan-300 text-[10px] px-2 py-0.5 rounded-md font-semibold">ledger-shard-mapping.md</span>
-                  </div>
-                </div>
-
-                <div className="border-t border-white/5 pt-3 mt-1 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-400 font-semibold">Calculated Matching Metric</span>
-                  <span className="text-xs font-black text-emerald-400">93% Alignment</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 2: Live Simulator Dashboard */}
-        <section id="simulator" className="mt-32 pt-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Test Drive the Real-Time Simulator
-            </h2>
-            <p className="mt-3 text-slate-400 text-sm font-medium leading-relaxed">
-              Select one of the topics below to simulate how CopilotX captures live interviewer questions and streams contextual solutions.
-            </p>
-          </div>
-
-          <div className="grid gap-8 lg:grid-cols-[250px_1fr] items-start">
-            
-            {/* Scenario Toggles */}
-            <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
-              <button
-                onClick={() => setActiveScenario('system')}
-                className={`flex-1 text-left px-4 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer whitespace-nowrap lg:whitespace-normal shrink-0 ${activeScenario === 'system' 
-                  ? 'border-violet-500/40 bg-violet-600/10 text-white shadow-inner shadow-violet-500/5' 
-                  : 'border-white/5 bg-white/[0.02] text-slate-400 hover:border-white/10 hover:text-white'}`}
-              >
-                🖥️ System Design Scenario
-              </button>
-              <button
-                onClick={() => setActiveScenario('sql')}
-                className={`flex-1 text-left px-4 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer whitespace-nowrap lg:whitespace-normal shrink-0 ${activeScenario === 'sql' 
-                  ? 'border-violet-500/40 bg-violet-600/10 text-white shadow-inner shadow-violet-500/5' 
-                  : 'border-white/5 bg-white/[0.02] text-slate-400 hover:border-white/10 hover:text-white'}`}
-              >
-                📊 Database Tuning Scenario
-              </button>
-              <button
-                onClick={() => setActiveScenario('react')}
-                className={`flex-1 text-left px-4 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer whitespace-nowrap lg:whitespace-normal shrink-0 ${activeScenario === 'react' 
-                  ? 'border-violet-500/40 bg-violet-600/10 text-white shadow-inner shadow-violet-500/5' 
-                  : 'border-white/5 bg-white/[0.02] text-slate-400 hover:border-white/10 hover:text-white'}`}
-              >
-                ⚛️ Frontend reconciler Scenario
-              </button>
-            </div>
-
-            {/* Simulated Live UI console */}
-            <div className="glass-card rounded-2xl overflow-hidden border-t-white/10">
+            <div className="relative w-full max-w-[540px] bg-white border border-slate-200/80 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col">
               
-              {/* Header bar */}
-              <div className="bg-[#0b0c16] px-5 py-4 border-b border-white/5 flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex gap-1 h-3 items-center wave-active">
-                    <span className="audio-wave-bar h-2 w-[2px]" />
-                    <span className="audio-wave-bar h-4 w-[2px]" />
-                    <span className="audio-wave-bar h-3 w-[2px]" />
-                    <span className="audio-wave-bar h-1 w-[2px]" />
-                    <span className="audio-wave-bar h-4 w-[2px]" />
-                  </div>
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                    Audio Capture Mode
-                  </span>
-                </div>
-
+              {/* Mockup Header */}
+              <div className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200/80 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live Interview
+                  </div>
                   {simulatorState === 'typing' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-cyan-950/40 border border-cyan-800/30 px-2.5 py-0.5 text-[10px] text-cyan-300 font-bold">
-                      🎙️ Voice Transcribing...
-                    </span>
+                    <span className="text-[10px] text-blue-600 font-bold bg-blue-50 border border-blue-100 rounded px-1.5 py-0.5 animate-pulse">🎙️ Listening...</span>
                   )}
                   {simulatorState === 'thinking' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-950/40 border border-violet-800/30 px-2.5 py-0.5 text-[10px] text-violet-300 font-bold animate-pulse">
-                      ⚡ AI Processing...
-                    </span>
+                    <span className="text-[10px] text-purple-600 font-bold bg-purple-50 border border-purple-100 rounded px-1.5 py-0.5 animate-pulse">⚡ Thinking...</span>
                   )}
                   {simulatorState === 'streaming' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-950/40 border border-emerald-800/30 px-2.5 py-0.5 text-[10px] text-emerald-300 font-bold">
-                      💡 Copilot Streaming...
-                    </span>
+                    <span className="text-[10px] text-indigo-600 font-bold bg-indigo-50 border border-indigo-100 rounded px-1.5 py-0.5">💡 Copilot Streaming...</span>
                   )}
-                  {simulatorState === 'idle' && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 border border-white/5 px-2.5 py-0.5 text-[10px] text-slate-400 font-bold">
-                      ✓ Ready
-                    </span>
-                  )}
+                </div>
+                <div className="flex items-center gap-3 text-xs text-slate-500 font-semibold">
+                  <span className="flex items-center gap-1">⏱ 24:35</span>
+                  <span className="border border-red-200 text-red-600 bg-red-50/50 rounded-md px-2 py-0.5 text-[10px] font-bold">End Session</span>
                 </div>
               </div>
 
-              <div className="p-6 space-y-6 text-left min-h-[360px] flex flex-col justify-between">
+              {/* Mockup Body: Two columns layout */}
+              <div className="p-4 grid grid-cols-1 md:grid-cols-[1.3fr_.7fr] gap-4 bg-slate-50/30">
                 
-                {/* Question panel */}
-                <div>
-                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Detected Audio Transcript</div>
-                  <div className="text-[15px] font-semibold text-slate-100 flex items-start gap-2 bg-white/[0.02] border border-white/5 p-3 rounded-xl min-h-[50px]">
-                    <span className="text-violet-400 shrink-0 font-bold text-xs uppercase bg-violet-500/10 px-1.5 py-0.5 rounded mt-0.5">INT</span>
-                    <span>{questionLength > 0 ? previewScenarios[activeScenario].question.slice(0, questionLength) : <span className="text-slate-600 italic">Listening for voice signals...</span>}</span>
+                {/* Left Column in Mockup */}
+                <div className="space-y-4">
+                  
+                  {/* AI Interviewer bubble */}
+                  <div className="bg-white border border-slate-200/60 rounded-xl p-3.5 shadow-sm text-left">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                        <Volume2 size={13} />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">AI Interviewer</span>
+                    </div>
+                    <p className="text-[13px] text-slate-800 font-semibold min-h-[40px]">
+                      {questionLength > 0 ? previewScenarios[activeScenario].question.slice(0, questionLength) : <span className="text-slate-400 italic">Listening for voice signals...</span>}
+                    </p>
                   </div>
+
+                  {/* Your Response audio waveform */}
+                  <div className="bg-white border border-slate-200/60 rounded-xl p-3.5 shadow-sm text-left">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Your Response</span>
+                      <span className="text-[11px] font-bold text-emerald-600">01:24</span>
+                    </div>
+                    <div className="h-8 flex items-center gap-1">
+                      {Array.from({ length: 28 }).map((_, i) => {
+                        const heights = [3,6,12,18,12,6,3,8,14,24,18,10,4,8,18,32,24,14,6,8,16,28,16,8,4,8,12,6];
+                        const h = heights[i % heights.length];
+                        return (
+                          <span 
+                            key={i} 
+                            className="flex-1 rounded-sm transition-all duration-300"
+                            style={{
+                              height: simulatorState === 'typing' ? `${Math.max(3, h * (0.3 + Math.random() * 0.7))}px` : '4px',
+                              backgroundColor: simulatorState === 'typing' ? '#2563eb' : '#e2e8f0'
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Metrics */}
+                  <div id="mockup-metrics" className="grid grid-cols-3 gap-2 rounded-xl transition-all duration-300">
+                    <div className="bg-white border border-slate-200/60 rounded-xl p-2.5 shadow-sm flex flex-col items-center">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Confidence</span>
+                      <div className="relative h-11 w-11 flex items-center justify-center">
+                        <svg className="absolute inset-0 transform -rotate-90" viewBox="0 0 36 36">
+                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f1f5f9" strokeWidth="2.5"/>
+                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#10b981" strokeWidth="2.5" strokeDasharray="82, 100" strokeLinecap="round"/>
+                        </svg>
+                        <span className="absolute text-[11px] font-extrabold text-slate-800">82%</span>
+                      </div>
+                      <span className="text-[9px] font-bold text-emerald-600 mt-1">Good</span>
+                    </div>
+
+                    <div className="bg-white border border-slate-200/60 rounded-xl p-2.5 shadow-sm flex flex-col items-center">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Clarity</span>
+                      <div className="relative h-11 w-11 flex items-center justify-center">
+                        <svg className="absolute inset-0 transform -rotate-90" viewBox="0 0 36 36">
+                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f1f5f9" strokeWidth="2.5"/>
+                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f97316" strokeWidth="2.5" strokeDasharray="78, 100" strokeLinecap="round"/>
+                        </svg>
+                        <span className="absolute text-[11px] font-extrabold text-slate-800">78%</span>
+                      </div>
+                      <span className="text-[9px] font-bold text-orange-600 mt-1">Good</span>
+                    </div>
+
+                    <div className="bg-white border border-slate-200/60 rounded-xl p-2.5 shadow-sm flex flex-col items-center">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Relevance</span>
+                      <div className="relative h-11 w-11 flex items-center justify-center">
+                        <svg className="absolute inset-0 transform -rotate-90" viewBox="0 0 36 36">
+                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f1f5f9" strokeWidth="2.5"/>
+                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeDasharray="91, 100" strokeLinecap="round"/>
+                        </svg>
+                        <span className="absolute text-[11px] font-extrabold text-slate-800">91%</span>
+                      </div>
+                      <span className="text-[9px] font-bold text-blue-600 mt-1">Excellent</span>
+                    </div>
+                  </div>
+
                 </div>
 
-                {/* AI response panel */}
-                <div className="flex-1 flex flex-col justify-start mt-4">
-                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                    <span>AI Copilot Smart Suggestion</span>
-                    {simulatorState === 'thinking' && (
-                      <span className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-ping" />
-                    )}
+                {/* Right Column in Mockup */}
+                <div className="space-y-4">
+                  
+                  {/* Transcript card */}
+                  <div className="bg-white border border-slate-200/60 rounded-xl p-3.5 shadow-sm text-left flex flex-col flex-1 min-h-[170px]">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">Transcript</span>
+                    <div className="text-[12px] text-slate-600 font-medium leading-relaxed overflow-y-auto flex-1 max-h-[140px] pr-1">
+                      {simulatorState === 'thinking' ? (
+                        <div className="flex flex-col items-center justify-center py-6 space-y-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+                          <span className="text-[10px] text-slate-400">Contextualizing solution...</span>
+                        </div>
+                      ) : answerLength > 0 ? (
+                        <FormattedAnswer text={previewScenarios[activeScenario].answer.slice(0, answerLength)} />
+                      ) : (
+                        <span className="text-slate-400 italic">Waiting for speech transcript to complete...</span>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="bg-[#05060d] border border-white/5 rounded-xl p-4 min-h-[220px] max-h-[350px] overflow-y-auto font-sans leading-relaxed text-sm">
-                    {simulatorState === 'thinking' ? (
-                      <div className="h-full flex flex-col items-center justify-center py-10 space-y-3">
-                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
-                        <span className="text-slate-400 text-xs font-semibold animate-pulse">Contextualizing resume + target role database...</span>
-                      </div>
-                    ) : answerLength > 0 ? (
-                      <FormattedAnswer text={previewScenarios[activeScenario].answer.slice(0, answerLength)} />
-                    ) : (
-                      <div className="h-full flex items-center justify-center py-10 text-slate-600 text-xs italic">
-                        Waiting for speech transcription to finalize...
-                      </div>
-                    )}
+                  {/* Job Role info */}
+                  <div className="bg-white border border-slate-200/60 rounded-xl p-3 shadow-sm text-left">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Job Role</span>
+                    <span className="text-xs font-bold text-slate-800">Backend Developer</span>
                   </div>
+
+                  {/* Question Ratio card */}
+                  <div className="bg-white border border-slate-200/60 rounded-xl p-3 shadow-sm text-left">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Question</span>
+                    <span className="text-xs font-black text-slate-800">5 / 12</span>
+                  </div>
+
                 </div>
 
               </div>
-            </div>
 
-          </div>
-        </section>
-
-        {/* Section 3: Interactive Resume match scorer */}
-        <section id="scorer" className="mt-32 pt-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Interactive Resume Alignment Scorer
-            </h2>
-            <p className="mt-3 text-slate-400 text-sm font-medium leading-relaxed">
-              Test how well your resume matches target job roles. Select a sample profile and company below, then check alignment.
-            </p>
-          </div>
-
-          <div className="glass-card rounded-2xl p-6 md:p-8 max-w-3xl mx-auto border-t-white/10">
-            <div className="grid gap-6 md:grid-cols-2 text-left">
-              
-              {/* Selectors */}
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">
-                    1. Select Candidate Profile
-                  </label>
-                  <select
-                    value={scorerResume}
-                    onChange={(e) => {
-                      setScorerResume(e.target.value as any);
-                      setScorerState('idle');
-                    }}
-                    className="w-full text-xs rounded-xl border border-white/10 bg-slate-900/60 px-3.5 py-3 outline-none focus:border-violet-500/50 text-white cursor-pointer"
-                  >
-                    <option value="lead_fe">Senior UI Developer (React, TS, Webpack, CSS)</option>
-                    <option value="staff_be">Staff backend Engineer (Go, PostgreSQL, Kafka, Redis)</option>
-                    <option value="ml_eng">Machine Learning Engineer (Python, PyTorch, CUDA, LLMs)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">
-                    2. Select Target Company
-                  </label>
-                  <select
-                    value={scorerCompany}
-                    onChange={(e) => {
-                      setScorerCompany(e.target.value as any);
-                      setScorerState('idle');
-                    }}
-                    className="w-full text-xs rounded-xl border border-white/10 bg-slate-900/60 px-3.5 py-3 outline-none focus:border-violet-500/50 text-white cursor-pointer"
-                  >
-                    <option value="Google">Google (Distributed Search Optimization)</option>
-                    <option value="Netflix">Netflix (High-Performance Client Application)</option>
-                    <option value="Stripe">Stripe (Asynchronous API Integrations)</option>
-                  </select>
-                </div>
-
-                <button
-                  onClick={runResumeAnalysis}
-                  disabled={scorerState === 'running'}
-                  className="w-full btn-gradient py-3.5 rounded-xl text-xs font-bold text-white shadow-lg cursor-pointer flex items-center justify-center gap-2"
+              {/* Quick toggles inside browser frame to test system/sql/react */}
+              <div className="bg-slate-50 border-t border-slate-200/80 px-4 py-2.5 flex items-center justify-center gap-2 overflow-x-auto">
+                <button 
+                  onClick={() => setActiveScenario('system')}
+                  className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'system' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
                 >
-                  {scorerState === 'running' ? (
-                    <>
-                      <div className="h-4.5 w-4.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      <span>Parsing Stacks ({scorerProgress}%)</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles size={14} />
-                      <span>Analyze Resume Match Alignment</span>
-                    </>
-                  )}
+                  System Design
+                </button>
+                <button 
+                  onClick={() => setActiveScenario('sql')}
+                  className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'sql' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
+                >
+                  Database Tuning
+                </button>
+                <button 
+                  onClick={() => setActiveScenario('react')}
+                  className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'react' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
+                >
+                  React 19 Reconciler
                 </button>
               </div>
 
-              {/* Progress and Score Results */}
-              <div className="flex flex-col items-center justify-center p-4 border border-white/5 bg-white/[0.01] rounded-2xl relative min-h-[220px]">
-                {scorerState === 'idle' && (
-                  <div className="text-center text-slate-500 text-xs italic space-y-2">
-                    <Target size={36} className="mx-auto text-slate-600 animate-pulse" />
-                    <p>Click the button to process context parsing...</p>
-                  </div>
-                )}
-
-                {scorerState === 'running' && (
-                  <div className="flex flex-col items-center justify-center space-y-4">
-                    <div className="relative flex items-center justify-center">
-                      <svg className="w-24 h-24 transform -rotate-90">
-                        <circle cx="48" cy="48" r="40" stroke="rgba(255,255,255,0.03)" strokeWidth="6" fill="transparent" />
-                        <circle
-                          cx="48"
-                          cy="48"
-                          r="40"
-                          stroke="#8b5cf6"
-                          strokeWidth="6"
-                          fill="transparent"
-                          strokeDasharray={251.2}
-                          strokeDashoffset={251.2 - (251.2 * scorerProgress) / 100}
-                          className="transition-all duration-100 ease-out"
-                        />
-                      </svg>
-                      <span className="absolute text-sm font-black text-white">{scorerProgress}%</span>
-                    </div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest animate-pulse">Running semantic parsing...</span>
-                  </div>
-                )}
-
-                {scorerState === 'done' && scorerScore !== null && (
-                  <div className="text-center space-y-4 animate-fadeIn">
-                    <div className="relative flex items-center justify-center mx-auto">
-                      <svg className="w-28 h-28 transform -rotate-90">
-                        <circle cx="56" cy="56" r="48" stroke="rgba(255,255,255,0.03)" strokeWidth="6" fill="transparent" />
-                        <circle
-                          cx="56"
-                          cy="56"
-                          r="48"
-                          stroke={scorerScore >= 90 ? '#10b981' : scorerScore >= 75 ? '#3b82f6' : '#f59e0b'}
-                          strokeWidth="6"
-                          fill="transparent"
-                          strokeDasharray={301.6}
-                          strokeDashoffset={301.6 - (301.6 * scorerScore) / 100}
-                          className="transition-all duration-1000 ease-out shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-                        />
-                      </svg>
-                      <span className="absolute text-xl font-black text-white">{scorerScore}%</span>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-xs font-extrabold uppercase tracking-wider text-slate-400">Match Coefficient</div>
-                      <p className="text-xs leading-relaxed text-slate-300 max-w-xs px-2 mt-1">{getScorerFeedback()}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
             </div>
           </div>
         </section>
 
-        {/* Section 4: Grid Features */}
-        <section id="features" className="mt-32 pt-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Engineered for High-Pressure Technical Rounds
-            </h2>
-            <p className="mt-3 text-slate-400 text-sm font-medium leading-relaxed">
-              Explore the four core system components designed to feed your AI context dynamically and yield ultra-fast responses.
-            </p>
-          </div>
+        {/* Brand Logo Cloud */}
+        <section className="relative z-10 mx-auto w-full max-w-7xl px-6 py-8 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            Trusted by learners and teams at
+          </span>
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 opacity-85">
+            {/* Google */}
+            <div className="flex items-center gap-1 font-semibold text-lg tracking-tight select-none">
+              <span className="text-blue-500">G</span>
+              <span className="text-red-500">o</span>
+              <span className="text-yellow-500">o</span>
+              <span className="text-blue-500">g</span>
+              <span className="text-green-500">l</span>
+              <span className="text-red-500">e</span>
+            </div>
 
-          <div className="grid gap-6 sm:grid-cols-2">
-            {[
-              {
-                title: 'Real-Time Audio Copilot',
-                desc: 'Streams audio inputs seamlessly from browser tabs or your local microphone feed. Transcribes questions letter-by-letter and renders structured system charts and optimized scripts on-the-fly.',
-                icon: Mic,
-                acc: '1.2s avg latency',
-                color: 'group-hover:text-violet-400 border-violet-500/10'
-              },
-              {
-                title: 'Personalized Resume Engine',
-                desc: 'Upload, digest, and store your career transcripts. Personalized system indexing ensures the LLM outlines answers utilizing the coding architectures, projects, and experiences in your CV.',
-                icon: FileText,
-                acc: 'Supports PDF, Doc, MD',
-                color: 'group-hover:text-cyan-400 border-cyan-500/10'
-              },
-              {
-                title: 'Knowledge & Prompts Base',
-                desc: 'Inject reference docs, documentation APIs, corporate code manuals, and personalized prompt rules directly into the session stack. Guides model reasoning templates precisely.',
-                icon: Brain,
-                acc: 'Custom templates',
-                color: 'group-hover:text-indigo-400 border-indigo-500/10'
-              },
-              {
-                title: 'Voice Mock Simulator',
-                desc: 'Simulate high-fidelity voice rounds with optional camera feeds. Delivers immediate grading feedback, outline analysis, query improvements, and suggested audio model structures.',
-                icon: PlayCircle,
-                acc: 'Local camera support',
-                color: 'group-hover:text-emerald-400 border-emerald-500/10'
-              }
-            ].map((f) => {
-              const Icon = f.icon;
-              return (
-                <div key={f.title} className="glass-card rounded-2xl p-6 text-left relative group border-t-white/10">
-                  <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-white/10 to-transparent opacity-50"></div>
-                  
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/[0.03] border border-white/5 text-slate-300 transition-colors group-hover:bg-white/[0.06] group-hover:text-white">
-                      <Icon size={20} className="transition-transform group-hover:scale-105" />
-                    </div>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-white/[0.02] border border-white/5 px-2.5 py-1 rounded-full">{f.acc}</span>
-                  </div>
+            {/* Microsoft */}
+            <div className="flex items-center gap-2 text-slate-500 font-semibold text-sm select-none">
+              <div className="grid grid-cols-2 gap-0.5">
+                <span className="w-2.5 h-2.5 bg-[#f25f22]" />
+                <span className="w-2.5 h-2.5 bg-[#7fba00]" />
+                <span className="w-2.5 h-2.5 bg-[#00a1f1]" />
+                <span className="w-2.5 h-2.5 bg-[#ffb900]" />
+              </div>
+              <span>Microsoft</span>
+            </div>
 
-                  <h3 className="font-display text-[17px] font-bold text-white tracking-tight mb-2">{f.title}</h3>
-                  <p className="text-slate-400 text-xs leading-relaxed font-medium">{f.desc}</p>
-                </div>
-              );
-            })}
+            {/* Amazon */}
+            <div className="flex flex-col items-center select-none">
+              <span className="text-slate-700 font-bold text-sm leading-none">amazon</span>
+              <svg className="w-12 h-2 text-amber-500" viewBox="0 0 100 20" fill="currentColor">
+                <path d="M 0 5 Q 50 25 100 5 L 90 20 Q 50 12 10 20 Z" />
+              </svg>
+            </div>
+
+            {/* Stripe */}
+            <div className="text-[#635bff] font-extrabold text-xl tracking-tight select-none">
+              stripe
+            </div>
+
+            {/* Shopify */}
+            <div className="flex items-center gap-1 text-[#95bf47] font-bold text-base select-none">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12z" />
+              </svg>
+              <span className="text-slate-700 font-semibold">shopify</span>
+            </div>
+
+            {/* Adobe */}
+            <div className="flex items-center gap-1.5 text-[#ff0000] font-bold text-sm select-none">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14.3 2H22v19.8L14.3 2zm-4.6 0H2v19.8L9.7 2zM12 9.3l4.7 10.5H13.6l-1.6-3.8H9.3L12 9.3z" />
+              </svg>
+              <span className="text-slate-800 font-bold tracking-tight">Adobe</span>
+            </div>
           </div>
         </section>
 
-        {/* Section 5: Pricing plans */}
-        <section id="pricing" className="mt-32 pt-8">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Flexible Tiers for Any Interview Phase
+        {/* Features Section */}
+        <section className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center">
+          <div className="max-w-3xl mx-auto mb-16">
+            <span className="inline-flex items-center rounded-full bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600 mb-4">
+              Everything you need to succeed
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
+              Smarter Practice. Better Results.
             </h2>
-            <p className="mt-3 text-slate-400 text-sm font-medium leading-relaxed">
-              Unlock real-time streaming copilots, unlimited resume scoring, and mock assessments.
+            <p className="mt-4 text-slate-600 text-base sm:text-lg font-medium max-w-xl mx-auto leading-relaxed">
+              Build confidence, improve communication, and land your dream role with AI that adapts to you.
             </p>
           </div>
 
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            
+            {/* Card 1: Real-time AI Interviews */}
+            <div className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('system')}>
+              <div>
+                <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-5">
+                  <Mic size={20} />
+                </div>
+                <h3 className="font-display text-lg font-bold text-slate-900 mb-2">Real-time AI Interviews</h3>
+                <p className="text-sm text-slate-500 leading-relaxed font-medium">
+                  Practice with AI interviewers that adapt to your answers and give instant feedback.
+                </p>
+              </div>
+              <span className="mt-6 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group-hover:translate-x-1 transition-all duration-200">
+                Learn more <ArrowRight size={12} />
+              </span>
+            </div>
+
+            {/* Card 2: Resume Intelligence */}
+            <div className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('sql')}>
+              <div>
+                <div className="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-5">
+                  <FileText size={20} />
+                </div>
+                <h3 className="font-display text-lg font-bold text-slate-900 mb-2">Resume Intelligence</h3>
+                <p className="text-sm text-slate-500 leading-relaxed font-medium">
+                  AI analyzes your resume and tailors questions to your experience and skills.
+                </p>
+              </div>
+              <span className="mt-6 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group-hover:translate-x-1 transition-all duration-200">
+                Learn more <ArrowRight size={12} />
+              </span>
+            </div>
+
+            {/* Card 3: Knowledge Base */}
+            <div className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('react')}>
+              <div>
+                <div className="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 mb-5">
+                  <Library size={20} />
+                </div>
+                <h3 className="font-display text-lg font-bold text-slate-900 mb-2">Knowledge Base</h3>
+                <p className="text-sm text-slate-500 leading-relaxed font-medium">
+                  Upload documents, notes, or links and let AI use them during interviews.
+                </p>
+              </div>
+              <span className="mt-6 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group-hover:translate-x-1 transition-all duration-200">
+                Learn more <ArrowRight size={12} />
+              </span>
+            </div>
+
+            {/* Card 4: Performance Insights */}
+            <div className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('insights')}>
+              <div>
+                <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 mb-5">
+                  <BarChart3 size={20} />
+                </div>
+                <h3 className="font-display text-lg font-bold text-slate-900 mb-2">Performance Insights</h3>
+                <p className="text-sm text-slate-500 leading-relaxed font-medium">
+                  Track your progress with detailed analytics and improve every time.
+                </p>
+              </div>
+              <span className="mt-6 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group-hover:translate-x-1 transition-all duration-200">
+                Learn more <ArrowRight size={12} />
+              </span>
+            </div>
+
+          </div>
+        </section>
+
+        {/* How It Works Section */}
+        <section className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center">
+          <div className="max-w-3xl mx-auto mb-16">
+            <span className="inline-flex items-center rounded-full bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600 mb-4">
+              Simple & Effective
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              How CopilotX Works
+            </h2>
+          </div>
+
+          <div className="relative grid gap-8 md:grid-cols-4 max-w-5xl mx-auto">
+            {/* Connector dotted line for desktop */}
+            <div className="hidden md:block absolute top-8 left-[12%] right-[12%] h-0.5 border-t-2 border-dashed border-slate-200 z-0" />
+
+            {/* Step 1 */}
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="h-16 w-16 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 text-lg font-bold shadow-sm mb-4">
+                1
+              </div>
+              <h3 className="font-display text-base font-bold text-slate-900 mb-2">Upload Resume</h3>
+              <p className="text-xs text-slate-500 leading-relaxed max-w-xs font-medium">
+                Upload your resume and add relevant documents.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="h-16 w-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-lg font-bold shadow-sm mb-4">
+                2
+              </div>
+              <h3 className="font-display text-base font-bold text-slate-900 mb-2">Choose Role</h3>
+              <p className="text-xs text-slate-500 leading-relaxed max-w-xs font-medium">
+                Select the job role and experience level.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="h-16 w-16 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 text-lg font-bold shadow-sm mb-4">
+                3
+              </div>
+              <h3 className="font-display text-base font-bold text-slate-900 mb-2">Start Interview</h3>
+              <p className="text-xs text-slate-500 leading-relaxed max-w-xs font-medium">
+                Get real-time AI interview and instant feedback.
+              </p>
+            </div>
+
+            {/* Step 4 */}
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="h-16 w-16 rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 text-lg font-bold shadow-sm mb-4">
+                4
+              </div>
+              <h3 className="font-display text-base font-bold text-slate-900 mb-2">Improve & Repeat</h3>
+              <p className="text-xs text-slate-500 leading-relaxed max-w-xs font-medium">
+                Track your progress and ace the real interview.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section id="pricing" className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center">
+          <div className="max-w-3xl mx-auto mb-12">
+            <span className="inline-flex items-center rounded-full bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600 mb-4">
+              Simple, Transparent Pricing
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Choose the Plan That Fits You
+            </h2>
+          </div>
+
           {/* Pricing Period Toggle */}
-          <div className="flex items-center justify-center gap-3 mb-10">
-            <span className={`text-xs font-bold transition-colors ${pricingPeriod === 'monthly' ? 'text-white' : 'text-slate-500'}`}>Monthly</span>
+          <div className="flex items-center justify-center gap-3 mb-12">
+            <span className={`text-xs font-bold transition-colors ${pricingPeriod === 'monthly' ? 'text-slate-900' : 'text-slate-400'}`}>Monthly</span>
             <button
               onClick={() => setPricingPeriod(pricingPeriod === 'monthly' ? 'annual' : 'monthly')}
-              className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-800 transition-colors duration-200 ease-in-out outline-none"
+              className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-200 transition-colors duration-200 ease-in-out outline-none"
             >
               <span
                 className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${pricingPeriod === 'annual' ? 'translate-x-5' : 'translate-x-0'}`}
               />
             </button>
-            <span className={`text-xs font-bold transition-colors flex items-center gap-1.5 ${pricingPeriod === 'annual' ? 'text-white' : 'text-slate-500'}`}>
-              Annually <span className="bg-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase px-2 py-0.5 rounded-full">Save 20%</span>
+            <span className={`text-xs font-bold transition-colors flex items-center gap-1.5 ${pricingPeriod === 'annual' ? 'text-slate-900' : 'text-slate-400'}`}>
+              Annually <span className="bg-emerald-100 text-emerald-700 text-[9px] font-black uppercase px-2 py-0.5 rounded-full">Save 20%</span>
             </span>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
+          <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto items-stretch">
             
             {/* Free Tier */}
-            <div className="glass-card rounded-2xl p-6 text-left flex flex-col justify-between border-t-white/10 relative">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 text-left flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)] relative">
               <div>
-                <h3 className="font-display text-lg font-bold text-white mb-1">Developer Basic</h3>
-                <p className="text-[11px] text-slate-500 leading-relaxed font-semibold">Test the local audio processing setup.</p>
+                <h3 className="font-display text-lg font-bold text-slate-900 mb-1">Free</h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed font-semibold">Get started with basic features</p>
                 
                 <div className="my-6">
-                  <span className="text-3xl font-black text-white">$0</span>
-                  <span className="text-xs text-slate-500"> / forever</span>
+                  <span className="text-3xl font-black text-slate-900">$0</span>
+                  <span className="text-xs text-slate-500"> / month</span>
                 </div>
 
-                <div className="h-px bg-white/5 mb-6" />
+                <div className="h-px bg-slate-100 mb-6" />
 
-                <ul className="space-y-3.5 text-xs text-slate-400 font-medium">
-                  <li className="flex items-center gap-2">✓ 2 audio test session runs</li>
-                  <li className="flex items-center gap-2">✓ 1 local resume profile</li>
-                  <li className="flex items-center gap-2">✓ Basic Markdown code rendering</li>
-                  <li className="flex items-center gap-2 text-slate-600">✗ Custom developer prompts</li>
-                  <li className="flex items-center gap-2 text-slate-600">✗ Realtime tab audio feed capture</li>
+                <ul className="space-y-3.5 text-xs text-slate-500 font-medium">
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> 5 Mock Interviews
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> Basic Feedback
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> Resume Analysis
+                  </li>
                 </ul>
               </div>
 
-              <button onClick={onSignIn} className="mt-8 w-full btn-glass py-2.5 rounded-xl text-xs font-bold text-white cursor-pointer">
+              <button onClick={onSignIn} className="mt-8 w-full py-2.5 rounded-xl border border-blue-200 text-blue-600 hover:bg-blue-50 text-xs font-bold cursor-pointer transition-colors text-center">
                 Get Started
               </button>
             </div>
 
             {/* Pro Tier (Featured) */}
-            <div className="glass-card rounded-2xl p-6 text-left flex flex-col justify-between border-violet-500/30 bg-violet-950/5 relative shadow-[0_15px_35px_rgba(124,58,237,0.12)]">
-              <div className="absolute top-4 right-4 bg-violet-500/20 border border-violet-500/30 text-violet-300 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider">
-                Most Popular
+            <div className="bg-white border-2 border-blue-600 rounded-2xl p-6 text-left flex flex-col justify-between shadow-lg relative transform lg:scale-[1.03]">
+              <div className="absolute top-4 right-4 bg-blue-600 text-white text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider">
+                Popular
               </div>
 
               <div>
-                <h3 className="font-display text-lg font-bold text-white mb-1">CopilotX Pro</h3>
-                <p className="text-[11px] text-slate-400 leading-relaxed font-semibold">Full real-time support for active engineering loops.</p>
+                <h3 className="font-display text-lg font-bold text-slate-900 mb-1">Pro</h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed font-semibold">For serious interview preparation</p>
                 
                 <div className="my-6">
-                  <span className="text-3xl font-black text-white">
+                  <span className="text-3xl font-black text-slate-900">
                     ${pricingPeriod === 'annual' ? '15' : '19'}
                   </span>
-                  <span className="text-xs text-slate-400"> / month</span>
-                  {pricingPeriod === 'annual' && <div className="text-[9px] text-emerald-400 font-bold mt-1">Billed annually ($180)</div>}
+                  <span className="text-xs text-slate-500"> / month</span>
+                  {pricingPeriod === 'annual' && <div className="text-[9px] text-emerald-600 font-bold mt-1">Billed annually ($180)</div>}
                 </div>
 
-                <div className="h-px bg-white/5 mb-6" />
+                <div className="h-px bg-slate-100 mb-6" />
 
-                <ul className="space-y-3.5 text-xs text-slate-300 font-medium">
-                  <li className="flex items-center gap-2 text-violet-300">✓ Unlimited real-time sessions</li>
-                  <li className="flex items-center gap-2">✓ Dynamic tab & desktop sound processing</li>
-                  <li className="flex items-center gap-2">✓ Infinite resume indexing slots</li>
-                  <li className="flex items-center gap-2">✓ Prompt injection API</li>
-                  <li className="flex items-center gap-2">✓ Advanced LLM engines (Gemini/GPT)</li>
+                <ul className="space-y-3.5 text-xs text-slate-600 font-medium">
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> Unlimited Mock Interviews
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> AI Feedback & Insights
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> Resume & Docs Intelligence
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> Interview History
+                  </li>
                 </ul>
               </div>
 
-              <button onClick={onSignIn} className="mt-8 w-full btn-gradient py-3 rounded-xl text-xs font-bold text-white shadow-lg cursor-pointer">
-                Upgrade to Pro
+              <button onClick={onSignIn} className="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-colors">
+                Start Pro Plan
               </button>
             </div>
 
-            {/* Enterprise Tier */}
-            <div className="glass-card rounded-2xl p-6 text-left flex flex-col justify-between border-t-white/10 relative">
+            {/* Team Tier */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 text-left flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)] relative">
               <div>
-                <h3 className="font-display text-lg font-bold text-white mb-1">Studio Enterprise</h3>
-                <p className="text-[11px] text-slate-500 leading-relaxed font-semibold">Enterprise grade setups with custom integrations.</p>
+                <h3 className="font-display text-lg font-bold text-slate-900 mb-1">Team</h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed font-semibold">For teams and organizations</p>
                 
                 <div className="my-6">
-                  <span className="text-2xl font-black text-white">Custom Pricing</span>
-                  <span className="text-xs text-slate-500"> / team quota</span>
+                  <span className="text-3xl font-black text-slate-900">
+                    ${pricingPeriod === 'annual' ? '49' : '59'}
+                  </span>
+                  <span className="text-xs text-slate-500"> / month</span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">Per user</span>
                 </div>
 
-                <div className="h-px bg-white/5 mb-6" />
+                <div className="h-px bg-slate-100 mb-6" />
 
-                <ul className="space-y-3.5 text-xs text-slate-400 font-medium">
-                  <li className="flex items-center gap-2">✓ Shared team session history</li>
-                  <li className="flex items-center gap-2">✓ Dedicated model server endpoints</li>
-                  <li className="flex items-center gap-2">✓ Zero-retention data privacy guarantees</li>
-                  <li className="flex items-center gap-2">✓ Custom model fine-tuning support</li>
-                  <li className="flex items-center gap-2">✓ Priority SLA 24/7 technical chats</li>
+                <ul className="space-y-3.5 text-xs text-slate-500 font-medium">
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> Everything in Pro
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> Team Analytics
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> Shared Knowledge Base
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> Priority Support
+                  </li>
                 </ul>
               </div>
 
-              <a href="mailto:support@copilotx.ai" className="mt-8 w-full btn-glass py-2.5 rounded-xl text-xs text-center font-bold text-white cursor-pointer">
-                Contact Enterprise
-              </a>
+              <button onClick={onSignIn} className="mt-8 w-full py-2.5 rounded-xl border border-blue-200 text-blue-600 hover:bg-blue-50 text-xs font-bold cursor-pointer transition-colors text-center">
+                Contact Sales
+              </button>
             </div>
 
           </div>
         </section>
 
-        {/* Section 6: FAQ Accordion */}
-        <section id="faq" className="mt-32 pt-8 max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Frequently Queried Specifications
-            </h2>
-            <p className="mt-3 text-slate-400 text-sm font-medium leading-relaxed">
-              Find fast responses about our localized integration patterns, custom prompts, and privacy protocols.
-            </p>
+        {/* CTA Banner Section */}
+        <section className="relative z-10 mx-auto w-full max-w-7xl px-6 py-12">
+          <div className="relative rounded-3xl bg-blue-50/70 border border-blue-100 p-8 md:p-12 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 text-left">
+            {/* Subtle glow */}
+            <div className="absolute right-0 bottom-0 w-[300px] h-[150px] bg-blue-300/10 rounded-full blur-[80px]" />
+            
+            <div>
+              <h2 className="font-display text-2xl md:text-3xl font-extrabold text-slate-900">
+                Ready to Ace Your Next Interview?
+              </h2>
+              <p className="text-sm text-slate-600 font-medium mt-2 max-w-xl">
+                Join thousands of learners improving their interview skills with CopilotX.
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center gap-2 shrink-0">
+              <button onClick={onStart} className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl px-7 py-4 text-sm font-bold shadow-[0_4px_14px_rgba(37,99,235,0.2)] flex items-center justify-center gap-2 cursor-pointer transition-all">
+                <span>Start Free Session</span> <ArrowRight size={16} />
+              </button>
+              <span className="text-[10px] text-slate-400 font-semibold">No credit card required</span>
+            </div>
           </div>
-
-          <div className="space-y-3 text-left">
-            {faqs.map((faq, index) => {
-              const isOpen = openFaq === index;
-              return (
-                <div
-                  key={index}
-                  className="rounded-xl border border-white/5 bg-white/[0.01] overflow-hidden transition-all duration-300"
-                >
-                  <button
-                    onClick={() => setOpenFaq(isOpen ? null : index)}
-                    className="w-full flex items-center justify-between px-6 py-4.5 font-semibold text-sm text-slate-200 hover:text-white transition-colors cursor-pointer select-none"
-                  >
-                    <span>{faq.q}</span>
-                    {isOpen ? <ChevronUp size={16} className="text-violet-400" /> : <ChevronDown size={16} className="text-slate-500" />}
-                  </button>
-                  
-                  {isOpen && (
-                    <div className="px-6 pb-5 pt-1 text-xs text-slate-400 leading-relaxed font-medium animate-fadeIn">
-                      {faq.a}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Section 7: Final Climax CTA */}
-        <section className="mt-32 border-t border-white/5 pt-20 pb-10 text-center relative overflow-hidden rounded-[2.5rem] bg-gradient-to-b from-white/[0.01] to-transparent">
-          <div className="pointer-events-none absolute left-1/2 bottom-0 -translate-x-1/2 w-[600px] h-[300px] bg-violet-600/5 opacity-[0.1] rounded-full blur-[110px]" />
-          
-          <h2 className="font-display text-3xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">
-            Ready to Ace Your Technical Rounds?
-          </h2>
-          
-          <p className="text-[15px] sm:text-[17px] text-slate-400 font-medium mb-10 max-w-lg mx-auto leading-relaxed">
-            Join thousands of developers utilizing context-aware live streaming copilots to clear their coding assessments.
-          </p>
-
-          <button onClick={onSignIn} className="btn-gradient inline-flex items-center gap-2 rounded-xl px-8 py-4 text-sm font-bold text-white shadow-xl cursor-pointer">
-            <span>Launch App with Google Account</span> <ArrowRight size={16} />
-          </button>
         </section>
 
       </main>
 
-      {/* Modern Compact Footer */}
-      <footer className="border-t border-white/5 bg-[#030407] py-12 relative z-10 text-xs text-slate-500">
-        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 text-left">
+      {/* Footer */}
+      <footer className="relative z-10 bg-slate-50 border-t border-slate-200/60 py-16 text-xs text-slate-500">
+        <div className="mx-auto w-full max-w-7xl px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 text-left">
           
-          {/* Logo brand column */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 shadow-md">
-                <Bot size={13} className="text-white" />
+          {/* Brand info */}
+          <div className="space-y-4 md:col-span-2">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 shadow-sm">
+                <Bot size={14} className="text-white" />
               </div>
-              <span className="font-display font-bold text-sm tracking-tight text-white">CopilotX</span>
+              <span className="font-display font-bold text-sm text-slate-900">CopilotX</span>
             </div>
-            <p className="leading-relaxed max-w-xs text-slate-600 font-medium">
-              Real-time AI Copilot, Resume match scoring alignment, and interactive voice mock coaching frameworks.
+            <p className="leading-relaxed text-slate-500 font-medium max-w-xs">
+              The AI Operating System for Interviews.
             </p>
           </div>
 
-          {/* Links Column 1 */}
+          {/* Links 1 */}
           <div>
-            <h4 className="font-bold text-slate-300 uppercase tracking-widest text-[10px] mb-4">Core Stacks</h4>
-            <ul className="space-y-2.5 font-medium">
-              <li><a href="#simulator" className="hover:text-slate-300 transition-colors">Real-time Transcript</a></li>
-              <li><a href="#scorer" className="hover:text-slate-300 transition-colors">Resume Match scorecard</a></li>
-              <li><a href="#features" className="hover:text-slate-300 transition-colors">Webcam Voice Trials</a></li>
-              <li><a href="#pricing" className="hover:text-slate-300 transition-colors">Vite local setup</a></li>
+            <h4 className="font-bold text-slate-800 uppercase tracking-widest text-[10px] mb-4">Product</h4>
+            <ul className="space-y-3 font-semibold">
+              <li><a href="#simulator" className="hover:text-blue-600 transition-colors">Live Interview</a></li>
+              <li><a href="#features" className="hover:text-blue-600 transition-colors">Mock Interview</a></li>
+              <li><a href="#features" className="hover:text-blue-600 transition-colors">Resumes</a></li>
+              <li><a href="#features" className="hover:text-blue-600 transition-colors">Knowledge Base</a></li>
             </ul>
           </div>
 
-          {/* Links Column 2 */}
+          {/* Links 2 */}
           <div>
-            <h4 className="font-bold text-slate-300 uppercase tracking-widest text-[10px] mb-4">Company</h4>
-            <ul className="space-y-2.5 font-medium">
-              <li><a href="mailto:support@copilotx.ai" className="hover:text-slate-300 transition-colors">Privacy Policy</a></li>
-              <li><a href="mailto:support@copilotx.ai" className="hover:text-slate-300 transition-colors">Terms of Service</a></li>
-              <li><a href="mailto:support@copilotx.ai" className="hover:text-slate-300 transition-colors">Help Center</a></li>
-              <li><a href="mailto:support@copilotx.ai" className="hover:text-slate-300 transition-colors">Release updates</a></li>
+            <h4 className="font-bold text-slate-800 uppercase tracking-widest text-[10px] mb-4">Resources</h4>
+            <ul className="space-y-3 font-semibold">
+              <li><a href="#" className="hover:text-blue-600 transition-colors">Blog</a></li>
+              <li><a href="#" className="hover:text-blue-600 transition-colors">Guides</a></li>
+              <li><a href="#" className="hover:text-blue-600 transition-colors">Help Center</a></li>
+              <li><a href="#" className="hover:text-blue-600 transition-colors">Changelog</a></li>
             </ul>
           </div>
 
-          {/* Subscribe column */}
-          <div className="space-y-4">
-            <h4 className="font-bold text-slate-300 uppercase tracking-widest text-[10px]">Updates Newsletter</h4>
-            <p className="leading-relaxed text-slate-600 font-medium">Get the latest model update news directly in your inbox.</p>
-            <form onSubmit={(e) => { e.preventDefault(); alert("Subscribed! Thank you."); }} className="flex gap-2">
-              <input
-                type="email"
-                required
-                placeholder="developer@gmail.com"
-                className="w-full rounded-lg bg-slate-900 border border-white/5 px-3 py-2 outline-none focus:border-violet-500/50 text-[11px] placeholder:text-slate-600 text-white"
-              />
-              <button type="submit" className="btn-gradient px-3 py-2 rounded-lg text-[11px] font-bold text-white shrink-0 cursor-pointer">
-                Subscribe
-              </button>
-            </form>
+          {/* Links 3 */}
+          <div>
+            <h4 className="font-bold text-slate-800 uppercase tracking-widest text-[10px] mb-4">Company</h4>
+            <ul className="space-y-3 font-semibold">
+              <li><a href="#" className="hover:text-blue-600 transition-colors">About Us</a></li>
+              <li><a href="#" className="hover:text-blue-600 transition-colors">Careers</a></li>
+              <li><a href="#" className="hover:text-blue-600 transition-colors">Privacy Policy</a></li>
+              <li><a href="#" className="hover:text-blue-600 transition-colors">Terms of Service</a></li>
+            </ul>
           </div>
 
         </div>
 
-        <div className="max-w-6xl mx-auto px-6 border-t border-white/5 pt-8 mt-8 flex flex-col sm:flex-row items-center justify-between text-slate-600 font-medium gap-4">
+        <div className="mx-auto w-full max-w-7xl px-6 border-t border-slate-200/50 pt-8 mt-12 flex flex-col sm:flex-row items-center justify-between text-slate-400 font-semibold gap-4">
           <p>© {new Date().getFullYear()} CopilotX Inc. Secure Google login enabled.</p>
           <div className="flex gap-4">
-            <a href="mailto:support@copilotx.ai" className="hover:text-slate-400 transition-colors">Support</a>
-            <a href="https://github.com" target="_blank" className="hover:text-slate-400 transition-colors">GitHub project</a>
+            <a href="mailto:support@copilotx.ai" className="hover:text-slate-600 transition-colors">Support</a>
+            <a href="https://github.com" target="_blank" className="hover:text-slate-600 transition-colors">GitHub project</a>
           </div>
         </div>
       </footer>
@@ -2849,18 +2800,18 @@ function Sidebar({ active, onNavigate, onLogout, showHelpChatbot }: { active: st
   };
 
   return (
-    <aside className="hidden h-screen w-64 shrink-0 border-r border-white/5 bg-[#0a0b14]/75 backdrop-blur-2xl py-6 lg:flex flex-col items-start justify-between px-4 relative z-20">
+    <aside className="hidden h-screen w-64 shrink-0 border-r border-slate-200 bg-white py-6 lg:flex flex-col items-start justify-between px-4 relative z-20">
       <div className="flex flex-col items-start w-full gap-8">
         <div
           onClick={() => onNavigate('Dashboard')}
           className="flex items-center gap-3 px-2 hover:opacity-80 transition-all cursor-pointer select-none"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-[0_0_15px_rgba(124,58,237,0.3)]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 shadow-[0_4px_12px_rgba(37,99,235,0.2)]">
             <Bot size={22} className="text-white" />
           </div>
           <div>
-            <div className="text-base font-bold text-white leading-tight">Copilot<span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">X</span></div>
-            <div className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase">Interview OS</div>
+            <div className="text-base font-bold text-slate-900 leading-tight">Copilot<span className="text-blue-600">X</span></div>
+            <div className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Interview OS</div>
           </div>
         </div>
 
@@ -2873,8 +2824,8 @@ function Sidebar({ active, onNavigate, onLogout, showHelpChatbot }: { active: st
                 key={item.label}
                 onClick={() => onNavigate(item.label)}
                 className={`flex w-full items-center gap-3.5 rounded-xl px-3.5 py-3 text-sm font-semibold transition-all cursor-pointer border ${selected
-                  ? 'bg-violet-600/15 text-violet-300 border-violet-500/20 shadow-[inset_0_0_12px_rgba(124,58,237,0.05),0_0_20px_rgba(124,58,237,0.1)]'
-                  : 'text-slate-400 border-transparent hover:bg-white/5 hover:text-white'
+                  ? 'bg-blue-50 text-blue-600 border-blue-100/50 shadow-sm'
+                  : 'text-slate-600 border-transparent hover:bg-slate-50 hover:text-slate-900'
                   }`}
               >
                 <Icon size={18} className="shrink-0" />
@@ -2885,39 +2836,39 @@ function Sidebar({ active, onNavigate, onLogout, showHelpChatbot }: { active: st
         </nav>
       </div>
 
-      <div className="border-t border-white/5 pt-4 w-full relative">
+      <div className="border-t border-slate-100 pt-4 w-full relative">
         <div
           onClick={() => setShowProfileMenu(!showProfileMenu)}
-          className="flex items-center gap-3 px-2 py-2.5 w-full cursor-pointer rounded-xl transition-all hover:bg-white/5 text-slate-400 hover:text-white"
+          className="flex items-center gap-3 px-2 py-2.5 w-full cursor-pointer rounded-xl transition-all hover:bg-slate-50 text-slate-500 hover:text-slate-900"
         >
           {keys.userPhoto ? (
-            <img src={keys.userPhoto} alt="Avatar" className="h-10 w-10 shrink-0 rounded-xl border border-white/10" />
+            <img src={keys.userPhoto} alt="Avatar" className="h-10 w-10 shrink-0 rounded-xl border border-slate-200" />
           ) : (
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-sm font-black text-slate-300 border border-slate-700/50 uppercase">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-sm font-black text-slate-600 border border-slate-200 uppercase">
               {keys.userName ? keys.userName.substring(0, 2) : 'IC'}
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-bold text-slate-200 truncate">{keys.userName || 'Interview Candidate'}</div>
-            <div className="text-[10px] text-slate-500 truncate">{keys.userEmail || 'Free Plan'}</div>
+            <div className="text-sm font-bold text-slate-800 truncate">{keys.userName || 'Interview Candidate'}</div>
+            <div className="text-[10px] text-slate-400 truncate">{keys.userEmail || 'Free Plan'}</div>
           </div>
         </div>
 
         {showProfileMenu && (
-          <div className="absolute bottom-16 left-0 z-30 w-full glass-card border border-white/10 p-2 shadow-2xl rounded-2xl animate-fadeIn">
+          <div className="absolute bottom-16 left-0 z-30 w-full glass-card border border-slate-200 p-2 shadow-2xl rounded-2xl animate-fadeIn">
             <button
               onClick={() => {
                 setShowProfileMenu(false);
                 onNavigate('Billing');
               }}
-              className="w-full text-left px-3 py-2 rounded-xl text-xs text-slate-200 hover:bg-white/5 transition-all flex items-center gap-2 cursor-pointer"
+              className="w-full text-left px-3 py-2 rounded-xl text-xs text-slate-700 hover:bg-slate-50 transition-all flex items-center gap-2 cursor-pointer"
             >
               💳 Manage Billing
             </button>
-            <div className="h-px bg-white/5 my-1" />
+            <div className="h-px bg-slate-100 my-1" />
             <button
               onClick={handleLogout}
-              className="w-full text-left px-3 py-2 rounded-xl text-xs text-red-400 hover:bg-red-500/10 transition-all flex items-center gap-2 font-bold cursor-pointer"
+              className="w-full text-left px-3 py-2 rounded-xl text-xs text-red-600 hover:bg-red-50 transition-all flex items-center gap-2 font-bold cursor-pointer"
             >
               🚪 Sign Out of Google
             </button>
@@ -2939,11 +2890,11 @@ function Topbar({
 }) {
   const keys = getCurrentUserKeys();
   return (
-    <header className="sticky top-0 z-30 border-b border-white/5 bg-[#050609]/75 px-5 py-4 backdrop-blur-2xl lg:px-8 relative z-10">
+    <header className="sticky top-0 z-30 border-b border-slate-200 bg-[#f8fafc]/75 px-5 py-4 backdrop-blur-2xl lg:px-8 relative z-10">
       <div className="flex items-center justify-between gap-4">
-        <div className="hidden min-w-0 flex-1 items-center gap-3 rounded-xl border border-white/5 bg-[#0a0b14]/50 px-4 py-2.5 text-slate-400 md:flex focus-within:border-violet-500/40 transition-all">
-          <Search size={18} className="text-slate-500" />
-          <input className="w-full bg-transparent text-sm outline-none placeholder:text-slate-600 text-white font-medium" placeholder="Search sessions, resumes, knowledge base, prompts..." />
+        <div className="hidden min-w-0 flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-slate-100/50 px-4 py-2.5 text-slate-500 md:flex focus-within:border-blue-500/40 transition-all">
+          <Search size={18} className="text-slate-400" />
+          <input className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400 text-slate-800 font-medium" placeholder="Search sessions, resumes, knowledge base, prompts..." />
         </div>
         <div className="ml-auto flex items-center gap-3">
           {isSessionActive ? (
@@ -2961,13 +2912,13 @@ function Topbar({
               </span>
             </Button>
           )}
-          <button className="relative rounded-xl border border-white/5 bg-[#0a0b14]/50 p-3 text-slate-300 hover:bg-white/5 transition-all cursor-pointer">
+          <button className="relative rounded-xl border border-slate-200 bg-white p-3 text-slate-600 hover:bg-slate-50 transition-all cursor-pointer">
             <Bell size={18} /><span className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
           </button>
           {keys.userPhoto ? (
-            <img src={keys.userPhoto} alt="Avatar" className="h-10 w-10 shrink-0 rounded-xl border border-white/10" />
+            <img src={keys.userPhoto} alt="Avatar" className="h-10 w-10 shrink-0 rounded-xl border border-slate-200" />
           ) : (
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-sm font-bold text-slate-300 border border-slate-700/50 uppercase">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-sm font-bold text-slate-600 border border-slate-200 uppercase">
               {keys.userName ? keys.userName.substring(0, 2) : 'IC'}
             </div>
           )}
@@ -3313,24 +3264,24 @@ function AppChoiceModal({ open, onClose, onContinueWeb }: { open: boolean; onClo
   };
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70 backdrop-blur-xl animate-fadeIn">
-      <div className="relative w-full max-w-2xl overflow-hidden rounded-[2.5rem] border border-white/10 bg-slate-950/80 p-8 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] md:p-10">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-md animate-fadeIn">
+      <div className="relative w-full max-w-2xl overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.1)] md:p-10">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-6 top-6 rounded-full p-2 text-slate-400 hover:bg-white/5 hover:text-white transition-all"
+          className="absolute right-6 top-6 rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-all"
         >
           <X size={20} />
         </button>
 
         {/* Modal Title */}
         <div className="text-center mb-8">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-500 text-white shadow-lg shadow-violet-500/20 mb-4">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-md shadow-blue-500/20 mb-4">
             <MonitorPlay size={28} />
           </div>
-          <h2 className="text-2xl font-black text-white tracking-tight">Choose Your Experience</h2>
-          <p className="mt-2 text-sm text-slate-400">Select how you want to run your interview assist session</p>
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight">Choose Your Experience</h2>
+          <p className="mt-2 text-sm text-slate-500">Select how you want to run your interview assist session</p>
         </div>
 
         {/* Options Grid */}
@@ -3339,24 +3290,24 @@ function AppChoiceModal({ open, onClose, onContinueWeb }: { open: boolean; onClo
           {/* Card 1: Desktop App */}
           <div 
             onClick={handleOpenDesktop}
-            className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-violet-500/30 bg-violet-600/5 hover:bg-violet-600/10 p-6 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer hover:shadow-[0_15px_30px_rgba(139,92,246,0.15)]"
+            className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-blue-200 bg-blue-50/50 hover:bg-blue-50/80 p-6 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer hover:shadow-lg"
           >
-            <div className="absolute top-4 right-4 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-300 text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wider">
+            <div className="absolute top-4 right-4 rounded-full bg-blue-600 text-white text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wider">
               Recommended
             </div>
             <div>
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-500/25 text-violet-300 group-hover:scale-110 transition-transform">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 group-hover:scale-110 transition-transform">
                 <Laptop size={24} />
               </div>
-              <h3 className="text-lg font-black text-white">Desktop Application</h3>
-              <p className="mt-2 text-xs text-slate-400 leading-5">
+              <h3 className="text-lg font-black text-slate-900">Desktop Application</h3>
+              <p className="mt-2 text-xs text-slate-500 leading-5">
                 Captures system audio, tab sound, and microphone feeds directly from your desktop. Bypasses all browser security constraints.
               </p>
             </div>
             <div className="mt-6">
               <button 
                 onClick={(e) => { e.stopPropagation(); handleOpenDesktop(); }}
-                className="w-full rounded-2xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold py-3 px-4 shadow-lg shadow-violet-600/30 transition-all flex items-center justify-center gap-1.5"
+                className="w-full rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-3 px-4 shadow-md transition-all flex items-center justify-center gap-1.5"
               >
                 <span>Open in Desktop</span>
                 <ArrowRight size={14} />
@@ -3367,21 +3318,21 @@ function AppChoiceModal({ open, onClose, onContinueWeb }: { open: boolean; onClo
           {/* Card 2: Web Browser */}
           <div 
             onClick={onContinueWeb}
-            className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] p-6 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer hover:border-white/10 hover:shadow-[0_15px_30px_rgba(255,255,255,0.03)]"
+            className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white hover:bg-slate-50 p-6 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer hover:shadow-lg"
           >
             <div>
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-slate-300 group-hover:scale-110 transition-transform">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 group-hover:scale-110 transition-transform">
                 <Globe size={24} />
               </div>
-              <h3 className="text-lg font-black text-white">Continue in Web</h3>
-              <p className="mt-2 text-xs text-slate-400 leading-5">
+              <h3 className="text-lg font-black text-slate-900">Continue in Web</h3>
+              <p className="mt-2 text-xs text-slate-500 leading-5">
                 Run the interview helper right here in this browser tab. Relies on manual browser screen/tab sharing controls.
               </p>
             </div>
             <div className="mt-6">
               <button 
                 onClick={(e) => { e.stopPropagation(); onContinueWeb(); }}
-                className="w-full rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs font-bold py-3 px-4 transition-all"
+                className="w-full rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold py-3 px-4 shadow-sm transition-all"
               >
                 Continue in Web
               </button>
@@ -3730,17 +3681,16 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
   if (!open) return null;
 
   const selectedResume = resumes.find(r => r.id === c.selectedResumeId);
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md">
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-[2rem] border border-white/5 bg-[#07080e]/95 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] backdrop-blur-3xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-md">
+      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.06)]">
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/5 bg-[#07080e]/95 px-6 py-4">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
           <div>
-            <h2 className="text-base font-black text-white">Start Live Session</h2>
-            <p className="text-[11px] text-slate-500">Configure your session, context, and options.</p>
+            <h2 className="text-base font-black text-slate-900">Start Live Session</h2>
+            <p className="text-[11px] text-slate-500 font-semibold">Configure your session, context, and options.</p>
           </div>
-          <button onClick={onClose} className="rounded-xl p-2 text-slate-400 hover:bg-white/5 hover:text-white transition-all"><X size={18} /></button>
+          <button onClick={onClose} className="rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all"><X size={18} /></button>
         </div>
 
         {/* Step Indicator */}
@@ -4122,13 +4072,13 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
 
       {/* Popup modals for context items */}
       {openDocModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-md rounded-[2rem] border border-white/10 bg-[#0a0d24] p-5 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
-                <Brain size={15} className="text-cyan-400" /> Select Reference Document
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                <Brain size={15} className="text-cyan-600" /> Select Reference Document
               </h3>
-              <button type="button" onClick={() => setOpenDocModal(false)} className="text-slate-400 hover:text-white cursor-pointer"><X size={16} /></button>
+              <button type="button" onClick={() => setOpenDocModal(false)} className="text-slate-500 hover:text-slate-900 cursor-pointer"><X size={16} /></button>
             </div>
             <div className="space-y-3">
               <CustomSelect
@@ -4145,7 +4095,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                 placeholder="-- Select Document --"
                 icon={Brain}
               />
-              <p className="text-[10px] text-slate-500">
+              <p className="text-[10px] text-slate-500 font-semibold">
                 Upload reference architecture, style guide, or cheat sheets to inject into the AI context.
               </p>
             </div>
@@ -4157,13 +4107,13 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
       )}
 
       {openPromptModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-md rounded-[2rem] border border-white/10 bg-[#0a0d24] p-5 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
-                <NotebookPen size={15} className="text-amber-400" /> Custom System Prompt
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                <NotebookPen size={15} className="text-amber-600" /> Custom System Prompt
               </h3>
-              <button type="button" onClick={() => setOpenPromptModal(false)} className="text-slate-400 hover:text-white cursor-pointer"><X size={16} /></button>
+              <button type="button" onClick={() => setOpenPromptModal(false)} className="text-slate-500 hover:text-slate-900 cursor-pointer"><X size={16} /></button>
             </div>
             <div className="space-y-3">
               <CustomSelect
@@ -4178,7 +4128,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                 placeholder="-- Select Custom Prompt --"
                 icon={NotebookPen}
               />
-              <p className="text-[10px] text-slate-500">
+              <p className="text-[10px] text-slate-500 font-semibold">
                 Select a saved prompt template from your Knowledge base to steer the AI's behavior and tone.
               </p>
             </div>
@@ -4190,13 +4140,13 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
       )}
 
       {openSessionModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-md rounded-[2rem] border border-white/10 bg-[#0a0d24] p-5 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
-                <PlayCircle size={15} className="text-emerald-400" /> Select Previous Session
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                <PlayCircle size={15} className="text-emerald-600" /> Select Previous Session
               </h3>
-              <button type="button" onClick={() => setOpenSessionModal(false)} className="text-slate-400 hover:text-white cursor-pointer"><X size={16} /></button>
+              <button type="button" onClick={() => setOpenSessionModal(false)} className="text-slate-500 hover:text-slate-900 cursor-pointer"><X size={16} /></button>
             </div>
             <div className="space-y-3">
               <CustomSelect
@@ -4952,15 +4902,15 @@ function MockInterview({
 
       {/* ── Setup Form Overlay Modal ── */}
       {showSetup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-fadeIn">
-          <div className="w-full max-w-xl rounded-[2rem] border border-white/10 bg-[#0a0d24] p-6 shadow-soft relative overflow-hidden">
-            <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-violet-600/10 blur-3xl pointer-events-none" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md p-4 animate-fadeIn">
+          <div className="w-full max-w-xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-2xl relative overflow-hidden">
+            <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-blue-100/50 blur-3xl pointer-events-none" />
 
-            <div className="flex justify-between items-center border-b border-white/5 pb-4 mb-4">
-              <h2 className="text-lg font-black text-white">Setup Mock Interview</h2>
+            <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
+              <h2 className="text-lg font-black text-slate-900">Setup Mock Interview</h2>
               <button
                 onClick={() => setShowSetup(false)}
-                className="rounded-full p-1.5 hover:bg-white/5 text-slate-400 hover:text-white transition-all"
+                className="rounded-full p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-all"
               >
                 <X size={18} />
               </button>
@@ -4974,7 +4924,7 @@ function MockInterview({
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
                     placeholder="e.g. Amazon, Google"
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.035] px-4 py-2.5 text-xs text-white outline-none focus:border-violet-500 transition-all"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 transition-all placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -4983,7 +4933,7 @@ function MockInterview({
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
                     placeholder="e.g. Senior Software Engineer"
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.035] px-4 py-2.5 text-xs text-white outline-none focus:border-violet-500 transition-all"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 transition-all placeholder:text-slate-400"
                   />
                 </div>
               </div>
@@ -4993,7 +4943,7 @@ function MockInterview({
                 <select
                   value={interviewType}
                   onChange={(e) => setInterviewType(e.target.value as any)}
-                  className="w-full rounded-xl border border-white/10 bg-[#070a1a] px-4 py-2.5 text-xs text-white outline-none focus:border-violet-500 cursor-pointer transition-all"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 cursor-pointer transition-all"
                 >
                   <option>Mixed</option>
                   <option>Behavioral</option>
@@ -5005,8 +4955,6 @@ function MockInterview({
                 </select>
               </div>
 
-
-
               <div>
                 <label className="block text-xs font-bold text-slate-500 mb-2">Job Description (JD)</label>
                 <textarea
@@ -5014,21 +4962,21 @@ function MockInterview({
                   onChange={(e) => setJd(e.target.value)}
                   rows={4}
                   placeholder="Paste Job Description to personalize interview questions..."
-                  className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.035] px-4 py-2.5 text-xs text-white outline-none focus:border-violet-500 transition-all"
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 transition-all placeholder:text-slate-400"
                 />
               </div>
             </div>
 
-            <div className="flex gap-3 mt-6 border-t border-white/5 pt-4">
+            <div className="flex gap-3 mt-6 border-t border-slate-100 pt-4">
               <button
                 onClick={() => setShowSetup(false)}
-                className="flex-1 rounded-xl border border-white/10 bg-white/[0.04] py-3 text-xs font-bold text-slate-300 hover:bg-white/[0.08] hover:text-white transition-all"
+                className="flex-1 rounded-xl border border-slate-200 bg-white py-3 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={startMockInterview}
-                className="flex-1 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 py-3 text-xs font-black text-white hover:from-violet-500 hover:to-indigo-500 shadow-glow transition-all"
+                className="flex-1 rounded-xl bg-blue-600 py-3 text-xs font-black text-white hover:bg-blue-500 shadow-md transition-all"
               >
                 Start Mock Interview
               </button>
@@ -7650,15 +7598,15 @@ function Plan({ label, value }: { label: string; value: number }) {
 }
 
 function Output({ k, v }: { k: string; v: string }) {
-  return <div className="flex justify-between rounded-2xl bg-white/[0.035] p-4 text-sm"><span className="text-slate-500">{k}</span><span className="font-bold text-white">{v}</span></div>;
+  return <div className="flex justify-between rounded-2xl bg-slate-50 border border-slate-200/60 p-4 text-sm"><span className="text-slate-500">{k}</span><span className="font-bold text-slate-900">{v}</span></div>;
 }
 
 function MiniMetric({ label, value }: { label: string; value: string }) {
-  return <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"><div className="text-2xl font-black text-white">{value}</div><div className="mt-1 text-xs text-slate-500">{label}</div></div>;
+  return <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><div className="text-2xl font-black text-slate-900">{value}</div><div className="mt-1 text-xs text-slate-500 font-semibold">{label}</div></div>;
 }
 
 function PreviewCard({ title, text }: { title: string; text: string }) {
-  return <div className="rounded-2xl bg-white/[0.035] p-4"><div className="text-xs font-black uppercase tracking-wide text-violet-300">{title}</div><p className="mt-2 text-sm leading-6 text-slate-300">{text}</p></div>;
+  return <div className="rounded-2xl bg-slate-50 border border-slate-200/60 p-4"><div className="text-xs font-black uppercase tracking-wide text-blue-600">{title}</div><p className="mt-2 text-sm leading-6 text-slate-600 font-medium">{text}</p></div>;
 }
 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
@@ -7666,11 +7614,11 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
 }
 
 const toneMap = {
-  violet: 'bg-violet-500/12 text-violet-200 ring-violet-400/20',
-  emerald: 'bg-emerald-500/12 text-emerald-200 ring-emerald-400/20',
-  amber: 'bg-amber-500/12 text-amber-200 ring-amber-400/20',
-  sky: 'bg-sky-500/12 text-sky-200 ring-sky-400/20',
-  rose: 'bg-rose-500/12 text-rose-200 ring-rose-400/20',
+  violet: 'bg-blue-50 text-blue-600 ring-blue-100/50',
+  emerald: 'bg-emerald-50 text-emerald-600 ring-emerald-100/50',
+  amber: 'bg-amber-50 text-amber-600 ring-amber-100/50',
+  sky: 'bg-sky-50 text-sky-600 ring-sky-100/50',
+  rose: 'bg-rose-50 text-rose-600 ring-rose-100/50',
 };
 
 function Badge({ children, tone = 'violet' }: { children: React.ReactNode; tone?: keyof typeof toneMap }) {
@@ -7679,15 +7627,15 @@ function Badge({ children, tone = 'violet' }: { children: React.ReactNode; tone?
 
 function Button({ children, onClick, variant = 'primary', className = '' }: { children: React.ReactNode; onClick?: () => void; variant?: 'primary' | 'secondary' | 'danger'; className?: string }) {
   const styles = {
-    primary: 'btn-gradient text-white shadow-lg shadow-violet-600/15',
-    secondary: 'btn-glass text-slate-200 border border-white/10 hover:border-white/20 hover:text-white',
+    primary: 'btn-gradient text-white shadow-lg shadow-blue-600/10',
+    secondary: 'btn-glass text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900',
     danger: 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-lg shadow-red-600/10 hover:from-red-500 hover:to-rose-500'
   };
   return <button onClick={onClick} className={`rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300 active:translate-y-0 cursor-pointer ${styles[variant]} ${className}`}>{children}</button>;
 }
 
 function Progress({ value }: { value: number }) {
-  return <div className="h-2 rounded-full bg-slate-800"><div className="h-2 rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style={{ width: `${value}%` }} /></div>;
+  return <div className="h-2 rounded-full bg-slate-100"><div className="h-2 rounded-full bg-gradient-to-r from-blue-600 to-cyan-400" style={{ width: `${value}%` }} /></div>;
 }
 
 // getMockAnswerForQuestion removed — only real API responses are used
@@ -7886,7 +7834,7 @@ function FormattedAnswer({ text }: { text: string }) {
                   const content = trimmed.replace(/^#+\s+/, '');
                   const sizeClass = level === 1 ? 'text-xl' : level === 2 ? 'text-lg' : 'text-base';
                   return (
-                    <h4 key={lIdx} className={`${sizeClass} font-black text-white mt-4 mb-2 tracking-tight`}>
+                    <h4 key={lIdx} className={`${sizeClass} font-black text-slate-900 mt-4 mb-2 tracking-tight`}>
                       {renderBoldText(content)}
                     </h4>
                   );
@@ -7894,7 +7842,7 @@ function FormattedAnswer({ text }: { text: string }) {
 
                 // Normal paragraph (trimEnd to preserve leading indentation for code that is formatted outside code blocks)
                 return (
-                  <p key={lIdx} className="text-slate-300 whitespace-pre-wrap">
+                  <p key={lIdx} className="text-slate-700 whitespace-pre-wrap">
                     {renderBoldText(line.trimEnd())}
                   </p>
                 );
@@ -7912,7 +7860,7 @@ function renderBoldText(text: string) {
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
       return (
-        <strong key={i} className="font-bold text-white">
+        <strong key={i} className="font-bold text-slate-900">
           {part.slice(2, -2)}
         </strong>
       );
