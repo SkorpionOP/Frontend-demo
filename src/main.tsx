@@ -2005,6 +2005,33 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
   // Pricing state
   const [pricingPeriod, setPricingPeriod] = useState<'monthly' | 'annual'>('annual');
 
+  // Stealth section demo animation
+  const [stealthPhase, setStealthPhase] = useState<'listening' | 'thinking' | 'response'>('listening');
+  const [visibleBullets, setVisibleBullets] = useState(0);
+
+  useEffect(() => {
+    let timeout: any;
+    const cycle = () => {
+      setStealthPhase('listening');
+      setVisibleBullets(0);
+      timeout = setTimeout(() => {
+        setStealthPhase('thinking');
+        timeout = setTimeout(() => {
+          setStealthPhase('response');
+          setVisibleBullets(0);
+          // Stagger bullets in one by one
+          [600, 1200, 1800].forEach((delay, i) => {
+            timeout = setTimeout(() => setVisibleBullets(i + 1), delay);
+          });
+          // Restart cycle
+          timeout = setTimeout(cycle, 5500);
+        }, 1500);
+      }, 2000);
+    };
+    cycle();
+    return () => clearTimeout(timeout);
+  }, []);
+
   // Set body background/color dynamically for light color scheme
   useEffect(() => {
     const prevBg = document.body.style.backgroundColor;
@@ -2390,7 +2417,8 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
           transition={{ duration: 0.6, type: "spring", bounce: 0.3 }}
           className="relative z-10 mx-auto w-full max-w-7xl px-6 py-4">
           
-          <div className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6 md:p-10 flex flex-col gap-8 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
+          <div className="bg-slate-900 border border-slate-700/60 rounded-2xl p-6 md:p-10 flex flex-col gap-8 shadow-[0_8px_40px_rgba(0,0,0,0.3)]">
+            
             {/* Top Row: Copy + Badges */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
               <div className="flex-1">
@@ -2424,38 +2452,195 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
               </div>
             </div>
 
-            {/* Side-by-side Proof */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* What You See */}
-              <div className="relative bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
-                <span className="inline-block text-[9px] font-black uppercase tracking-widest text-emerald-400 mb-3">What You See</span>
-                <div className="bg-slate-900 rounded-lg p-3 border border-slate-700/60 relative">
-                  <div className="flex items-center gap-2 mb-2">
+            {/* ── Phase Step Indicator ── */}
+            <div className="flex items-center gap-0 w-full max-w-md mx-auto">
+              {(['listening', 'thinking', 'response'] as const).map((phase, idx) => {
+                const labels = ['1. Listening', '2. Processing', '3. Responding'];
+                const colors = {
+                  listening: { active: 'bg-blue-500', text: 'text-blue-400', ring: 'ring-blue-500/40' },
+                  thinking:  { active: 'bg-yellow-400', text: 'text-yellow-400', ring: 'ring-yellow-400/40' },
+                  response:  { active: 'bg-emerald-500', text: 'text-emerald-400', ring: 'ring-emerald-500/40' },
+                };
+                const isActive = stealthPhase === phase;
+                const isDone = (stealthPhase === 'thinking' && idx === 0) || (stealthPhase === 'response' && idx < 2);
+                const c = colors[phase];
+                return (
+                  <React.Fragment key={phase}>
+                    <div className="flex flex-col items-center gap-1 flex-1">
+                      <motion.div
+                        animate={isActive ? { scale: [1, 1.15, 1] } : { scale: 1 }}
+                        transition={{ repeat: isActive ? Infinity : 0, duration: 1.2, ease: 'easeInOut' }}
+                        className={`h-6 w-6 rounded-full flex items-center justify-center text-[9px] font-black transition-all duration-500
+                          ${isActive ? `${c.active} ring-4 ${c.ring} shadow-lg text-white` : isDone ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+                      >
+                        {isDone ? '✓' : idx + 1}
+                      </motion.div>
+                      <span className={`text-[9px] font-bold tracking-wide transition-colors duration-500 ${isActive ? c.text : isDone ? 'text-emerald-400' : 'text-slate-400'}`}>
+                        {labels[idx]}
+                      </span>
+                    </div>
+                    {idx < 2 && (
+                      <div className="h-px flex-1 mb-4 relative overflow-hidden bg-slate-700">
+                        <motion.div
+                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 to-emerald-400"
+                          animate={{ width: isDone ? '100%' : isActive ? '50%' : '0%' }}
+                          transition={{ duration: 0.6, ease: 'easeInOut' }}
+                        />
+                      </div>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+
+            {/* ── Main Demo: Side-by-side with invisible signal divider ── */}
+            <div className="relative grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-stretch">
+
+              {/* LEFT: What YOU See */}
+              <motion.div
+                className="relative bg-slate-800 border border-emerald-500/30 rounded-xl p-4 overflow-hidden"
+                animate={{ borderColor: stealthPhase === 'response' ? 'rgba(16,185,129,0.4)' : 'rgba(16,185,129,0.1)' }}
+                transition={{ duration: 0.5 }}
+              >
+                {/* Corner glow */}
+                <motion.div
+                  className="absolute -top-6 -left-6 h-20 w-20 rounded-full bg-emerald-500/10 blur-xl pointer-events-none"
+                  animate={{ opacity: stealthPhase === 'response' ? 0.7 : 0.2 }}
+                  transition={{ duration: 0.6 }}
+                />
+
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400">👤 You</span>
+                    <span className="text-[9px] text-slate-400">— your private view</span>
+                  </div>
+                  <motion.span
+                    className="text-[9px] font-bold flex items-center gap-1.5"
+                    animate={{ color: stealthPhase === 'listening' ? '#60a5fa' : stealthPhase === 'thinking' ? '#facc15' : '#34d399' }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <motion.span
+                      className={`h-1.5 w-1.5 rounded-full ${stealthPhase === 'listening' ? 'bg-blue-400' : stealthPhase === 'thinking' ? 'bg-yellow-400' : 'bg-emerald-400'} animate-pulse`}
+                    />
+                    {stealthPhase === 'listening' ? 'Listening...' : stealthPhase === 'thinking' ? 'Processing...' : 'Copilot Active'}
+                  </motion.span>
+                </div>
+
+                <div className="bg-slate-900 rounded-lg p-3 border border-slate-700/60 min-h-[180px] relative overflow-hidden">
+                  {/* Scan line animation */}
+                  <AnimatePresence>
+                    {stealthPhase === 'thinking' && (
+                      <motion.div
+                        key="scanline"
+                        className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-yellow-400/60 to-transparent pointer-events-none z-10"
+                        initial={{ top: 0, opacity: 0.8 }}
+                        animate={{ top: '100%', opacity: [0.8, 0.8, 0] }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-800">
                     <div className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-amber-400 to-orange-600">
                       <SutraLogo size={10} className="text-white" />
                     </div>
                     <span className="text-[10px] font-bold text-slate-300">Sutra AI Overlay</span>
-                    <span className="ml-auto h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <motion.span
+                      className="ml-auto h-1.5 w-1.5 rounded-full"
+                      animate={{ backgroundColor: stealthPhase === 'listening' ? '#60a5fa' : stealthPhase === 'thinking' ? '#facc15' : '#10b981' }}
+                      transition={{ duration: 0.4 }}
+                      style={{ boxShadow: '0 0 6px currentColor' }}
+                    />
                   </div>
-                  <div className="bg-blue-900/30 border border-blue-500/30 rounded-md px-2.5 py-2 mb-2">
-                    <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest block mb-1">SAY FIRST</span>
-                    <p className="text-[10px] text-slate-200 italic leading-snug">&ldquo;That's similar to a bottleneck we solved last quarter...&rdquo;</p>
-                  </div>
-                  <div className="space-y-1">
-                    {['Use async workers + message queue', 'Cache at CDN edge layer', 'Auto-scale horizontally'].map((b, i) => (
-                      <div key={i} className="flex items-center gap-1.5">
-                        <span className="h-3 w-3 rounded-full bg-slate-700 text-[7px] flex items-center justify-center text-slate-400 font-bold shrink-0">{i+1}</span>
-                        <span className="text-[9px] text-slate-400">{b}</span>
-                      </div>
-                    ))}
-                  </div>
+
+                  <AnimatePresence mode="wait">
+                    {stealthPhase === 'listening' && (
+                      <motion.div key="listening" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.35 }} className="flex flex-col items-center justify-center py-6 gap-3">
+                        <div className="flex items-end gap-0.5 h-6">
+                          {[0, 1, 2, 3, 4, 5, 6].map(i => (
+                            <motion.span key={i} className="w-1 rounded-full bg-blue-400 inline-block" animate={{ height: ['3px', `${8 + Math.sin(i) * 10}px`, '3px'] }} transition={{ repeat: Infinity, duration: 0.7 + i * 0.05, delay: i * 0.1, ease: 'easeInOut' }} />
+                          ))}
+                        </div>
+                        <div className="text-center">
+                          <span className="text-[10px] text-blue-300 font-semibold block">Detecting interview question...</span>
+                          <span className="text-[8px] text-slate-400 mt-0.5 block">Transcribing audio in real-time</span>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {stealthPhase === 'thinking' && (
+                      <motion.div key="thinking" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.35 }} className="flex flex-col items-center justify-center py-6 gap-3">
+                        <div className="flex gap-2 items-center">
+                          {[0, 1, 2, 3].map(i => (
+                            <motion.span key={i} className="h-2.5 w-2.5 rounded-full bg-yellow-400 inline-block" animate={{ y: [0, -8, 0], opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }} transition={{ repeat: Infinity, duration: 0.65, delay: i * 0.15 }} />
+                          ))}
+                        </div>
+                        <div className="text-center">
+                          <span className="text-[10px] text-yellow-300 font-semibold block">Crafting your response...</span>
+                          <span className="text-[8px] text-slate-400 mt-0.5 block">Analyzing question context + your resume</span>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {stealthPhase === 'response' && (
+                      <motion.div key="response" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="space-y-2">
+                        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="bg-blue-900/40 border border-blue-500/30 rounded-md px-2.5 py-2">
+                          <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest block mb-1">💬 SAY FIRST</span>
+                          <p className="text-[10px] text-slate-200 italic leading-snug">&ldquo;That&rsquo;s similar to a bottleneck we solved last quarter...&rdquo;</p>
+                        </motion.div>
+                        <div className="space-y-1.5 px-0.5">
+                          <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest block">Key Points</span>
+                          {['Use async workers + message queue', 'Cache at CDN edge layer', 'Auto-scale horizontally'].map((b, i) => (
+                            visibleBullets > i && (
+                              <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="flex items-center gap-1.5">
+                                <span className="h-3.5 w-3.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-[7px] flex items-center justify-center text-emerald-400 font-black shrink-0">{i + 1}</span>
+                                <span className="text-[10px] text-slate-300 font-medium">{b}</span>
+                              </motion.div>
+                            )
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
+              </motion.div>
+
+              {/* CENTER: Invisible barrier divider */}
+              <div className="hidden md:flex flex-col items-center justify-center gap-2 px-2 min-w-[44px]">
+                <div className="flex-1 w-px bg-gradient-to-b from-transparent via-emerald-500/30 to-transparent" />
+                <motion.div
+                  className="h-8 w-8 rounded-full bg-slate-900 border border-emerald-500/40 flex items-center justify-center shadow-[0_0_16px_rgba(16,185,129,0.2)]"
+                  animate={{ boxShadow: ['0 0 8px rgba(16,185,129,0.15)', '0 0 20px rgba(16,185,129,0.35)', '0 0 8px rgba(16,185,129,0.15)'] }}
+                  transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+                >
+                  <ShieldCheck size={14} className="text-emerald-400" />
+                </motion.div>
+                <span className="text-[7px] font-black uppercase tracking-widest text-emerald-400 text-center leading-tight">Invisible<br/>Barrier</span>
+                <div className="flex-1 w-px bg-gradient-to-b from-transparent via-emerald-500/30 to-transparent" />
               </div>
 
-              {/* What They See */}
-              <div className="relative bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
-                <span className="inline-block text-[9px] font-black uppercase tracking-widest text-slate-400 mb-3">What the Interviewer Sees</span>
-                <div className="bg-slate-900 rounded-lg p-3 border border-slate-700/60">
+              {/* RIGHT: What Interviewer Sees */}
+              <div className="relative bg-slate-800 border border-slate-700 rounded-xl p-4 overflow-hidden">
+                {/* Subtle scanline texture to imply "recording" */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,1) 2px, rgba(255,255,255,1) 4px)' }} />
+
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">🎥 Interviewer</span>
+                    <span className="text-[9px] text-slate-400">— their screen share view</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <motion.span
+                      className="h-1.5 w-1.5 rounded-full bg-red-500"
+                      animate={{ opacity: [1, 0.3, 1] }}
+                      transition={{ repeat: Infinity, duration: 1.2 }}
+                    />
+                    <span className="text-[8px] text-red-400 font-black tracking-widest">LIVE</span>
+                  </div>
+                </div>
+
+                <div className="bg-slate-900 rounded-lg p-3 border border-slate-700/60 min-h-[180px] relative">
                   <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-800">
                     <div className="flex gap-1">
                       <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
@@ -2463,23 +2648,89 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
                       <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
                     </div>
                     <span className="text-[9px] text-slate-500 font-mono">your-project/index.ts</span>
+                    <div className="ml-auto flex items-center gap-1.5">
+                      <motion.span
+                        className="h-1.5 w-1.5 rounded-full bg-red-500"
+                        animate={{ opacity: [1, 0.2, 1] }}
+                        transition={{ repeat: Infinity, duration: 1 }}
+                      />
+                      <span className="text-[8px] text-red-400 font-bold">REC</span>
+                    </div>
                   </div>
-                  <div className="space-y-1.5 font-mono">
-                    <div className="h-2 rounded bg-slate-800 w-full" />
-                    <div className="h-2 rounded bg-slate-800 w-3/4" />
-                    <div className="h-2 rounded bg-blue-900/50 w-5/6" />
-                    <div className="h-2 rounded bg-slate-800 w-4/5" />
-                    <div className="h-2 rounded bg-slate-800 w-2/3" />
+
+                  {/* Fake IDE code lines */}
+                  <div className="space-y-2 font-mono">
+                    {[
+                      { w: 'w-full',  color: 'bg-slate-800' },
+                      { w: 'w-3/4',  color: 'bg-slate-800' },
+                      { w: 'w-5/6',  color: 'bg-blue-900/50' },
+                      { w: 'w-4/5',  color: 'bg-slate-800' },
+                      { w: 'w-2/3',  color: 'bg-slate-800' },
+                    ].map((line, i) => (
+                      <div key={i} className="flex gap-2 items-center">
+                        <span className="text-[8px] text-slate-500 w-3 shrink-0">{i + 1}</span>
+                        <div className={`h-2 rounded ${line.color} ${line.w}`} />
+                      </div>
+                    ))}
                   </div>
-                  <div className="mt-3 flex items-center gap-2 pt-2 border-t border-slate-800">
+
+                  {/* No-overlay confirmation */}
+                  <motion.div
+                    className="mt-3 flex items-center gap-2 pt-2 border-t border-slate-800"
+                    animate={{ opacity: [0.6, 1, 0.6] }}
+                    transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+                  >
                     <CheckCircle2 size={10} className="text-emerald-400 shrink-0" />
-                    <span className="text-[9px] text-slate-500">No overlay visible — clean screen share</span>
+                    <span className="text-[9px] text-slate-400">No overlay visible — clean screen share</span>
+                  </motion.div>
+
+                  {/* Big "hidden" label overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <motion.div
+                      className="bg-slate-900/80 border border-slate-700/60 rounded-lg px-3 py-2 flex items-center gap-2 backdrop-blur-sm"
+                      animate={{ opacity: [0.55, 0.8, 0.55] }}
+                      transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
+                    >
+                      <EyeOff size={12} className="text-slate-500" />
+                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Sutra AI hidden</span>
+                    </motion.div>
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* ── How It Works — 3-step mini timeline ── */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-700">
+              {[
+                { step: '01', icon: Mic, title: 'Audio Captured', desc: "Sutra silently listens to the interviewer's voice via your mic.", color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/30' },
+                { step: '02', icon: Brain, title: 'AI Generates Answer', desc: 'Your profile + context shapes a tailored talking point in <2s.', color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/30' },
+                { step: '03', icon: EyeOff, title: 'Zero Screen Exposure', desc: 'The overlay is click-through — never captured by any screen share tool.', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
+              ].map(({ step, icon: Icon, title, desc, color, bg }, i) => (
+                <motion.div
+                  key={step}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.12 }}
+                  className={`flex gap-3 rounded-xl border p-3 ${bg}`}
+                >
+                  <div className={`h-7 w-7 shrink-0 rounded-lg flex items-center justify-center ${bg}`}>
+                    <Icon size={14} className={color} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className={`text-[8px] font-black uppercase tracking-widest ${color}`}>{step}</span>
+                      <span className="text-[10px] font-bold text-white">{title}</span>
+                    </div>
+                    <p className="text-[9px] text-slate-300 leading-relaxed">{desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
           </div>
         </motion.section>
+
 
         {/* Brand Logo Cloud */}
         <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.1 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-8 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
