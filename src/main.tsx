@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bot, Brain, Mic, MicOff, FileText, Building2, Image as ImageIcon, Library, BarChart3,
   NotebookPen, ShieldCheck, PlayCircle, Home, Search, Bell, Plus, X, Briefcase, LayoutDashboard,
@@ -7,11 +8,18 @@ import {
   PlusCircle, Copy, Save, Camera, Pause, Pin, Minimize2, Maximize2, Move,
   SlidersHorizontal, CheckCircle2, Crown, Zap, Target, Layers, ScreenShare, AlertCircle, ExternalLink,
   Volume2, VolumeX, Activity, MonitorSpeaker, HelpCircle, ChevronDown, ChevronUp, ChevronRight, Cpu,
-  Laptop, Globe, ArrowRight, PlayCircle as MonitorPlay
+  Laptop, Globe, ArrowRight, PlayCircle as MonitorPlay, EyeOff, BellOff
 } from 'lucide-react';
 import './styles/globals.css';
 import { signInWithGoogle, logOut, type AppUser, isFirebaseConfigured } from './firebase';
 
+
+
+export const SutraLogo = ({ size = 24, className = "text-white" }: { size?: number, className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M12 0C12 7 17 12 24 12C17 12 12 17 12 24C12 17 7 12 0 12C7 12 12 7 12 0ZM12 4C12 8 16 12 20 12C16 12 12 16 12 20C12 16 8 12 4 12C8 12 12 8 12 4Z" fill="currentColor" fillRule="evenodd" />
+  </svg>
+);
 
 export function getCurrentUserKeys() {
   try {
@@ -626,11 +634,11 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: (u: AppUser) => void })
       <div className="relative z-10 w-full max-w-md p-6">
         <div className="bg-white border border-slate-200/80 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.05)] relative overflow-hidden backdrop-blur-2xl animate-fadeIn">
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 shadow-[0_4px_12px_rgba(37,99,235,0.2)] mb-5">
-              <Bot size={28} className="text-white" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 shadow-[0_4px_12px_rgba(245,158,11,0.3)] mb-5">
+              <SutraLogo size={28} className="text-white" />
             </div>
             <h1 className="font-display text-3xl font-extrabold tracking-tight text-slate-900">
-              Copilot<span className="text-blue-600">X</span>
+              Sutra <span className="text-orange-500">AI</span>
             </h1>
             <p className="mt-2.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
               Interview OS Console
@@ -928,7 +936,7 @@ function App() {
 
   const [showHelpChatbot, setShowHelpChatbot] = useState(false);
   const [helpMessages, setHelpMessages] = useState<Array<{ sender: 'user' | 'bot'; text: string; time: string }>>([
-    { sender: 'bot', text: "Hello! I'm the CopilotX Support AI. How can I help you resolve app issues, configure reference context, or optimize your session today?", time: 'Just now' }
+    { sender: 'bot', text: "Hello! I'm the Sutra AI Support AI. How can I help you resolve app issues, configure reference context, or optimize your session today?", time: 'Just now' }
   ]);
   const [helpInput, setHelpInput] = useState('');
   const [isBotTyping, setIsBotTyping] = useState(false);
@@ -946,7 +954,7 @@ function App() {
     
     // Feature explanations
     if (q.includes('live session') || q.includes('interview os') || q.includes('streaming') || q.includes('real-time') || q.includes('step')) {
-      return "To start and run a **Live Session (Interview OS)**, follow these steps:\n\n1. **Start the Session**: Click the '+ Start Session' button in the top-right header.\n2. **Configuration**: Select your target company, role, session type ('Interview+Coding' or 'Coding Test'), preferred AI model, and response style (Concise/Standard/Detailed). Optionally choose an active resume and reference docs.\n3. **Share Your Screen**: Click 'Accept & Connect' on the authorization modal. Choose the browser tab where your video call is running (Google Meet, Teams, etc.). *Crucial:* Check the 'Share tab audio' checkbox at the bottom-left of the browser picker window to capture interviewer voice.\n4. **Get Real-time Answers**: As the interviewer asks questions, CopilotX transcribes them automatically and streams answers in the right panel.\n5. **Screenshot Capture**: In coding tests or editor views, click 'Screenshot' in the footer to capture the code window for step-by-step solution guidance.\n6. **End Session**: Click the red 'Exit' button to save the transcript and generate an AI summary overview.";
+      return "To start and run a **Live Session (Interview OS)**, follow these steps:\n\n1. **Start the Session**: Click the '+ Start Session' button in the top-right header.\n2. **Configuration**: Select your target company, role, session type ('Interview+Coding' or 'Coding Test'), preferred AI model, and response style (Concise/Standard/Detailed). Optionally choose an active resume and reference docs.\n3. **Share Your Screen**: Click 'Accept & Connect' on the authorization modal. Choose the browser tab where your video call is running (Google Meet, Teams, etc.). *Crucial:* Check the 'Share tab audio' checkbox at the bottom-left of the browser picker window to capture interviewer voice.\n4. **Get Real-time Answers**: As the interviewer asks questions, Sutra AI transcribes them automatically and streams answers in the right panel.\n5. **Screenshot Capture**: In coding tests or editor views, click 'Screenshot' in the footer to capture the code window for step-by-step solution guidance.\n6. **End Session**: Click the red 'Exit' button to save the transcript and generate an AI summary overview.";
     }
     if (q.includes('mock interview') || q.includes('webcam') || q.includes('practice')) {
       return "**Mock Interviews** allow you to practice with an AI interviewer:\n\n1. **Profile Adaptation**: Generates custom questions tailored to your targeted company, role, and job description.\n2. **Camera & Voice**: Records your answers using your webcam and mic.\n3. **Feedback**: Analyzes your speech patterns, answers, and provides a customized score alongside suggested improvements.";
@@ -972,7 +980,7 @@ function App() {
       return "To minimize response delays:\n\n1. Select 'Gemini 2.5 Flash' in the Setup Wizard (highly optimized for low-latency streaming).\n2. Set 'Style' to 'Concise' and 'Speed' to 'Fast' in the Wizard configuration.\n3. Verify your local network and FastAPI backend connections are stable.";
     }
     
-    return "I can help explain all CopilotX features (Live Session OS, Mock Interviews, Recent Sessions, Resume Parser, and Custom Prompts) or provide troubleshooting tips (Mic setup, screenshots, response lag). Please ask me a specific question!";
+    return "I can help explain all Sutra AI features (Live Session OS, Mock Interviews, Recent Sessions, Resume Parser, and Custom Prompts) or provide troubleshooting tips (Mic setup, screenshots, response lag). Please ask me a specific question!";
   };
 
   const handleHelpMessageSend = () => {
@@ -1747,10 +1755,10 @@ function App() {
             <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 bg-white/[0.02]">
               <div className="flex items-center gap-2.5">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 text-violet-300">
-                  <Bot size={18} />
+                  <SutraLogo size={18} />
                 </div>
                 <div>
-                  <h4 className="text-sm font-black text-white">CopilotX Support AI</h4>
+                  <h4 className="text-sm font-black text-white">Sutra AI Support AI</h4>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     <span className="text-[10px] text-slate-400 font-medium">Online Help Agent</span>
@@ -1838,7 +1846,7 @@ function App() {
             <div className="flex gap-2 border-t border-white/10 px-5 py-3.5 bg-slate-950">
               <input
                 type="text"
-                placeholder="Ask a question about CopilotX..."
+                placeholder="Ask a question about Sutra AI..."
                 value={helpInput}
                 onChange={e => setHelpInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleHelpMessageSend()}
@@ -2099,11 +2107,11 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
       {/* Navbar */}
       <header className="relative z-50 mx-auto w-full max-w-7xl px-6 py-5 flex items-center justify-between transition-all">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 shadow-[0_4px_12px_rgba(37,99,235,0.2)]">
-            <Bot size={18} className="text-white" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 shadow-[0_4px_12px_rgba(245,158,11,0.3)]">
+            <SutraLogo size={18} className="text-white" />
           </div>
           <span className="font-display text-lg font-bold tracking-tight text-slate-900">
-            Copilot<span className="text-blue-600">X</span>
+            Sutra <span className="text-orange-500">AI</span>
           </span>
         </div>
 
@@ -2133,7 +2141,7 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
       <main className="relative z-10 flex-1">
         
         {/* Hero Section */}
-        <section className="relative z-10 mx-auto w-full max-w-7xl px-6 py-12 md:py-20 grid items-center gap-12 lg:grid-cols-[1.1fr_.9fr]">
+        <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, type: "spring", bounce: 0.3 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-12 md:py-20 grid items-center gap-12 lg:grid-cols-[1.1fr_.9fr]">
           <div className="flex flex-col items-start text-left">
             <div className="mb-6 flex flex-wrap gap-2 animate-fadeIn">
               <span className="inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600">
@@ -2143,12 +2151,16 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
             </div>
 
             <h1 className="font-display text-5xl sm:text-6xl lg:text-[70px] font-black leading-[1.08] tracking-tight text-slate-900">
-              Ace Your Next <br />
-              <span className="text-blue-600">Interview</span> with AI
+              Your Real-Time <br />
+              <span className="text-blue-600">Interview Copilot</span>
             </h1>
             
             <p className="mt-6 max-w-xl text-slate-600 text-base sm:text-lg leading-relaxed font-medium">
-              CopilotX helps you practice smarter with real-time AI interviews, personalized feedback, and role-specific preparation.
+              Practice smarter before. Perform flawlessly during. Sutra AI is the only tool that bridges <span className="font-bold text-slate-800">mock preparation</span> and <span className="font-bold text-slate-800">live interview performance</span> — invisibly.
+            </p>
+            <p className="mt-2 text-xs text-slate-500 font-semibold flex items-center gap-1.5">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Built for Glances, Not Reading. Speak like a human, not a teleprompter.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4 w-full sm:w-auto">
@@ -2297,21 +2309,35 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
                 {/* Right Column in Mockup */}
                 <div className="space-y-4">
                   
-                  {/* Transcript card */}
+                  {/* Glance-First HUD */}
                   <div className="bg-white border border-slate-200/60 rounded-xl p-3.5 shadow-sm text-left flex flex-col flex-1 min-h-[170px]">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">Transcript</span>
-                    <div className="text-[12px] text-slate-600 font-medium leading-relaxed overflow-y-auto flex-1 max-h-[140px] pr-1">
-                      {simulatorState === 'thinking' ? (
-                        <div className="flex flex-col items-center justify-center py-6 space-y-2">
-                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-                          <span className="text-[10px] text-slate-400">Contextualizing solution...</span>
-                        </div>
-                      ) : answerLength > 0 ? (
-                        <FormattedAnswer text={previewScenarios[activeScenario].answer.slice(0, answerLength)} />
-                      ) : (
-                        <span className="text-slate-400 italic">Waiting for speech transcript to complete...</span>
-                      )}
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Copilot HUD</span>
+                      <span className="text-[9px] font-black bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full uppercase tracking-wider">Glance Mode</span>
                     </div>
+                    {simulatorState === 'thinking' ? (
+                      <div className="flex flex-col items-center justify-center py-6 space-y-2">
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+                        <span className="text-[10px] text-slate-400">Building your personalized response...</span>
+                      </div>
+                    ) : answerLength > 0 ? (
+                      <div className="space-y-2">
+                        <div className="bg-blue-50 border border-blue-100 rounded-lg px-2.5 py-2">
+                          <span className="text-[8px] font-black text-blue-600 uppercase tracking-widest block mb-1">SAY FIRST</span>
+                          <p className="text-[11px] text-slate-800 font-semibold leading-snug italic">&ldquo;{previewScenarios[activeScenario].answer.slice(0, Math.min(answerLength, 80))}...&rdquo;</p>
+                        </div>
+                        <div className="space-y-1.5 px-0.5">
+                          {['Scale horizontally, not vertically', 'Use a message queue (Kafka/RabbitMQ)', 'Cache aggressively at the edge'].map((point, i) => (
+                            <div key={i} className="flex items-start gap-2">
+                              <span className="mt-0.5 h-3.5 w-3.5 rounded-full bg-slate-100 border border-slate-200 text-[8px] font-black text-slate-500 flex items-center justify-center shrink-0">{i + 1}</span>
+                              <span className="text-[10px] text-slate-600 font-medium leading-tight">{point}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-slate-400 italic text-[11px]">Waiting for AI Copilot to activate...</span>
+                    )}
                   </div>
 
                   {/* Job Role info */}
@@ -2354,10 +2380,109 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
 
             </div>
           </div>
-        </section>
+        </motion.section>
+
+        {/* ── Stealth & Privacy Ribbon ── */}
+        <motion.section 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6, type: "spring", bounce: 0.3 }}
+          className="relative z-10 mx-auto w-full max-w-7xl px-6 py-4">
+          
+          <div className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6 md:p-10 flex flex-col gap-8 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
+            {/* Top Row: Copy + Badges */}
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="flex-1">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-400 mb-4">
+                  <ShieldCheck size={14} />
+                  100% Invisible to Screen Share
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+                  They see your screen. <br className="hidden sm:block" />
+                  <span className="text-emerald-400">They never see Sutra AI.</span>
+                </h2>
+                <p className="text-sm text-slate-400 max-w-lg leading-relaxed">
+                  Our click-through overlay sits invisibly above any video platform. You type in your IDE, maintain eye contact, and the AI speaks to you silently — no tab-switch alerts, no extension permissions, no traces.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { icon: EyeOff, text: "Click-Through Overlay" },
+                  { icon: BellOff, text: "No Tab-Switch Alerts" },
+                  { icon: Database, text: "Zero Data Logged" }
+                ].map(({ icon: Icon, text }) => (
+                  <motion.div 
+                    whileHover={{ scale: 1.05 }}
+                    key={text} 
+                    className="flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-800/50 px-3.5 py-1.5 cursor-default shadow-sm backdrop-blur-sm"
+                  >
+                    <Icon size={12} className="text-emerald-400 shrink-0" />
+                    <span className="text-[11px] font-bold text-slate-300 tracking-wide">{text}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Side-by-side Proof */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* What You See */}
+              <div className="relative bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
+                <span className="inline-block text-[9px] font-black uppercase tracking-widest text-emerald-400 mb-3">What You See</span>
+                <div className="bg-slate-900 rounded-lg p-3 border border-slate-700/60 relative">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-amber-400 to-orange-600">
+                      <SutraLogo size={10} className="text-white" />
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-300">Sutra AI Overlay</span>
+                    <span className="ml-auto h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  </div>
+                  <div className="bg-blue-900/30 border border-blue-500/30 rounded-md px-2.5 py-2 mb-2">
+                    <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest block mb-1">SAY FIRST</span>
+                    <p className="text-[10px] text-slate-200 italic leading-snug">&ldquo;That's similar to a bottleneck we solved last quarter...&rdquo;</p>
+                  </div>
+                  <div className="space-y-1">
+                    {['Use async workers + message queue', 'Cache at CDN edge layer', 'Auto-scale horizontally'].map((b, i) => (
+                      <div key={i} className="flex items-center gap-1.5">
+                        <span className="h-3 w-3 rounded-full bg-slate-700 text-[7px] flex items-center justify-center text-slate-400 font-bold shrink-0">{i+1}</span>
+                        <span className="text-[9px] text-slate-400">{b}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* What They See */}
+              <div className="relative bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
+                <span className="inline-block text-[9px] font-black uppercase tracking-widest text-slate-400 mb-3">What the Interviewer Sees</span>
+                <div className="bg-slate-900 rounded-lg p-3 border border-slate-700/60">
+                  <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-800">
+                    <div className="flex gap-1">
+                      <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
+                      <span className="h-2.5 w-2.5 rounded-full bg-yellow-500" />
+                      <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
+                    </div>
+                    <span className="text-[9px] text-slate-500 font-mono">your-project/index.ts</span>
+                  </div>
+                  <div className="space-y-1.5 font-mono">
+                    <div className="h-2 rounded bg-slate-800 w-full" />
+                    <div className="h-2 rounded bg-slate-800 w-3/4" />
+                    <div className="h-2 rounded bg-blue-900/50 w-5/6" />
+                    <div className="h-2 rounded bg-slate-800 w-4/5" />
+                    <div className="h-2 rounded bg-slate-800 w-2/3" />
+                  </div>
+                  <div className="mt-3 flex items-center gap-2 pt-2 border-t border-slate-800">
+                    <CheckCircle2 size={10} className="text-emerald-400 shrink-0" />
+                    <span className="text-[9px] text-slate-500">No overlay visible — clean screen share</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.section>
 
         {/* Brand Logo Cloud */}
-        <section className="relative z-10 mx-auto w-full max-w-7xl px-6 py-8 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
+        <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.1 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-8 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
             Trusted by learners and teams at
           </span>
@@ -2412,10 +2537,10 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
               <span className="text-slate-800 font-bold tracking-tight">Adobe</span>
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Features Section */}
-        <section className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center">
+        <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.6, type: "spring", bounce: 0.2 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center">
           <div className="max-w-3xl mx-auto mb-16">
             <span className="inline-flex items-center rounded-full bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600 mb-4">
               Everything you need to succeed
@@ -2431,7 +2556,7 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             
             {/* Card 1: Real-time AI Interviews */}
-            <div className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('system')}>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} whileHover={{ y: -6, scale: 1.02 }} className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('system')}>
               <div>
                 <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-5">
                   <Mic size={20} />
@@ -2444,10 +2569,10 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
               <span className="mt-6 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group-hover:translate-x-1 transition-all duration-200">
                 Learn more <ArrowRight size={12} />
               </span>
-            </div>
+            </motion.div>
 
             {/* Card 2: Resume Intelligence */}
-            <div className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('sql')}>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} whileHover={{ y: -6, scale: 1.02 }} className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('sql')}>
               <div>
                 <div className="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-5">
                   <FileText size={20} />
@@ -2460,10 +2585,10 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
               <span className="mt-6 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group-hover:translate-x-1 transition-all duration-200">
                 Learn more <ArrowRight size={12} />
               </span>
-            </div>
+            </motion.div>
 
             {/* Card 3: Knowledge Base */}
-            <div className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('react')}>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} whileHover={{ y: -6, scale: 1.02 }} className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('react')}>
               <div>
                 <div className="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 mb-5">
                   <Library size={20} />
@@ -2476,10 +2601,10 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
               <span className="mt-6 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group-hover:translate-x-1 transition-all duration-200">
                 Learn more <ArrowRight size={12} />
               </span>
-            </div>
+            </motion.div>
 
             {/* Card 4: Performance Insights */}
-            <div className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('insights')}>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} whileHover={{ y: -6, scale: 1.02 }} className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('insights')}>
               <div>
                 <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 mb-5">
                   <BarChart3 size={20} />
@@ -2492,71 +2617,106 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
               <span className="mt-6 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group-hover:translate-x-1 transition-all duration-200">
                 Learn more <ArrowRight size={12} />
               </span>
-            </div>
+            </motion.div>
 
           </div>
-        </section>
+        </motion.section>
 
-        {/* How It Works Section */}
-        <section className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center">
-          <div className="max-w-3xl mx-auto mb-16">
+        {/* Dual-Loop Framework */}
+        <motion.section
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.7, type: "spring", bounce: 0.2 }}
+          id="how-it-works"
+          className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center"
+        >
+          <div className="max-w-3xl mx-auto mb-14">
             <span className="inline-flex items-center rounded-full bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600 mb-4">
-              Simple & Effective
+              The Only Tool That Bridges Both Worlds
             </span>
             <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              How CopilotX Works
+              The Dual-Loop Framework
             </h2>
+            <p className="mt-4 text-slate-500 font-medium text-sm leading-relaxed">
+              Your practice sessions build a personalized memory store. When the real interview happens, Sutra AI surfaces <em>your own</em> stories, not generic AI text.
+            </p>
           </div>
 
-          <div className="relative grid gap-8 md:grid-cols-4 max-w-5xl mx-auto">
-            {/* Connector dotted line for desktop */}
-            <div className="hidden md:block absolute top-8 left-[12%] right-[12%] h-0.5 border-t-2 border-dashed border-slate-200 z-0" />
-
-            {/* Step 1 */}
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="h-16 w-16 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 text-lg font-bold shadow-sm mb-4">
-                1
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto text-left">
+            {/* Loop 1: Rehearsal */}
+            <motion.div
+              whileHover={{ y: -4 }}
+              className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm flex flex-col gap-5"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                  <NotebookPen size={20} />
+                </div>
+                <div>
+                  <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Loop 1</span>
+                  <h3 className="font-display text-xl font-bold text-slate-900 leading-tight">Rehearsal Mode</h3>
+                </div>
               </div>
-              <h3 className="font-display text-base font-bold text-slate-900 mb-2">Upload Resume</h3>
-              <p className="text-xs text-slate-500 leading-relaxed max-w-xs font-medium">
-                Upload your resume and add relevant documents.
-              </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="h-16 w-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-lg font-bold shadow-sm mb-4">
-                2
+              <div className="space-y-3">
+                {[
+                  { step: '01', title: 'Upload your resume + job docs', desc: 'Sutra AI learns your experience, projects, and skill set.' },
+                  { step: '02', title: 'Run unlimited mock interviews', desc: 'AI plays the interviewer. You build real, natural answers.' },
+                  { step: '03', title: 'Responses saved to memory store', desc: 'Your best answers are stored privately, locally, and securely.' },
+                ].map(({ step, title, desc }) => (
+                  <div key={step} className="flex gap-3">
+                    <span className="text-[10px] font-black text-blue-400 w-5 shrink-0 mt-0.5">{step}</span>
+                    <div>
+                      <p className="text-sm font-bold text-slate-800">{title}</p>
+                      <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <h3 className="font-display text-base font-bold text-slate-900 mb-2">Choose Role</h3>
-              <p className="text-xs text-slate-500 leading-relaxed max-w-xs font-medium">
-                Select the job role and experience level.
-              </p>
-            </div>
+            </motion.div>
 
-            {/* Step 3 */}
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="h-16 w-16 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 text-lg font-bold shadow-sm mb-4">
-                3
+            {/* Loop 2: Live Performance */}
+            <motion.div
+              whileHover={{ y: -4 }}
+              className="bg-slate-900 border border-slate-700 rounded-2xl p-8 flex flex-col gap-5"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                  <Radio size={20} />
+                </div>
+                <div>
+                  <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Loop 2</span>
+                  <h3 className="font-display text-xl font-bold text-white leading-tight">Live Performance</h3>
+                </div>
               </div>
-              <h3 className="font-display text-base font-bold text-slate-900 mb-2">Start Interview</h3>
-              <p className="text-xs text-slate-500 leading-relaxed max-w-xs font-medium">
-                Get real-time AI interview and instant feedback.
-              </p>
-            </div>
-
-            {/* Step 4 */}
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="h-16 w-16 rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 text-lg font-bold shadow-sm mb-4">
-                4
+              <div className="space-y-3">
+                {[
+                  { step: '01', title: 'Copilot activates invisibly', desc: 'The click-through overlay launches over Zoom, Teams, or Meet.' },
+                  { step: '02', title: 'AI detects the interview topic', desc: 'Natural language processing matches the question context in real-time.' },
+                  { step: '03', title: 'Your stories surface automatically', desc: 'The HUD shows your own personalized answers — not generic AI text.' },
+                ].map(({ step, title, desc }) => (
+                  <div key={step} className="flex gap-3">
+                    <span className="text-[10px] font-black text-emerald-400 w-5 shrink-0 mt-0.5">{step}</span>
+                    <div>
+                      <p className="text-sm font-bold text-white">{title}</p>
+                      <p className="text-xs text-slate-400 leading-relaxed">{desc}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <h3 className="font-display text-base font-bold text-slate-900 mb-2">Improve & Repeat</h3>
-              <p className="text-xs text-slate-500 leading-relaxed max-w-xs font-medium">
-                Track your progress and ace the real interview.
-              </p>
-            </div>
+            </motion.div>
           </div>
-        </section>
+
+          {/* Center connector */}
+          <div className="flex items-center justify-center my-6 gap-3">
+            <div className="h-px bg-slate-200 flex-1" />
+            <div className="flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5">
+              <ArrowRight size={12} className="text-blue-600" />
+              <span className="text-xs font-bold text-blue-600">Rehearsal builds your Live performance</span>
+            </div>
+            <div className="h-px bg-slate-200 flex-1" />
+          </div>
+        </motion.section>
 
         {/* Pricing Section */}
         <section id="pricing" className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center">
@@ -2585,9 +2745,45 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
             </span>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto items-stretch">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto items-stretch">
             
-            {/* Free Tier */}
+            {/* BYOK Tier */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 text-left flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)] relative">
+              <div className="absolute top-4 right-4 bg-slate-900 text-amber-400 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider">
+                Dev
+              </div>
+              <div>
+                <h3 className="font-display text-lg font-bold text-slate-900 mb-1">BYOK</h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed font-semibold">Bring Your Own API Key</p>
+                
+                <div className="my-6">
+                  <span className="text-3xl font-black text-slate-900">${pricingPeriod === 'annual' ? '7' : '9'}</span>
+                  <span className="text-xs text-slate-500"> / month</span>
+                </div>
+
+                <div className="h-px bg-slate-100 mb-6" />
+
+                <ul className="space-y-3.5 text-xs text-slate-500 font-medium">
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> Use OpenAI / Anthropic / DeepSeek keys
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> Zero token markup — pay AI directly
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> Native overlay + stealth mode
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-500 font-bold">✓</span> Absolute data privacy
+                  </li>
+                </ul>
+              </div>
+
+              <button onClick={onSignIn} className="mt-8 w-full py-2.5 rounded-xl border border-amber-300 text-amber-700 hover:bg-amber-50 text-xs font-bold cursor-pointer transition-colors text-center">
+                Connect My Keys
+              </button>
+            </div>
+
             <div className="bg-white border border-slate-200 rounded-2xl p-6 text-left flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)] relative">
               <div>
                 <h3 className="font-display text-lg font-bold text-slate-900 mb-1">Free</h3>
@@ -2710,7 +2906,7 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
                 Ready to Ace Your Next Interview?
               </h2>
               <p className="text-sm text-slate-600 font-medium mt-2 max-w-xl">
-                Join thousands of learners improving their interview skills with CopilotX.
+                Join thousands of learners improving their interview skills with Sutra AI.
               </p>
             </div>
 
@@ -2732,10 +2928,10 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
           {/* Brand info */}
           <div className="space-y-4 md:col-span-2">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 shadow-sm">
-                <Bot size={14} className="text-white" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-orange-600 shadow-sm">
+                <SutraLogo size={14} className="text-white" />
               </div>
-              <span className="font-display font-bold text-sm text-slate-900">CopilotX</span>
+              <span className="font-display font-bold text-sm text-slate-900">Sutra AI</span>
             </div>
             <p className="leading-relaxed text-slate-500 font-medium max-w-xs">
               The AI Operating System for Interviews.
@@ -2778,9 +2974,9 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
         </div>
 
         <div className="mx-auto w-full max-w-7xl px-6 border-t border-slate-200/50 pt-8 mt-12 flex flex-col sm:flex-row items-center justify-between text-slate-400 font-semibold gap-4">
-          <p>© {new Date().getFullYear()} CopilotX Inc. Secure Google login enabled.</p>
+          <p>© {new Date().getFullYear()} Sutra AI Inc. Secure Google login enabled.</p>
           <div className="flex gap-4">
-            <a href="mailto:support@copilotx.ai" className="hover:text-slate-600 transition-colors">Support</a>
+            <a href="mailto:support@sutra.ai" className="hover:text-slate-600 transition-colors">Support</a>
             <a href="https://github.com" target="_blank" className="hover:text-slate-600 transition-colors">GitHub project</a>
           </div>
         </div>
@@ -2806,11 +3002,11 @@ function Sidebar({ active, onNavigate, onLogout, showHelpChatbot }: { active: st
           onClick={() => onNavigate('Dashboard')}
           className="flex items-center gap-3 px-2 hover:opacity-80 transition-all cursor-pointer select-none"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 shadow-[0_4px_12px_rgba(37,99,235,0.2)]">
-            <Bot size={22} className="text-white" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 shadow-[0_4px_12px_rgba(245,158,11,0.3)]">
+            <SutraLogo size={22} className="text-white" />
           </div>
           <div>
-            <div className="text-base font-bold text-slate-900 leading-tight">Copilot<span className="text-blue-600">X</span></div>
+            <div className="text-base font-bold text-slate-900 leading-tight">Sutra <span className="text-orange-500">AI</span></div>
             <div className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Interview OS</div>
           </div>
         </div>
@@ -3258,8 +3454,8 @@ function AppChoiceModal({ open, onClose, onContinueWeb }: { open: boolean; onClo
   if (!open) return null;
 
   const handleOpenDesktop = () => {
-    window.location.href = "copilotx://start-session";
-    alert("🔗 Trying to open CopilotX Desktop App...\n\nIf the app doesn't open, make sure you have the Desktop Client installed. You can download the latest bundle from the Releases page.");
+    window.location.href = "sutra://start-session";
+    alert("🔗 Trying to open Sutra AI Desktop App...\n\nIf the app doesn't open, make sure you have the Desktop Client installed. You can download the latest bundle from the Releases page.");
     onClose();
   };
 
@@ -3343,7 +3539,7 @@ function AppChoiceModal({ open, onClose, onContinueWeb }: { open: boolean; onClo
 
         {/* Footer info */}
         <p className="text-[10px] text-center text-slate-500 leading-relaxed mt-6">
-          🔒 Running CopilotX is secure. For the best performance and to capture browser/app sound cards seamlessly, we recommend using the desktop app.
+          🔒 Running Sutra AI is secure. For the best performance and to capture browser/app sound cards seamlessly, we recommend using the desktop app.
         </p>
 
       </div>
@@ -5779,7 +5975,7 @@ function LiveSession({
 
             <h3 className="text-xl font-black text-white">Share Tab or Window to Connect</h3>
             <p className="mt-2.5 text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
-              To capture the interviewer's audio and process live questions, CopilotX requires capturing a browser tab or an application window. Sharing the entire screen is not supported.
+              To capture the interviewer's audio and process live questions, Sutra AI requires capturing a browser tab or an application window. Sharing the entire screen is not supported.
             </p>
 
             {/* Instruction Steps */}
@@ -6024,7 +6220,7 @@ function LiveSession({
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400 shadow-sm">
               <Brain size={16} className="text-white" />
             </div>
-            <span className="text-base font-black text-slate-100">CopilotX</span>
+            <span className="text-base font-black text-slate-100">Sutra AI</span>
           </div>
 
           {/* Active Context Badges */}
@@ -6084,8 +6280,8 @@ function LiveSession({
         <div className="flex-1 min-h-0 overflow-y-auto p-5 bg-[#050712]/40">
           {qaHistory.length === 0 && !stream.text ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-900/60 border border-slate-800">
-                <Bot size={26} className="text-slate-400" />
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 border border-orange-500/20 shadow-[0_4px_12px_rgba(245,158,11,0.2)]">
+                <SutraLogo size={26} className="text-white" />
               </div>
               <p className="text-sm font-semibold text-slate-400">No messages yet.</p>
               <p className="text-xs text-slate-500 mt-1">Click "Answer" to start!</p>
@@ -7527,7 +7723,7 @@ function SessionSummary({ onHome, onReplay }: { onHome: () => void; onReplay: ()
 }
 
 function Page({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
-  return <main className="px-5 py-7 lg:px-8 flex-1 overflow-y-auto min-h-0"><div className="mb-8"><p className="text-sm font-semibold text-violet-300">CopilotX</p><h1 className="mt-2 text-4xl font-black text-white">{title}</h1><p className="mt-2 text-slate-400">{subtitle}</p></div>{children}</main>;
+  return <main className="px-5 py-7 lg:px-8 flex-1 overflow-y-auto min-h-0"><div className="mb-8"><p className="text-sm font-semibold text-violet-300">Sutra AI</p><h1 className="mt-2 text-4xl font-black text-white">{title}</h1><p className="mt-2 text-slate-400">{subtitle}</p></div>{children}</main>;
 }
 
 function useStream() {
