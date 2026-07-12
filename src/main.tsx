@@ -8,7 +8,7 @@ import {
   PlusCircle, Copy, Save, Camera, Pause, Pin, Minimize2, Maximize2, Move,
   SlidersHorizontal, CheckCircle2, Crown, Zap, Target, Layers, ScreenShare, AlertCircle, ExternalLink,
   Volume2, VolumeX, Activity, MonitorSpeaker, HelpCircle, ChevronDown, ChevronUp, ChevronRight, Cpu,
-  Laptop, Globe, ArrowRight, PlayCircle as MonitorPlay, EyeOff, BellOff,
+  Laptop, Globe, Monitor, ArrowRight, PlayCircle as MonitorPlay, EyeOff, BellOff,
   Trash, Edit3, MessageSquare, Check, Video
 } from 'lucide-react';
 import './styles/globals.css';
@@ -2778,6 +2778,115 @@ const previewScenarios = {
   }
 };
 
+const getStealthScenarioContent = (scenario: 'system' | 'sql' | 'react') => {
+  if (scenario === 'system') {
+    return {
+      sayFirst: "Actually, that reminds me of an API concurrency bottleneck we solved on our ingestion service using a partitioned queue...",
+      star: [
+        { label: 'S/T', desc: 'Concurrently handling 10k req/sec validation bottlenecks.' },
+        { label: 'A', desc: 'Partitioned Kafka brokers categorized by channel priority.' },
+        { label: 'R', desc: 'Worker containers autoscaled with APNs callback integration.' }
+      ]
+    };
+  } else if (scenario === 'sql') {
+    return {
+      sayFirst: "For database querying latency, we typically target composite index paths based on ordering keys...",
+      star: [
+        { label: 'S/T', desc: 'Optimizing high-latency user session queries under peak load.' },
+        { label: 'A', desc: 'Created B-Tree indices to match sort filters directly.' },
+        { label: 'R', desc: 'Reduced query scan range by 94%, avoiding table scans.' }
+      ]
+    };
+  } else {
+    return {
+      sayFirst: "With React 19, reconciliation is built on asynchronous transition states to prevent thread locks...",
+      star: [
+        { label: 'S/T', desc: 'Managing heavy client-side updates without input lag.' },
+        { label: 'A', desc: 'Used Fiber time-slicing hooks to chunk rendering cycles.' },
+        { label: 'R', desc: 'Standardized async actions without manual pending indicators.' }
+      ]
+    };
+  }
+};
+
+const MockIDE = ({ scenario }: { scenario: 'system' | 'sql' | 'react' }) => {
+  return (
+    <div className="flex-1 flex flex-col bg-[#0d1117] text-[#c9d1d9] font-mono text-left select-none h-full w-full">
+      {/* VS Code title bar */}
+      <div className="bg-[#161b22] px-3 py-2 flex items-center gap-1.5 border-b border-slate-800 shrink-0">
+        <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f56]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f]" />
+        <span className="text-[10px] text-slate-500 ml-4 font-sans">
+          {scenario === 'system' ? 'QueueService.ts' : scenario === 'sql' ? 'optimize.sql' : 'ProfileEditor.tsx'} — Sutra AI Workspace
+        </span>
+      </div>
+
+      {/* Editor Body */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* IDE Sidebar */}
+        <div className="w-12 bg-[#0d1117] border-r border-slate-850 flex flex-col items-center py-2 gap-3 shrink-0" style={{ borderColor: '#1f242c' }}>
+          <div className="p-1 rounded text-slate-400"><Code2 size={16} /></div>
+          <div className="p-1 rounded text-slate-600"><Database size={16} /></div>
+        </div>
+
+        {/* Code Content */}
+        <div className="flex-1 p-4 flex gap-4 overflow-y-auto relative">
+          {/* Line Numbers */}
+          <div className="text-slate-600 text-[10px] text-right space-y-1 select-none pr-3 border-r border-slate-800/40 shrink-0">
+            {Array.from({ length: 9 }).map((_, i) => <div key={i}>{i + 1}</div>)}
+          </div>
+
+          {/* Actual Code */}
+          <div className="text-[10px] sm:text-[11px] leading-relaxed space-y-1 text-slate-300">
+            {scenario === 'system' && (
+              <>
+                <div><span className="text-[#ff7b72]">import</span> &#123; messageQueue &#125; <span className="text-[#ff7b72]">from</span> <span className="text-[#a5d6ff]">'./broker'</span>;</div>
+                <div className="text-slate-500">// Ingestion concurrency logic</div>
+                <div><span className="text-[#ff7b72]">export async function</span> <span className="text-[#d2a8ff]">handleIngestion</span>(req, res) &#123;</div>
+                <div>&nbsp;&nbsp;<span className="text-[#ff7b72]">const</span> payload = req.body;</div>
+                <div>&nbsp;&nbsp;<span className="text-[#d2a8ff]">validatePayload</span>(payload);</div>
+                <div>&nbsp;&nbsp;<span className="text-[#ff7b72]">await</span> messageQueue.<span className="text-[#d2a8ff]">dispatch</span>(&#123;</div>
+                <div>&nbsp;&nbsp;&nbsp;&nbsp;topic: <span className="text-[#a5d6ff]">'notifications-high'</span>,</div>
+                <div>&nbsp;&nbsp;&nbsp;&nbsp;key: payload.userId</div>
+                <div>&nbsp;&nbsp;&#125;);</div>
+                <div>&#125;</div>
+              </>
+            )}
+            {scenario === 'sql' && (
+              <>
+                <div className="text-slate-500">-- Heavy read latency query optimization</div>
+                <div><span className="text-[#ff7b72]">CREATE INDEX</span> idx_sessions_active</div>
+                <div><span className="text-[#ff7b72]">ON</span> user_sessions (user_id, last_active <span className="text-[#ff7b72]">DESC</span>);</div>
+                <div>&nbsp;</div>
+                <div className="text-slate-500">-- Optimized B-Tree composite query path:</div>
+                <div><span className="text-[#ff7b72]">SELECT</span> id, session_token, last_active</div>
+                <div><span className="text-[#ff7b72]">FROM</span> user_sessions</div>
+                <div><span className="text-[#ff7b72]">WHERE</span> user_id = <span className="text-[#79c0ff]">918</span></div>
+                <div><span className="text-[#ff7b72]">ORDER BY</span> last_active <span className="text-[#ff7b72]">DESC</span>;</div>
+              </>
+            )}
+            {scenario === 'react' && (
+              <>
+                <div><span className="text-[#ff7b72]">import</span> &#123; useTransition &#125; <span className="text-[#ff7b72]">from</span> <span className="text-[#a5d6ff]">'react'</span>;</div>
+                <div>&nbsp;</div>
+                <div><span className="text-[#ff7b72]">function</span> <span className="text-[#d2a8ff]">ProfileEditor</span>() &#123;</div>
+                <div>&nbsp;&nbsp;<span className="text-[#ff7b72]">const</span> [isPending, startTransition] = <span className="text-[#d2a8ff]">useTransition</span>();</div>
+                <div>&nbsp;&nbsp;<span className="text-[#ff7b72]">const</span> updateProfile = () =&gt; &#123;</div>
+                <div>&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#d2a8ff]">startTransition</span>(<span className="text-[#ff7b72]">async</span> () =&gt; &#123;</div>
+                <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#ff7b72]">await</span> api.<span className="text-[#d2a8ff]">saveProfile</span>();</div>
+                <div>&nbsp;&nbsp;&nbsp;&nbsp;&#125;);</div>
+                <div>&nbsp;&nbsp;&#125;;</div>
+                <div>&#125;</div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function Landing({
   onSignIn,
   onStart,
@@ -2799,11 +2908,18 @@ function Landing({
   const [hoveredLoop, setHoveredLoop] = useState<number | null>(null);
 
   // Pricing state
-  const [pricingPeriod, setPricingPeriod] = useState<'monthly' | 'annual'>('annual');
+  const [landingPricingTab, setLandingPricingTab] = useState<'periods' | 'credits'>('periods');
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   // Stealth section demo animation
   const [stealthPhase, setStealthPhase] = useState<'listening' | 'thinking' | 'response'>('listening');
   const [visibleBullets, setVisibleBullets] = useState(0);
+
+  // Hero active mode state
+  const [activeMode, setActiveMode] = useState<'prep' | 'live'>('live');
+
+  // Interactive stealth slider position (0-100)
+  const [sliderPos, setSliderPos] = useState(50);
 
   useEffect(() => {
     let timeout: any;
@@ -2830,12 +2946,13 @@ function Landing({
 
   // Set body background/color dynamically for light color scheme
   useEffect(() => {
-    const prevBg = document.body.style.backgroundColor;
+    const prevBg = document.body.style.background;
     const prevColor = document.body.style.color;
-    document.body.style.backgroundColor = '#f8fafc';
+    document.body.style.background = 'linear-gradient(180deg, #eff6ff 0%, #ffffff 45%, #f0fdf4 80%, #ffffff 100%)';
+    document.body.style.backgroundAttachment = 'fixed';
     document.body.style.color = '#0f172a';
     return () => {
-      document.body.style.backgroundColor = prevBg;
+      document.body.style.background = prevBg;
       document.body.style.color = prevColor;
     };
   }, []);
@@ -2916,49 +3033,234 @@ function Landing({
     };
   }, [activeScenario]);
 
-  return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col relative overflow-hidden font-sans">
-      
-      {/* Drifting Aura Lights */}
-      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-blue-100/50 blur-[130px]" />
-      <div className="pointer-events-none absolute top-1/3 -right-20 h-[600px] w-[600px] rounded-full bg-indigo-50/70 blur-[150px]" />
-      <div className="pointer-events-none absolute -bottom-20 left-1/3 h-[500px] w-[500px] rounded-full bg-purple-50/50 blur-[120px]" />
-
-      {/* Grid Pattern Mask */}
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(circle_at_50%_30%,black_60%,transparent_100%)] opacity-80" />
-
-      {/* Navbar */}
-      <header className="relative z-50 mx-auto w-full max-w-7xl px-6 py-5 flex items-center justify-between transition-all">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 shadow-[0_4px_12px_rgba(245,158,11,0.3)]">
-            <SutraLogo size={18} className="text-white" />
-          </div>
-          <span className="font-display text-lg font-bold tracking-tight text-slate-900">
-            Sutra <span className="text-orange-500">AI</span>
-          </span>
+  const renderMockupAnswer = (scenario: 'system' | 'sql' | 'react', length: number) => {
+    const currentData = previewScenarios[scenario];
+    const fullText = currentData.answer;
+    
+    if (scenario === 'system') {
+      const headerText = "Ingestion & In-Memory Queueing";
+      const totalLen = headerText.length;
+      return (
+        <div className="space-y-1">
+          <h4 className="text-[11px] font-black text-slate-800 tracking-tight leading-snug">
+            {headerText.slice(0, length)}
+          </h4>
+          {length > totalLen && (
+            <p className="text-[10px] text-slate-600 font-medium leading-relaxed italic mt-0.5">
+              1. <strong className="text-teal-700 font-bold" style={{ color: '#0f766e' }}>API Ingestion Service</strong>: Light Node.js/Go instances validate schemas...
+            </p>
+          )}
         </div>
+      );
+    } else if (scenario === 'sql') {
+      const headerText = "Composite Indexing & Planning Analysis";
+      const totalLen = headerText.length;
+      return (
+        <div className="space-y-1">
+          <h4 className="text-[11px] font-black text-slate-800 tracking-tight leading-snug">
+            {headerText.slice(0, length)}
+          </h4>
+          {length > totalLen && (
+            <p className="text-[10px] text-slate-600 font-medium leading-relaxed italic mt-0.5">
+              1. <strong className="text-teal-700 font-bold" style={{ color: '#0f766e' }}>Composite Indexes</strong>: Align indexed keys with sorting criteria...
+            </p>
+          )}
+        </div>
+      );
+    } else {
+      const headerText = "Fiber Tree Diffing & Async Actions";
+      const totalLen = headerText.length;
+      return (
+        <div className="space-y-1">
+          <h4 className="text-[11px] font-black text-slate-800 tracking-tight leading-snug">
+            {headerText.slice(0, length)}
+          </h4>
+          {length > totalLen && (
+            <p className="text-[10px] text-slate-600 font-medium leading-relaxed italic mt-0.5">
+              1. <strong className="text-teal-700 font-bold" style={{ color: '#0f766e' }}>Fiber Time Slicing</strong>: Breaks rendering tasks into microscopic execution...
+            </p>
+          )}
+        </div>
+      );
+    }
+  };
 
-        <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
-          <a href="#simulator" className="hover:text-blue-600 transition-colors cursor-pointer">Live Interview</a>
-          <a href="#features" className="hover:text-blue-600 transition-colors cursor-pointer">Mock Interview</a>
-          <a href="#features" className="hover:text-blue-600 transition-colors cursor-pointer">Resumes</a>
-          <a href="#features" className="hover:text-blue-600 transition-colors cursor-pointer">Knowledge Base</a>
-          <a href="#pricing" className="hover:text-blue-600 transition-colors cursor-pointer">Pricing</a>
-          <div className="flex items-center gap-1 hover:text-blue-600 transition-colors cursor-pointer group">
-            <span>Resources</span>
-            <ChevronDown size={14} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
+  return (
+    <div className="min-h-screen text-slate-900 flex flex-col relative overflow-hidden font-sans" style={{ background: '#ffffff' }}>
+
+      {/* === BASE CANVAS: Clean white with a soft blue wash at top === */}
+      <div className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(180deg, #eff6ff 0%, #ffffff 45%, #f0fdf4 80%, #ffffff 100%)' }} />
+
+      {/* === AURA ORBS — matched to page accent colors === */}
+      {/* Top-left: Blue — matches CTA button (blue-600) */}
+      <motion.div
+        animate={{
+          x: [0, 40, -25, 15, 0],
+          y: [0, -35, 20, -15, 0],
+          scale: [1, 1.15, 0.95, 1.05, 1],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="pointer-events-none absolute -top-32 -left-24 h-[650px] w-[650px] rounded-full"
+        style={{
+          background: 'radial-gradient(circle at 35% 35%, #2563eb 0%, #3b82f6 18%, rgba(59,130,246,0.35) 45%, transparent 68%)',
+          filter: 'blur(70px)',
+          opacity: 0.22
+        }}
+      />
+      {/* Top-right: Amber/Orange — matches logo */}
+      <motion.div
+        animate={{
+          x: [0, -30, 20, -40, 0],
+          y: [0, 40, -15, 30, 0],
+          scale: [1, 0.9, 1.1, 0.95, 1],
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="pointer-events-none absolute -top-16 right-[-60px] h-[550px] w-[550px] rounded-full"
+        style={{
+          background: 'radial-gradient(circle at 60% 35%, #f59e0b 0%, #f97316 18%, rgba(249,115,22,0.3) 45%, transparent 68%)',
+          filter: 'blur(75px)',
+          opacity: 0.18
+        }}
+      />
+      {/* Center-right: Blue again, secondary glow */}
+      <motion.div
+        animate={{
+          x: [0, 50, -30, 20, 0],
+          y: [0, -25, 45, -30, 0],
+          scale: [1, 1.1, 0.85, 1.05, 1],
+        }}
+        transition={{
+          duration: 22,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="pointer-events-none absolute top-[20%] -right-20 h-[700px] w-[600px] rounded-full"
+        style={{
+          background: 'radial-gradient(circle at 65% 40%, #1d4ed8 0%, #2563eb 15%, rgba(37,99,235,0.2) 50%, transparent 70%)',
+          filter: 'blur(90px)',
+          opacity: 0.18
+        }}
+      />
+      {/* Mid-left: Emerald — matches live indicators & badges */}
+      <motion.div
+        animate={{
+          x: [0, -45, 35, -20, 0],
+          y: [0, 30, -35, 15, 0],
+          scale: [1, 1.05, 0.9, 1.15, 1],
+        }}
+        transition={{
+          duration: 18,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="pointer-events-none absolute top-[35%] -left-28 h-[550px] w-[550px] rounded-full"
+        style={{
+          background: 'radial-gradient(circle at 30% 50%, #059669 0%, #10b981 18%, rgba(16,185,129,0.25) 48%, transparent 68%)',
+          filter: 'blur(80px)',
+          opacity: 0.2
+        }}
+      />
+      {/* Bottom-center: Soft blue sweep */}
+      <motion.div
+        animate={{
+          x: [0, 35, -35, 15, 0],
+          y: [0, -45, 25, -15, 0],
+          scale: [1, 1.1, 0.9, 1.05, 1],
+        }}
+        transition={{
+          duration: 28,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="pointer-events-none absolute bottom-[0%] left-[15%] h-[500px] w-[800px] rounded-full"
+        style={{
+          background: 'radial-gradient(ellipse at 50% 60%, #3b82f6 0%, rgba(59,130,246,0.3) 35%, transparent 65%)',
+          filter: 'blur(90px)',
+          opacity: 0.15
+        }}
+      />
+      {/* Bottom-right: Amber accent echo */}
+      <motion.div
+        animate={{
+          x: [0, -25, 45, -15, 0],
+          y: [0, 35, -25, 45, 0],
+          scale: [1, 0.9, 1.15, 0.95, 1],
+        }}
+        transition={{
+          duration: 24,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="pointer-events-none absolute -bottom-20 right-[5%] h-[420px] w-[420px] rounded-full"
+        style={{
+          background: 'radial-gradient(circle, #f59e0b 0%, rgba(245,158,11,0.3) 38%, transparent 65%)',
+          filter: 'blur(65px)',
+          opacity: 0.16
+        }}
+      />
+
+      {/* === HERO SPOTLIGHT: Directional white light from top keeps text readable === */}
+      <div className="pointer-events-none absolute top-0 left-0 right-0 h-[700px]" style={{ background: 'radial-gradient(ellipse 90% 60% at 50% 0%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 40%, transparent 100%)' }} />
+
+      {/* === DOT GRID: Blue-tinted to match CTA === */}
+      <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, rgba(37,99,235,0.12) 1px, transparent 1px)', backgroundSize: '30px 30px', maskImage: 'radial-gradient(ellipse 85% 55% at 50% 10%, black 10%, rgba(0,0,0,0.35) 45%, transparent 75%)', opacity: 0.9 }} />
+
+      {/* === TOP ACCENT LINE: Blue-to-amber matches brand === */}
+      <div className="pointer-events-none absolute top-0 inset-x-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent 0%, #3b82f6 25%, #2563eb 45%, #f59e0b 65%, #f97316 80%, transparent 100%)' }} />
+
+      {/* Navbar — sticky glass bar */}
+      <header className="sticky top-0 z-50 w-full border-b border-slate-200/60 bg-white/80 backdrop-blur-xl shadow-[0_1px_20px_rgba(0,0,0,0.06)] transition-all">
+        <div className="mx-auto w-full max-w-7xl px-6 py-4 flex items-center justify-between">
+          {/* Brand */}
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 shadow-[0_4px_12px_rgba(245,158,11,0.35)]">
+              <SutraLogo size={18} className="text-white" />
+            </div>
+            <span className="font-display text-lg font-bold tracking-tight text-slate-900">
+              Sutra <span className="text-orange-500">AI</span>
+            </span>
           </div>
-        </nav>
 
-        <div className="flex items-center gap-4">
-          <button onClick={onSignIn} className="text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors cursor-pointer">
-            Log in
-          </button>
-          <button onClick={onStart} className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl px-5 py-2.5 text-sm font-bold shadow-[0_4px_14px_rgba(37,99,235,0.2)] transition-all cursor-pointer">
-            Start Free Session →
-          </button>
+          {/* Nav links — match actual landing page sections */}
+          <nav className="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-500">
+            <a href="#simulator" className="hover:text-teal-600 transition-colors duration-200 cursor-pointer">Live Interview</a>
+            <a href="#how-it-works" className="hover:text-teal-600 transition-colors duration-200 cursor-pointer">How It Works</a>
+            <a href="#features" className="hover:text-teal-600 transition-colors duration-200 cursor-pointer">Features</a>
+            <a href="#reviews" className="hover:text-teal-600 transition-colors duration-200 cursor-pointer">Reviews</a>
+            <a href="#pricing" className="hover:text-teal-600 transition-colors duration-200 cursor-pointer">Pricing</a>
+            <a href="#showcase-video" className="hover:text-teal-600 transition-colors duration-200 cursor-pointer">Watch Demo</a>
+          </nav>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onSignIn}
+              className="text-sm font-semibold text-slate-600 hover:text-teal-700 transition-colors cursor-pointer"
+            >
+              Log in
+            </button>
+            <button
+              onClick={onStart}
+              className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white cursor-pointer transition-all duration-200 hover:-translate-y-px active:translate-y-0"
+              style={{
+                background: 'linear-gradient(135deg, #0d9488 0%, #059669 100%)',
+                boxShadow: '0 4px 14px rgba(13,148,136,0.35), inset 0 1px 0 rgba(255,255,255,0.15)'
+              }}
+            >
+              Start Free Session <ArrowRight size={14} />
+            </button>
+          </div>
         </div>
       </header>
+
 
       {/* Main Container */}
       <main className="relative z-10 flex-1">
@@ -2966,20 +3268,39 @@ function Landing({
         {/* Hero Section */}
         <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, type: "spring", bounce: 0.3 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-12 md:py-20 grid items-center gap-12 lg:grid-cols-[1.1fr_.9fr]">
           <div className="flex flex-col items-start text-left">
-            <div className="mb-6 flex flex-wrap gap-2 animate-fadeIn">
-              <span className="inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600">
-                <Sparkles size={11} className="text-blue-500" />
-                + AI-Powered Interview Preparation
-              </span>
+            {/* Dynamic Segmented Switch */}
+            <div className="mb-6 flex items-center gap-1 rounded-2xl border border-slate-200/80 bg-slate-100 p-1">
+              <button
+                onClick={() => setActiveMode('prep')}
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${
+                  activeMode === 'prep' 
+                    ? 'bg-white text-teal-900 shadow-sm border border-slate-200/30' 
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <Volume2 size={13} className={activeMode === 'prep' ? 'text-teal-600' : 'text-slate-400'} />
+                Prep Mode: AI Mock Interviewer
+              </button>
+              <button
+                onClick={() => setActiveMode('live')}
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${
+                  activeMode === 'live' 
+                    ? 'bg-white text-teal-900 shadow-sm border border-slate-200/30' 
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <Monitor size={13} className={activeMode === 'live' ? 'text-teal-600' : 'text-slate-400'} />
+                Live Mode: Invisible Copilot
+              </button>
             </div>
 
             <h1 className="font-display text-5xl sm:text-6xl lg:text-[70px] font-black leading-[1.08] tracking-tight text-slate-900">
-              Your Real-Time <br />
-              <span className="text-blue-600">Interview Copilot</span>
+              The Invisible, <br />
+              <span className="text-blue-600">Local-First AI Interview Copilot.</span>
             </h1>
             
             <p className="mt-6 max-w-xl text-slate-600 text-base sm:text-lg leading-relaxed font-medium">
-              Practice smarter before. Perform flawlessly during. Sutra AI is the only tool that bridges <span className="font-bold text-slate-800">mock preparation</span> and <span className="font-bold text-slate-800">live interview performance</span> — invisibly.
+              Sutra AI is the only platform built as a native desktop overlay. Practice with structured voice mock interviews before, and perform flawlessly during live calls — without anyone ever knowing it's there.
             </p>
             <p className="mt-2 text-xs text-slate-500 font-semibold flex items-center gap-1.5">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -2995,8 +3316,21 @@ function Landing({
               </a>
             </div>
 
+            {/* High trust Feature Check */}
+            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-500 font-bold">
+              <span className="flex items-center gap-1.5 text-emerald-600">
+                <CheckCircle2 size={13} className="text-emerald-500" /> True system-level invisibility
+              </span>
+              <span className="flex items-center gap-1.5 text-emerald-600">
+                <CheckCircle2 size={13} className="text-emerald-500" /> No browser extension flags
+              </span>
+              <span className="flex items-center gap-1.5 text-emerald-600">
+                <CheckCircle2 size={13} className="text-emerald-500" /> Dynamic STAR-method talking points
+              </span>
+            </div>
+
             {/* Trust elements */}
-            <div className="mt-12 flex items-center gap-4">
+            <div className="mt-8 flex items-center gap-4">
               <div className="flex -space-x-3">
                 <img className="h-9 w-9 rounded-full border-2 border-white object-cover shadow-sm animate-fadeIn" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80" alt="Learner 1" />
                 <img className="h-9 w-9 rounded-full border-2 border-white object-cover shadow-sm animate-fadeIn" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80" alt="Learner 2" />
@@ -3019,189 +3353,302 @@ function Landing({
           {/* Right Column: Premium Mockup */}
           <div id="simulator" className="relative group w-full flex justify-center">
             {/* Subtle blue/indigo background glow */}
-            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-blue-500 to-indigo-500 opacity-[0.08] blur-2xl" />
+            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-blue-500 to-indigo-500 opacity-[0.08] blur-2xl animate-pulse" />
             
-            <div className="relative w-full max-w-[540px] bg-white border border-slate-200/80 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col">
-              
-              {/* Mockup Header */}
-              <div className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200/80 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live Interview
-                  </div>
-                  {simulatorState === 'typing' && (
-                    <span className="text-[10px] text-blue-600 font-bold bg-blue-50 border border-blue-100 rounded px-1.5 py-0.5 animate-pulse">🎙️ Listening...</span>
-                  )}
-                  {simulatorState === 'thinking' && (
-                    <span className="text-[10px] text-purple-600 font-bold bg-purple-50 border border-purple-100 rounded px-1.5 py-0.5 animate-pulse">⚡ Thinking...</span>
-                  )}
-                  {simulatorState === 'streaming' && (
-                    <span className="text-[10px] text-indigo-600 font-bold bg-indigo-50 border border-indigo-100 rounded px-1.5 py-0.5">💡 Copilot Streaming...</span>
-                  )}
-                </div>
-                <div className="flex items-center gap-3 text-xs text-slate-500 font-semibold">
-                  <span className="flex items-center gap-1">⏱ 24:35</span>
-                  <span className="border border-red-200 text-red-600 bg-red-50/50 rounded-md px-2 py-0.5 text-[10px] font-bold">End Session</span>
-                </div>
-              </div>
-
-              {/* Mockup Body: Two columns layout */}
-              <div className="p-4 grid grid-cols-1 md:grid-cols-[1.3fr_.7fr] gap-4 bg-slate-50/30">
+            {activeMode === 'prep' ? (
+              // PREP MODE MOCKUP
+              <div className="relative w-full max-w-[540px] bg-white border border-slate-200/80 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col">
                 
-                {/* Left Column in Mockup */}
-                <div className="space-y-4">
-                  
-                  {/* AI Interviewer bubble */}
-                  <div className="bg-white border border-slate-200/60 rounded-xl p-3.5 shadow-sm text-left">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                        <Volume2 size={13} />
-                      </div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">AI Interviewer</span>
+                {/* Mockup Header */}
+                <div className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200/80 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Prep Mode: AI Mock
                     </div>
-                    <p className="text-[13px] text-slate-800 font-semibold min-h-[40px]">
-                      {questionLength > 0 ? previewScenarios[activeScenario].question.slice(0, questionLength) : <span className="text-slate-400 italic">Listening for voice signals...</span>}
-                    </p>
+                    {simulatorState === 'typing' && (
+                      <span className="text-[10px] text-blue-600 font-bold bg-blue-50 border border-blue-100 rounded px-1.5 py-0.5 animate-pulse">🎙️ Listening...</span>
+                    )}
+                    {simulatorState === 'thinking' && (
+                      <span className="text-[10px] text-purple-600 font-bold bg-purple-50 border border-purple-100 rounded px-1.5 py-0.5 animate-pulse">⚡ Thinking...</span>
+                    )}
+                    {simulatorState === 'streaming' && (
+                      <span className="text-[10px] text-indigo-600 font-bold bg-indigo-50 border border-indigo-100 rounded px-1.5 py-0.5">💡 Copilot Streaming...</span>
+                    )}
                   </div>
-
-                  {/* Your Response audio waveform */}
-                  <div className="bg-white border border-slate-200/60 rounded-xl p-3.5 shadow-sm text-left">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Your Response</span>
-                      <span className="text-[11px] font-bold text-emerald-600">01:24</span>
-                    </div>
-                    <div className="h-8 flex items-center gap-1">
-                      {Array.from({ length: 28 }).map((_, i) => {
-                        const heights = [3,6,12,18,12,6,3,8,14,24,18,10,4,8,18,32,24,14,6,8,16,28,16,8,4,8,12,6];
-                        const h = heights[i % heights.length];
-                        return (
-                          <span 
-                            key={i} 
-                            className="flex-1 rounded-sm transition-all duration-300"
-                            style={{
-                              height: simulatorState === 'typing' ? `${Math.max(3, h * (0.3 + Math.random() * 0.7))}px` : '4px',
-                              backgroundColor: simulatorState === 'typing' ? '#2563eb' : '#e2e8f0'
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
+                  <div className="flex items-center gap-3 text-xs text-slate-500 font-semibold">
+                    <span className="flex items-center gap-1">⏱ 24:35</span>
+                    <span className="border border-red-200 text-red-600 bg-red-50/50 rounded-md px-2 py-0.5 text-[10px] font-bold">End Session</span>
                   </div>
-
-                  {/* Metrics */}
-                  <div id="mockup-metrics" className="grid grid-cols-3 gap-2 rounded-xl transition-all duration-300">
-                    <div className="bg-white border border-slate-200/60 rounded-xl p-2.5 shadow-sm flex flex-col items-center">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Confidence</span>
-                      <div className="relative h-11 w-11 flex items-center justify-center">
-                        <svg className="absolute inset-0 transform -rotate-90" viewBox="0 0 36 36">
-                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f1f5f9" strokeWidth="2.5"/>
-                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#10b981" strokeWidth="2.5" strokeDasharray="82, 100" strokeLinecap="round"/>
-                        </svg>
-                        <span className="absolute text-[11px] font-extrabold text-slate-800">82%</span>
-                      </div>
-                      <span className="text-[9px] font-bold text-emerald-600 mt-1">Good</span>
-                    </div>
-
-                    <div className="bg-white border border-slate-200/60 rounded-xl p-2.5 shadow-sm flex flex-col items-center">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Clarity</span>
-                      <div className="relative h-11 w-11 flex items-center justify-center">
-                        <svg className="absolute inset-0 transform -rotate-90" viewBox="0 0 36 36">
-                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f1f5f9" strokeWidth="2.5"/>
-                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f97316" strokeWidth="2.5" strokeDasharray="78, 100" strokeLinecap="round"/>
-                        </svg>
-                        <span className="absolute text-[11px] font-extrabold text-slate-800">78%</span>
-                      </div>
-                      <span className="text-[9px] font-bold text-orange-600 mt-1">Good</span>
-                    </div>
-
-                    <div className="bg-white border border-slate-200/60 rounded-xl p-2.5 shadow-sm flex flex-col items-center">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Relevance</span>
-                      <div className="relative h-11 w-11 flex items-center justify-center">
-                        <svg className="absolute inset-0 transform -rotate-90" viewBox="0 0 36 36">
-                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f1f5f9" strokeWidth="2.5"/>
-                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeDasharray="91, 100" strokeLinecap="round"/>
-                        </svg>
-                        <span className="absolute text-[11px] font-extrabold text-slate-800">91%</span>
-                      </div>
-                      <span className="text-[9px] font-bold text-blue-600 mt-1">Excellent</span>
-                    </div>
-                  </div>
-
                 </div>
 
-                {/* Right Column in Mockup */}
-                <div className="space-y-4">
+                {/* Mockup Body: Two columns layout */}
+                <div className="p-4 grid grid-cols-1 md:grid-cols-[1.25fr_.75fr] gap-4 bg-slate-50/30 transition-all duration-300 min-h-[380px]">
                   
-                  {/* Glance-First HUD */}
-                  <div className="bg-white border border-slate-200/60 rounded-xl p-3.5 shadow-sm text-left flex flex-col flex-1 min-h-[170px]">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Copilot HUD</span>
-                      <span className="text-[9px] font-black bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full uppercase tracking-wider">Glance Mode</span>
-                    </div>
-                    {simulatorState === 'thinking' ? (
-                      <div className="flex flex-col items-center justify-center py-6 space-y-2">
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-                        <span className="text-[10px] text-slate-400">Building your personalized response...</span>
-                      </div>
-                    ) : answerLength > 0 ? (
-                      <div className="space-y-2">
-                        <div className="bg-blue-50 border border-blue-100 rounded-lg px-2.5 py-2">
-                          <span className="text-[8px] font-black text-blue-600 uppercase tracking-widest block mb-1">SAY FIRST</span>
-                          <p className="text-[11px] text-slate-800 font-semibold leading-snug italic">&ldquo;{previewScenarios[activeScenario].answer.slice(0, Math.min(answerLength, 80))}...&rdquo;</p>
+                  {/* Left Column in Mockup */}
+                  <div className="space-y-4">
+                    
+                    {/* AI Interviewer bubble */}
+                    <div className="bg-white border border-slate-200/60 rounded-xl p-3.5 shadow-sm text-left border-teal-500/30 ring-2 ring-teal-500/5">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                          <Volume2 size={13} />
                         </div>
-                        <div className="space-y-1.5 px-0.5">
-                          {['Scale horizontally, not vertically', 'Use a message queue (Kafka/RabbitMQ)', 'Cache aggressively at the edge'].map((point, i) => (
-                            <div key={i} className="flex items-start gap-2">
-                              <span className="mt-0.5 h-3.5 w-3.5 rounded-full bg-slate-100 border border-slate-200 text-[8px] font-black text-slate-500 flex items-center justify-center shrink-0">{i + 1}</span>
-                              <span className="text-[10px] text-slate-600 font-medium leading-tight">{point}</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">AI Interviewer</span>
+                      </div>
+                      <p className="text-[13px] text-slate-800 font-semibold min-h-[40px]">
+                        {questionLength > 0 ? previewScenarios[activeScenario].question.slice(0, questionLength) : <span className="text-slate-400 italic">Listening for voice signals...</span>}
+                      </p>
+                    </div>
+
+                    {/* Your Response audio waveform */}
+                    <div className="bg-white border border-slate-200/60 rounded-xl p-3.5 shadow-sm text-left border-teal-500/30 ring-2 ring-teal-500/5">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Your Response</span>
+                        <span className="text-[11px] font-bold text-emerald-600">01:24</span>
+                      </div>
+                      <div className="h-8 flex items-center gap-1">
+                        {Array.from({ length: 28 }).map((_, i) => {
+                          const heights = [3,6,12,18,12,6,3,8,14,24,18,10,4,8,18,32,24,14,6,8,16,28,16,8,4,8,12,6];
+                          const h = heights[i % heights.length];
+                          return (
+                            <span 
+                              key={i} 
+                              className="flex-1 rounded-sm transition-all duration-300"
+                              style={{
+                                height: `${Math.max(3, h * (0.3 + Math.random() * 0.7))}px`,
+                                backgroundColor: '#2563eb'
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Metrics */}
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      id="mockup-metrics" 
+                      className="grid grid-cols-3 gap-2 rounded-xl transition-all duration-300"
+                    >
+                      <div className="bg-white border border-slate-200/60 rounded-xl p-2.5 shadow-sm flex flex-col items-center">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Confidence</span>
+                        <div className="relative h-11 w-11 flex items-center justify-center">
+                          <svg className="absolute inset-0 transform -rotate-90" viewBox="0 0 36 36">
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f1f5f9" strokeWidth="2.5"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="#10b981" strokeWidth="2.5" strokeDasharray="82, 100" strokeLinecap="round"/>
+                          </svg>
+                          <span className="absolute text-[11px] font-extrabold text-slate-800">82%</span>
+                        </div>
+                        <span className="text-[9px] font-bold text-emerald-600 mt-1">Good</span>
+                      </div>
+
+                      <div className="bg-white border border-slate-200/60 rounded-xl p-2.5 shadow-sm flex flex-col items-center">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Clarity</span>
+                        <div className="relative h-11 w-11 flex items-center justify-center">
+                          <svg className="absolute inset-0 transform -rotate-90" viewBox="0 0 36 36">
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f1f5f9" strokeWidth="2.5"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f97316" strokeWidth="2.5" strokeDasharray="78, 100" strokeLinecap="round"/>
+                          </svg>
+                          <span className="absolute text-[11px] font-extrabold text-slate-800">78%</span>
+                        </div>
+                        <span className="text-[9px] font-bold text-orange-600 mt-1">Good</span>
+                      </div>
+
+                      <div className="bg-white border border-slate-200/60 rounded-xl p-2.5 shadow-sm flex flex-col items-center">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Relevance</span>
+                        <div className="relative h-11 w-11 flex items-center justify-center">
+                          <svg className="absolute inset-0 transform -rotate-90" viewBox="0 0 36 36">
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f1f5f9" strokeWidth="2.5"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeDasharray="91, 100" strokeLinecap="round"/>
+                          </svg>
+                          <span className="absolute text-[11px] font-extrabold text-slate-800">91%</span>
+                        </div>
+                        <span className="text-[9px] font-bold text-blue-600 mt-1">Excellent</span>
+                      </div>
+                    </motion.div>
+
+                  </div>
+
+                  {/* Right Column in Mockup */}
+                  <div className="space-y-4">
+                    
+                    <motion.div 
+                      key="prep-feedback"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="bg-white border border-slate-200/60 rounded-xl p-3.5 shadow-sm text-left flex flex-col flex-1 min-h-[170px]"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">AI Feedback</span>
+                        <span className="text-[8px] font-black bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded-full uppercase tracking-wider">Voice Mock</span>
+                      </div>
+                      <div className="space-y-3 mt-1">
+                        <div className="bg-teal-50 border border-teal-100 rounded-lg p-2 flex items-start gap-1.5">
+                          <Sparkles size={13} className="text-teal-600 shrink-0 mt-0.5 animate-pulse" />
+                          <div>
+                            <span className="text-[8px] font-black text-teal-800 uppercase block">Speech Pacing</span>
+                            <p className="text-[9px] text-slate-600 font-bold leading-normal mt-0.5">
+                              Pacing is good. Try to emphasize system partition strategies.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Talking Points</span>
+                          {['Include partition offset lag checks', 'Mention dead-letter queue adapter'].map((tip, idx) => (
+                            <div key={idx} className="flex items-center gap-1.5">
+                              <span className="h-1 w-1 rounded-full bg-teal-500 shrink-0" />
+                              <span className="text-[9px] text-slate-600 font-bold">{tip}</span>
                             </div>
                           ))}
                         </div>
                       </div>
-                    ) : (
-                      <span className="text-slate-400 italic text-[11px]">Waiting for AI Copilot to activate...</span>
-                    )}
-                  </div>
+                    </motion.div>
 
-                  {/* Job Role info */}
-                  <div className="bg-white border border-slate-200/60 rounded-xl p-3 shadow-sm text-left">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Job Role</span>
-                    <span className="text-xs font-bold text-slate-800">Backend Developer</span>
-                  </div>
+                    {/* Job Role info */}
+                    <div className="bg-white border border-slate-200/60 rounded-xl p-3 shadow-sm text-left">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Job Role</span>
+                      <span className="text-xs font-bold text-slate-800">Backend Developer</span>
+                    </div>
 
-                  {/* Question Ratio card */}
-                  <div className="bg-white border border-slate-200/60 rounded-xl p-3 shadow-sm text-left">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Question</span>
-                    <span className="text-xs font-black text-slate-800">5 / 12</span>
+                    {/* Question Ratio card */}
+                    <div className="bg-white border border-slate-200/60 rounded-xl p-3 shadow-sm text-left">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Question</span>
+                      <span className="text-xs font-black text-slate-800">5 / 12</span>
+                    </div>
+
                   </div>
 
                 </div>
 
-              </div>
+                {/* Quick toggles inside browser frame to test system/sql/react */}
+                <div className="bg-slate-50 border-t border-slate-200/80 px-4 py-2.5 flex items-center justify-center gap-2 overflow-x-auto">
+                  <button 
+                    onClick={() => setActiveScenario('system')}
+                    className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'system' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
+                  >
+                    System Design
+                  </button>
+                  <button 
+                    onClick={() => setActiveScenario('sql')}
+                    className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'sql' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
+                  >
+                    Database Tuning
+                  </button>
+                  <button 
+                    onClick={() => setActiveScenario('react')}
+                    className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'react' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
+                  >
+                    React 19 Reconciler
+                  </button>
+                </div>
 
-              {/* Quick toggles inside browser frame to test system/sql/react */}
-              <div className="bg-slate-50 border-t border-slate-200/80 px-4 py-2.5 flex items-center justify-center gap-2 overflow-x-auto">
-                <button 
-                  onClick={() => setActiveScenario('system')}
-                  className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'system' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
-                >
-                  System Design
-                </button>
-                <button 
-                  onClick={() => setActiveScenario('sql')}
-                  className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'sql' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
-                >
-                  Database Tuning
-                </button>
-                <button 
-                  onClick={() => setActiveScenario('react')}
-                  className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'react' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
-                >
-                  React 19 Reconciler
-                </button>
               </div>
+            ) : (
+              // LIVE STEALTH SLIDER MODE
+              <div className="relative w-full max-w-[540px] aspect-[4/3] bg-[#0d1117] border border-slate-850 rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col select-none" style={{ borderColor: '#1f242c' }}>
+                
+                {/* 1. Background Layer: What They See (Clean IDE) */}
+                <div className="absolute inset-0 flex flex-col">
+                  {/* Mock IDE view */}
+                  <MockIDE scenario={activeScenario} />
+                </div>
 
-            </div>
+                {/* 2. Foreground Layer: Your View (Overlay HUD active) */}
+                <div 
+                  className="absolute inset-0 z-10 flex flex-col overflow-hidden pointer-events-none"
+                  style={{ clipPath: `polygon(0 0, ${sliderPos}% 0, ${sliderPos}% 100%, 0 100%)` }}
+                >
+                  <MockIDE scenario={activeScenario} />
+
+                  {/* Floating Glassmorphic Sutra HUD Overlay */}
+                  <div className="absolute top-[85px] left-8 w-[250px] sm:w-[280px] bg-white/75 backdrop-blur-md border border-white/40 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] rounded-2xl p-4 text-left pointer-events-auto">
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sutra AI Overlay</span>
+                      <span className="flex items-center gap-1 bg-emerald-500/10 text-emerald-700 px-2.5 py-0.5 rounded-full text-[9px] font-bold border border-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.2)]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        GLANCE MODE
+                      </span>
+                    </div>
+
+                    {/* SAY FIRST block */}
+                    <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-3 mb-3">
+                      <span className="text-[9px] font-black text-teal-600 tracking-widest uppercase block mb-1">SAY FIRST</span>
+                      <p className="text-[10.5px] font-semibold text-slate-800 leading-relaxed italic">
+                        &ldquo;{getStealthScenarioContent(activeScenario).sayFirst}&rdquo;
+                      </p>
+                    </div>
+
+                    {/* STAR outline block */}
+                    <div className="space-y-1.5 pt-1 border-t border-slate-100">
+                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block">STAR Outline</span>
+                      {getStealthScenarioContent(activeScenario).star.map((point, i) => (
+                        <div key={i} className="flex items-start gap-1.5">
+                          <span className="mt-0.5 px-1 bg-slate-100 border border-slate-200 rounded text-[7px] font-black text-slate-500 shrink-0">{point.label}</span>
+                          <span className="text-[9px] text-slate-600 font-bold leading-snug">{point.desc}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating Labels / Annotations */}
+                <div className="absolute top-12 left-4 z-20 pointer-events-none">
+                  <span className="bg-emerald-600 text-white font-black text-[8px] uppercase tracking-wider px-2 py-0.5 rounded shadow-sm border border-emerald-500/20">
+                    👁️ Your View (HUD Active)
+                  </span>
+                </div>
+                <div className="absolute top-12 right-4 z-20 pointer-events-none">
+                  <span className="bg-red-600/90 text-white font-black text-[8px] uppercase tracking-wider px-2 py-0.5 rounded shadow-sm border border-red-500/20">
+                    💻 Screen Share (Invisible)
+                  </span>
+                </div>
+
+                {/* 3. Slider Control Handle */}
+                <div 
+                  className="absolute top-0 bottom-0 w-1 bg-teal-500/80 cursor-ew-resize flex items-center justify-center z-30"
+                  style={{ left: `${sliderPos}%` }}
+                >
+                  <div className="w-8 h-8 rounded-full bg-teal-600 border-2 border-white shadow-lg flex items-center justify-center text-white text-xs select-none hover:bg-teal-500 transition-colors cursor-ew-resize">
+                    ↔
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="100" 
+                    value={sliderPos} 
+                    onChange={(e) => setSliderPos(Number(e.target.value))}
+                    className="absolute inset-0 opacity-0 w-8 h-full cursor-ew-resize"
+                    style={{ transform: 'translateX(-50%)', width: '40px' }}
+                  />
+                </div>
+
+                {/* Quick Scenario Toggles at the bottom inside the slider mode */}
+                <div className="absolute bottom-0 inset-x-0 bg-slate-900 border-t border-slate-800 px-4 py-2 flex items-center justify-center gap-2 z-20 shrink-0">
+                  <button 
+                    onClick={() => setActiveScenario('system')}
+                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'system' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-800'}`}
+                  >
+                    System Design
+                  </button>
+                  <button 
+                    onClick={() => setActiveScenario('sql')}
+                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'sql' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-800'}`}
+                  >
+                    Database Tuning
+                  </button>
+                  <button 
+                    onClick={() => setActiveScenario('react')}
+                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'react' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-800'}`}
+                  >
+                    React 19 Reconciler
+                  </button>
+                </div>
+
+              </div>
+            )}
+
           </div>
         </motion.section>
 
@@ -3528,60 +3975,78 @@ function Landing({
         </motion.section>
 
 
-        {/* Brand Logo Cloud */}
-        <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.1 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-8 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-            Trusted by learners and teams at
-          </span>
-          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 opacity-85">
-            {/* Google */}
-            <div className="flex items-center gap-1 font-semibold text-lg tracking-tight select-none">
-              <span className="text-blue-500">G</span>
-              <span className="text-red-500">o</span>
-              <span className="text-yellow-500">o</span>
-              <span className="text-blue-500">g</span>
-              <span className="text-green-500">l</span>
-              <span className="text-red-500">e</span>
+        {/* Stealth & Integration Ribbon */}
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }} 
+          whileInView={{ opacity: 1, y: 0 }} 
+          viewport={{ once: true }} 
+          transition={{ duration: 0.8, delay: 0.1 }} 
+          className="relative z-10 mx-auto w-full max-w-7xl px-6 py-6 border-y border-slate-200/60 bg-slate-50/50 flex flex-col xl:flex-row items-center justify-between gap-6 shadow-sm"
+        >
+          <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 bg-slate-100/80 px-3.5 py-1.5 rounded-full border border-slate-200/80 shadow-sm">
+              COMPATIBLE WITH ANY CALL PLATFORM — 100% INVISIBLE & DETECTED-FREE
+            </span>
+            <div className="flex items-center gap-1.5 text-[10px] text-emerald-600 font-bold bg-emerald-50 border border-emerald-100 px-3.5 py-1.5 rounded-full shadow-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Undetectable: Verified secure 8 hours ago</span>
             </div>
-
-            {/* Microsoft */}
-            <div className="flex items-center gap-2 text-slate-500 font-semibold text-sm select-none">
-              <div className="grid grid-cols-2 gap-0.5">
-                <span className="w-2.5 h-2.5 bg-[#f25f22]" />
-                <span className="w-2.5 h-2.5 bg-[#7fba00]" />
-                <span className="w-2.5 h-2.5 bg-[#00a1f1]" />
-                <span className="w-2.5 h-2.5 bg-[#ffb900]" />
-              </div>
-              <span>Microsoft</span>
-            </div>
-
-            {/* Amazon */}
-            <div className="flex flex-col items-center select-none">
-              <span className="text-slate-700 font-bold text-sm leading-none">amazon</span>
-              <svg className="w-12 h-2 text-amber-500" viewBox="0 0 100 20" fill="currentColor">
-                <path d="M 0 5 Q 50 25 100 5 L 90 20 Q 50 12 10 20 Z" />
+          </div>
+          
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-300">
+            {/* Zoom */}
+            <div className="flex items-center gap-1.5 text-slate-400 font-extrabold text-xs select-none">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z" />
               </svg>
+              <span>zoom</span>
             </div>
 
-            {/* Stripe */}
-            <div className="text-[#635bff] font-extrabold text-xl tracking-tight select-none">
-              stripe
-            </div>
-
-            {/* Shopify */}
-            <div className="flex items-center gap-1 text-[#95bf47] font-bold text-base select-none">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12z" />
+            {/* Google Meet */}
+            <div className="flex items-center gap-1.5 text-slate-400 font-extrabold text-xs select-none">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
-              <span className="text-slate-700 font-semibold">shopify</span>
+              <span>Google Meet</span>
             </div>
 
-            {/* Adobe */}
-            <div className="flex items-center gap-1.5 text-[#ff0000] font-bold text-sm select-none">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M14.3 2H22v19.8L14.3 2zm-4.6 0H2v19.8L9.7 2zM12 9.3l4.7 10.5H13.6l-1.6-3.8H9.3L12 9.3z" />
+            {/* MS Teams */}
+            <div className="flex items-center gap-1.5 text-slate-400 font-extrabold text-xs select-none">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
-              <span className="text-slate-800 font-bold tracking-tight">Adobe</span>
+              <span>MS Teams</span>
+            </div>
+
+            {/* Webex */}
+            <div className="flex items-center gap-1.5 text-slate-400 font-extrabold text-xs select-none">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+              <span>Webex</span>
+            </div>
+
+            {/* LeetCode */}
+            <div className="flex items-center gap-1.5 text-slate-400 font-extrabold text-xs select-none">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+              </svg>
+              <span>LeetCode</span>
+            </div>
+
+            {/* HackerRank */}
+            <div className="flex items-center gap-1.5 text-slate-400 font-extrabold text-xs select-none">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m18 16 4-4-4-4" />
+                <path d="m6 8-4 4 4 4" />
+                <path d="m14.5 4-5 16" />
+              </svg>
+              <span>HackerRank</span>
             </div>
           </div>
         </motion.section>
@@ -3951,206 +4416,436 @@ function Landing({
           </div>
         </motion.section>
 
-        {/* Pricing Section */}
-        <section id="pricing" className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center">
-          <div className="max-w-3xl mx-auto mb-12">
-            <span className="inline-flex items-center rounded-full bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600 mb-4">
-              Simple, Transparent Pricing
-            </span>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Choose the Plan That Fits You
-            </h2>
-          </div>
+        {/* ════════════════════════════════ */}
+        {/* PRICING SECTION                  */}
+        {/* ════════════════════════════════ */}
+        <section id="pricing" className="relative z-10 w-full py-24 overflow-hidden">
 
-          {/* Pricing Period Toggle */}
-          <div className="flex items-center justify-center gap-3 mb-12">
-            <span className={`text-xs font-bold transition-colors ${pricingPeriod === 'monthly' ? 'text-slate-900' : 'text-slate-400'}`}>Monthly</span>
-            <button
-              onClick={() => setPricingPeriod(pricingPeriod === 'monthly' ? 'annual' : 'monthly')}
-              className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-200 transition-colors duration-200 ease-in-out outline-none"
+          {/* Background — matches landing page canvas */}
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 40%, #f0fdf4 80%, #ffffff 100%)' }} />
+          <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, rgba(13,148,136,0.06) 1px, transparent 1px)', backgroundSize: '28px 28px', maskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black 20%, transparent 80%)' }} />
+
+          <div className="relative mx-auto w-full max-w-7xl px-6">
+
+            {/* ── Header ── */}
+            <div className="text-center mb-14">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-teal-200 bg-teal-50 px-4 py-1.5 text-xs font-bold text-teal-700 mb-5 tracking-wider uppercase">
+                  <Zap size={11} /> Simple, Transparent Pricing
+                </span>
+                <h2 className="font-display text-4xl sm:text-5xl lg:text-[56px] font-black text-slate-900 tracking-tight leading-tight mb-4">
+                  Choose Your Plan
+                </h2>
+                <p className="text-slate-500 text-base sm:text-lg font-medium max-w-xl mx-auto leading-relaxed">
+                  Select a subscription plan for unlimited practice or get session credits to pay-as-you-go.
+                </p>
+              </motion.div>
+            </div>
+
+            {/* ── Toggle Selector ── */}
+            <div className="flex justify-center mb-12">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="relative flex items-center gap-1 rounded-2xl border border-slate-200 bg-slate-100 p-1.5"
+              >
+                <button
+                  onClick={() => setLandingPricingTab('periods')}
+                  className="relative px-5 py-2.5 text-sm font-bold rounded-xl transition-colors duration-200 cursor-pointer capitalize z-10 flex items-center gap-1.5"
+                  style={{ color: landingPricingTab === 'periods' ? '#ffffff' : '#64748b' }}
+                >
+                  {landingPricingTab === 'periods' && (
+                    <motion.div
+                      layoutId="landing-pricing-tab-indicator"
+                      className="absolute inset-0 rounded-xl"
+                      style={{ background: 'linear-gradient(135deg, #0d9488, #059669)' }}
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-1.5">
+                    Subscription Plans
+                  </span>
+                </button>
+                <button
+                  onClick={() => setLandingPricingTab('credits')}
+                  className="relative px-5 py-2.5 text-sm font-bold rounded-xl transition-colors duration-200 cursor-pointer capitalize z-10 flex items-center gap-1.5"
+                  style={{ color: landingPricingTab === 'credits' ? '#ffffff' : '#64748b' }}
+                >
+                  {landingPricingTab === 'credits' && (
+                    <motion.div
+                      layoutId="landing-pricing-tab-indicator"
+                      className="absolute inset-0 rounded-xl"
+                      style={{ background: 'linear-gradient(135deg, #0d9488, #059669)' }}
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-1.5">
+                    Session Credits
+                  </span>
+                </button>
+              </motion.div>
+            </div>
+
+            {/* ── Plan Cards ── */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={landingPricingTab}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto items-stretch mb-16">
+                  {(landingPricingTab === 'periods' ? [
+                    {
+                      name: 'Weekly Plan',
+                      desc: 'Short-term intensive mock prep',
+                      price: '$9',
+                      unit: '/ week',
+                      features: ['Unlimited live mock interviews', 'Real-time AI suggestions', 'Resume synchronization', '7 days history retention', 'Unlimited customer support'],
+                      highlight: false,
+                      cta: 'Subscribe Weekly',
+                      badge: '',
+                    },
+                    {
+                      name: 'Monthly Plan',
+                      desc: 'Standard prep for job seekers',
+                      price: '$29',
+                      unit: '/ month',
+                      features: ['Unlimited live mock interviews', 'Advanced AI feedback reports', 'Resume matching & optimization', '90 days history retention', 'Knowledge base doc context matching', 'Unlimited priority support'],
+                      highlight: true,
+                      cta: 'Subscribe Monthly',
+                      badge: 'Most Popular',
+                    },
+                    {
+                      name: 'Yearly Plan',
+                      desc: 'Long-term ongoing career development',
+                      price: '$199',
+                      unit: '/ year',
+                      features: ['Unlimited live mock interviews', 'Premium custom AI models', 'Unlimited history retention', 'Early access to new tools', 'Priority queue channel support', 'Advanced career analytics dashboard'],
+                      highlight: false,
+                      cta: 'Subscribe Yearly',
+                      badge: 'Best Value',
+                    },
+                  ] : [
+                    {
+                      name: '1 Session Credit',
+                      desc: 'One full live mock session',
+                      price: '$3',
+                      unit: 'one-time',
+                      features: ['1 full live mock session (unlimited mins)', 'Real-time AI feedback & transcript', 'Standard response channel', '30 days validity'],
+                      highlight: false,
+                      cta: 'Buy 1 Credit',
+                      badge: '',
+                    },
+                    {
+                      name: '2 Sessions Pack',
+                      desc: 'Double practice sessions',
+                      price: '$5',
+                      unit: 'one-time',
+                      features: ['2 full live mock sessions', 'Real-time AI feedback & transcript', 'Personalized resume sync', '60 days validity', 'Standard response channel'],
+                      highlight: false,
+                      cta: 'Buy 2 Credits',
+                      badge: '',
+                    },
+                    {
+                      name: '3 Sessions Pack',
+                      desc: 'Triple practice sessions + extras',
+                      price: '$7',
+                      unit: 'one-time',
+                      features: ['3 full live mock sessions', 'Real-time AI feedback & transcript', 'Personalized resume sync', '90 days validity', 'Priority email support', 'Knowledge base doc matching'],
+                      highlight: true,
+                      cta: 'Buy 3 Credits',
+                      badge: 'Popular Choice',
+                    },
+                  ]).map((plan, i) => (
+                    <motion.div
+                      key={plan.name}
+                      initial={{ opacity: 0, y: 24 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: i * 0.08 }}
+                      whileHover={{ y: -5, boxShadow: plan.highlight ? '0 24px 60px rgba(13,148,136,0.18)' : '0 16px 40px rgba(0,0,0,0.1)' }}
+                      className="relative rounded-3xl bg-white flex flex-col overflow-hidden"
+                      style={{
+                        border: plan.highlight ? '2px solid #0d9488' : '1px solid #e2e8f0',
+                        boxShadow: plan.highlight ? '0 16px 48px rgba(13,148,136,0.12)' : '0 2px 12px rgba(0,0,0,0.04)',
+                      }}
+                    >
+                      {/* Top accent bar for Highlighted plan */}
+                      {plan.highlight && (
+                        <div className="h-1 w-full" style={{ background: 'linear-gradient(to right, #0d9488, #059669)' }} />
+                      )}
+                      {/* Badge */}
+                      {plan.badge && (
+                        <div className="absolute top-5 right-5">
+                          <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black tracking-wider bg-teal-50 border border-teal-200 text-teal-700">
+                            <Sparkles size={9} /> {plan.badge}
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="p-7 flex flex-col flex-1">
+                        {/* Header */}
+                        <div className="mb-5">
+                          <h3 className="font-display text-xl font-black text-slate-900 mb-1">{plan.name}</h3>
+                          <p className="text-slate-400 text-xs font-medium">{plan.desc}</p>
+                        </div>
+
+                        {/* Perceived Value Badge */}
+                        <div className="flex items-center gap-2 rounded-xl border border-teal-100 bg-teal-50 px-3.5 py-2.5 mb-5">
+                          <span className="text-sm">{landingPricingTab === 'periods' ? '♾' : '⚡'}</span>
+                          <span className="text-sm font-black text-teal-800">
+                            {landingPricingTab === 'periods' ? 'Unlimited AI Usage' : 'Session-based Credits'}
+                          </span>
+                          <span className="text-teal-500 text-[10px] font-semibold uppercase">Included</span>
+                        </div>
+
+                        {/* Price */}
+                        <div className="mb-5">
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-4xl font-black text-slate-900">{plan.price}</span>
+                            <span className="text-slate-400 text-sm font-medium">
+                              {plan.unit}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="h-px bg-slate-100 mb-5" />
+
+                        {/* Features */}
+                        <ul className="space-y-3 flex-1 mb-7">
+                          {plan.features.map((f) => (
+                            <li key={f} className="flex items-start gap-2.5 text-sm text-slate-600 font-medium text-left">
+                              <div className="mt-0.5 h-4 w-4 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+                                <Check size={9} className="text-emerald-600" />
+                              </div>
+                              {f.includes('Unlimited') ? (
+                                <span className="font-bold text-slate-800">{f}</span>
+                              ) : f}
+                            </li>
+                          ))}
+                        </ul>
+
+                        {/* CTA */}
+                        <button
+                          onClick={onSignIn}
+                          className="w-full py-3.5 rounded-2xl text-sm font-black cursor-pointer transition-all duration-200 hover:-translate-y-px"
+                          style={plan.highlight ? {
+                            background: 'linear-gradient(135deg, #0d9488 0%, #059669 100%)',
+                            color: '#ffffff',
+                            boxShadow: '0 4px 20px rgba(13,148,136,0.3), inset 0 1px 0 rgba(255,255,255,0.15)',
+                          } : {
+                            background: '#f8fafc',
+                            color: '#334155',
+                            border: '1px solid #e2e8f0',
+                          }}
+                        >
+                          {plan.cta}
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* ── Credits vs Subscription Explanation ── */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="mt-20 rounded-3xl border border-slate-200 bg-white p-8 md:p-12 shadow-[0_2px_20px_rgba(0,0,0,0.04)]"
             >
-              <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${pricingPeriod === 'annual' ? 'translate-x-5' : 'translate-x-0'}`}
-              />
-            </button>
-            <span className={`text-xs font-bold transition-colors flex items-center gap-1.5 ${pricingPeriod === 'annual' ? 'text-slate-900' : 'text-slate-400'}`}>
-              Annually <span className="bg-emerald-100 text-emerald-700 text-[9px] font-black uppercase px-2 py-0.5 rounded-full">Save 20%</span>
-            </span>
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto items-stretch">
-            
-            {/* BYOK Tier */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 text-left flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)] relative">
-              <div className="absolute top-4 right-4 bg-slate-900 text-amber-400 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider">
-                Dev
-              </div>
-              <div>
-                <h3 className="font-display text-lg font-bold text-slate-900 mb-1">BYOK</h3>
-                <p className="text-[11px] text-slate-400 leading-relaxed font-semibold">Bring Your Own API Key</p>
-                
-                <div className="my-6">
-                  <span className="text-3xl font-black text-slate-900">${pricingPeriod === 'annual' ? '7' : '9'}</span>
-                  <span className="text-xs text-slate-500"> / month</span>
-                </div>
-
-                <div className="h-px bg-slate-100 mb-6" />
-
-                <ul className="space-y-3.5 text-xs text-slate-500 font-medium">
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> Use OpenAI / Anthropic / DeepSeek keys
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> Zero token markup — pay AI directly
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> Native overlay + stealth mode
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> Absolute data privacy
-                  </li>
-                </ul>
-              </div>
-
-              <button onClick={onSignIn} className="mt-8 w-full py-2.5 rounded-xl border border-amber-300 text-amber-700 hover:bg-amber-50 text-xs font-bold cursor-pointer transition-colors text-center">
-                Connect My Keys
-              </button>
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 text-left flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)] relative">
-              <div>
-                <h3 className="font-display text-lg font-bold text-slate-900 mb-1">Free</h3>
-                <p className="text-[11px] text-slate-400 leading-relaxed font-semibold">Get started with basic features</p>
-                
-                <div className="my-6">
-                  <span className="text-3xl font-black text-slate-900">$0</span>
-                  <span className="text-xs text-slate-500"> / month</span>
-                </div>
-
-                <div className="h-px bg-slate-100 mb-6" />
-
-                <ul className="space-y-3.5 text-xs text-slate-500 font-medium">
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> 5 Mock Interviews
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> Basic Feedback
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> Resume Analysis
-                  </li>
-                </ul>
-              </div>
-
-              <button onClick={onSignIn} className="mt-8 w-full py-2.5 rounded-xl border border-blue-200 text-blue-600 hover:bg-blue-50 text-xs font-bold cursor-pointer transition-colors text-center">
-                Get Started
-              </button>
-            </div>
-
-            {/* Pro Tier (Featured) */}
-            <div className="bg-white border-2 border-blue-600 rounded-2xl p-6 text-left flex flex-col justify-between shadow-lg relative transform lg:scale-[1.03]">
-              <div className="absolute top-4 right-4 bg-blue-600 text-white text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider">
-                Popular
-              </div>
-
-              <div>
-                <h3 className="font-display text-lg font-bold text-slate-900 mb-1">Pro</h3>
-                <p className="text-[11px] text-slate-400 leading-relaxed font-semibold">For serious interview preparation</p>
-                
-                <div className="my-6">
-                  <span className="text-3xl font-black text-slate-900">
-                    ${pricingPeriod === 'annual' ? '15' : '19'}
+              <div className="grid md:grid-cols-[1fr_auto] gap-10 items-center">
+                <div>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 border border-teal-200 px-3 py-1 text-xs font-black text-teal-700 mb-5 tracking-wider uppercase">
+                    <Zap size={10} /> Sessions & Subscriptions
                   </span>
-                  <span className="text-xs text-slate-500"> / month</span>
-                  {pricingPeriod === 'annual' && <div className="text-[9px] text-emerald-600 font-bold mt-1">Billed annually ($180)</div>}
+                  <h3 className="font-display text-2xl sm:text-3xl font-black text-slate-900 mb-3">
+                    Flexible options for<br />every interview prep
+                  </h3>
+                  <p className="text-slate-500 text-sm leading-relaxed font-medium max-w-md">
+                    Choose session credits if you are preparing for a specific loop, or subscribe to get unlimited practice sessions and complete access to all AI tools.
+                  </p>
                 </div>
-
-                <div className="h-px bg-slate-100 mb-6" />
-
-                <ul className="space-y-3.5 text-xs text-slate-600 font-medium">
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> Unlimited Mock Interviews
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> AI Feedback & Insights
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> Resume & Docs Intelligence
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> Interview History
-                  </li>
-                </ul>
+                <div className="grid grid-cols-2 gap-3 shrink-0">
+                  {[
+                    { icon: Mic, label: '1 Live Mock Session', cost: 'Consumes 1 Credit', color: 'text-teal-600', bg: 'bg-teal-50 border-teal-200' },
+                    { icon: Brain, label: 'Real-time AI Feedback', cost: 'Included in all plans', color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
+                    { icon: FileText, label: 'Resume Analyzer', cost: 'Included in all plans', color: 'text-violet-600', bg: 'bg-violet-50 border-violet-200' },
+                    { icon: Sparkles, label: 'Unlimited Practice', cost: 'With any Subscription', color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' },
+                  ].map(({ icon: Icon, label, cost, color, bg }) => (
+                    <div key={label} className={`flex flex-col gap-2 rounded-2xl border p-4 min-w-[140px] ${bg}`}>
+                      <div className="h-8 w-8 rounded-xl bg-white/70 flex items-center justify-center border border-current/10">
+                        <Icon size={15} className={color} />
+                      </div>
+                      <span className="text-xs font-bold text-slate-800">{label}</span>
+                      <span className="text-[10px] font-semibold text-slate-400">{cost}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
+            </motion.div>
 
-              <button onClick={onSignIn} className="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-colors">
-                Start Pro Plan
-              </button>
-            </div>
+            {/* ── Feature Comparison Table ── */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="mt-16"
+            >
+              <h3 className="font-display text-2xl font-black text-slate-900 text-center mb-8">Full Feature Comparison</h3>
+              <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-100">
+                      <th className="text-left py-4 px-6 text-slate-400 font-bold text-xs uppercase tracking-wider">Feature</th>
+                      {['Free Tier', 'Session Credits', 'Subscriptions'].map((col) => (
+                        <th key={col} className="py-4 px-6 text-center font-black text-xs uppercase tracking-wider" style={{ color: col === 'Subscriptions' ? '#0d9488' : '#1e293b' }}>
+                          {col}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { feature: 'Price / Investment', free: 'Free ($0)', credits: 'From $3', subscriptions: 'From $9/wk' },
+                      { feature: 'Mock Sessions Included', free: '1 session/day (10 mins)', credits: '1 full session per credit', subscriptions: 'Unlimited sessions' },
+                      { feature: 'AI Feedback Reports', free: 'Basic suggestions', credits: 'Advanced feedback', subscriptions: 'Premium custom feedback' },
+                      { feature: 'Resume Matching', free: 'Basic analysis', credits: 'Full resume matching', subscriptions: 'Unlimited matching & sync' },
+                      { feature: 'Session History Archive', free: '24 hours', credits: '90 days', subscriptions: 'Unlimited archive' },
+                      { feature: 'Custom Prompts & Guides', free: false, credits: true, subscriptions: true },
+                      { feature: 'Priority Audio Channels', free: false, free_bool: true, credits: false, credits_bool: true, subscriptions: true },
+                      { feature: 'Support Tier', free: 'Standard support', credits: 'Priority email support', subscriptions: 'Priority 24/7 queue support' },
+                    ].map((row, i) => (
+                      <tr key={row.feature} className="border-b border-slate-50" style={{ background: i % 2 === 0 ? '#fafafa' : '#ffffff' }}>
+                        <td className="py-4 px-6 text-slate-700 font-medium">
+                          {row.feature}
+                        </td>
+                        {[row.free, row.credits, row.subscriptions].map((val, j) => {
+                          const isBool = typeof val === 'boolean' || val === undefined;
+                          const boolVal = j === 0 ? (row.free_bool !== undefined ? row.free_bool : val) : j === 1 ? (row.credits_bool !== undefined ? row.credits_bool : val) : val;
+                          return (
+                            <td key={j} className="py-4 px-6 text-center">
+                              {isBool ? (
+                                boolVal ? (
+                                  <div className="inline-flex items-center justify-center h-5 w-5 rounded-full mx-auto bg-emerald-50 border border-emerald-200">
+                                    <Check size={11} className="text-emerald-600" />
+                                  </div>
+                                ) : (
+                                  <div className="inline-flex items-center justify-center h-5 w-5 rounded-full mx-auto bg-slate-50 border border-slate-200">
+                                    <span className="text-slate-300 text-xs font-black">—</span>
+                                  </div>
+                                )
+                              ) : (
+                                <span className="text-xs font-bold" style={{ color: j === 2 ? '#0d9488' : '#64748b' }}>{val}</span>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
 
-            {/* Team Tier */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 text-left flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)] relative">
-              <div>
-                <h3 className="font-display text-lg font-bold text-slate-900 mb-1">Team</h3>
-                <p className="text-[11px] text-slate-400 leading-relaxed font-semibold">For teams and organizations</p>
-                
-                <div className="my-6">
-                  <span className="text-3xl font-black text-slate-900">
-                    ${pricingPeriod === 'annual' ? '49' : '59'}
+            {/* ── FAQ ── */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="mt-20 max-w-3xl mx-auto"
+            >
+              <h3 className="font-display text-2xl font-black text-slate-900 text-center mb-10">Frequently Asked Questions</h3>
+              <div className="space-y-2">
+                {[
+                  { q: 'How do session credits work?', a: 'Session credits allow you to pay-as-you-go. One credit is used to conduct one full-length live mock interview. Your feedback, transcripts, and history are kept for 90 days. Unused credits never expire.' },
+                  { q: 'What is included in unlimited subscriptions?', a: 'Subscribed plans (Weekly, Monthly, Yearly) give you unlimited live mock session attempts, priority audio server access, advanced resume matching, and permanent history archives without any session gating.' },
+                  { q: 'What does Unlimited Support mean?', a: 'We do not gate support behind paywalls. Every user — including those on the Free tier — can contact our support team. Subscribed members and credit pack buyers get priority queue response times.' },
+                  { q: 'Can I switch between credits and subscriptions?', a: 'Yes! You can purchase session credits at any time if you only need short-term preparation. If you require more practice, you can subscribe to our weekly, monthly, or yearly plans directly from your billing dashboard.' },
+                  { q: 'Is there a free trial or free tier?', a: 'Yes. We offer a Free Plan which includes 1 live session per day (up to 10 minutes) with basic AI transcripts and suggestions so you can try out our system.' },
+                ].map((faq, i) => (
+                  <motion.div
+                    key={i}
+                    layout
+                    className="rounded-2xl border bg-white overflow-hidden cursor-pointer transition-colors duration-200"
+                    style={{
+                      borderColor: openFaq === i ? '#99f6e4' : '#e2e8f0',
+                      boxShadow: openFaq === i ? '0 0 0 3px rgba(13,148,136,0.06)' : 'none',
+                    }}
+                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  >
+                    <div className="flex items-center justify-between px-6 py-4 gap-4">
+                      <span className="font-bold text-sm text-slate-800">{faq.q}</span>
+                      <motion.div animate={{ rotate: openFaq === i ? 45 : 0 }} transition={{ duration: 0.2 }} className="shrink-0">
+                        <div className="h-6 w-6 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center">
+                          <span className="text-slate-500 text-sm font-bold leading-none">+</span>
+                        </div>
+                      </motion.div>
+                    </div>
+                    <AnimatePresence>
+                      {openFaq === i && (
+                        <motion.div
+                          key="answer"
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25, ease: 'easeInOut' }}
+                        >
+                          <div className="px-6 pb-5 text-sm text-slate-500 font-medium leading-relaxed border-t border-slate-100 pt-4">
+                            {faq.a}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* ── CTA Banner ── */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="mt-20 relative rounded-3xl overflow-hidden border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-emerald-50 p-10 md:p-14 text-center shadow-[0_8px_40px_rgba(13,148,136,0.08)]"
+            >
+              {/* Ambient glow */}
+              <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[400px] h-[200px] rounded-full blur-3xl pointer-events-none" style={{ background: 'rgba(13,148,136,0.08)' }} />
+              <div className="relative">
+                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 mb-4 leading-tight">
+                  Ready to ace your<br />
+                  <span style={{ background: 'linear-gradient(135deg, #0d9488, #059669)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    next interview?
                   </span>
-                  <span className="text-xs text-slate-500"> / month</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">Per user</span>
-                </div>
-
-                <div className="h-px bg-slate-100 mb-6" />
-
-                <ul className="space-y-3.5 text-xs text-slate-500 font-medium">
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> Everything in Pro
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> Team Analytics
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> Shared Knowledge Base
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500 font-bold">✓</span> Priority Support
-                  </li>
-                </ul>
+                </h2>
+                <p className="text-slate-500 text-base font-medium mb-8 max-w-lg mx-auto">
+                  Join 12,000+ learners who use Sutra AI to prepare smarter and perform flawlessly.
+                </p>
+                <button
+                  onClick={onStart}
+                  className="inline-flex items-center gap-2.5 rounded-2xl px-8 py-4 text-base font-black text-white cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl"
+                  style={{
+                    background: 'linear-gradient(135deg, #0d9488 0%, #059669 100%)',
+                    boxShadow: '0 8px 24px rgba(13,148,136,0.35), inset 0 1px 0 rgba(255,255,255,0.15)',
+                  }}
+                >
+                  Start Practicing Today <ArrowRight size={18} />
+                </button>
+                <p className="text-slate-400 text-xs font-semibold mt-4">No credit card required · Cancel anytime</p>
               </div>
-
-              <button onClick={onSignIn} className="mt-8 w-full py-2.5 rounded-xl border border-blue-200 text-blue-600 hover:bg-blue-50 text-xs font-bold cursor-pointer transition-colors text-center">
-                Contact Sales
-              </button>
-            </div>
+            </motion.div>
 
           </div>
         </section>
 
-        {/* CTA Banner Section */}
-        <section className="relative z-10 mx-auto w-full max-w-7xl px-6 py-12">
-          <div className="relative rounded-3xl bg-blue-50/70 border border-blue-100 p-8 md:p-12 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 text-left">
-            {/* Subtle glow */}
-            <div className="absolute right-0 bottom-0 w-[300px] h-[150px] bg-blue-300/10 rounded-full blur-[80px]" />
-            
-            <div>
-              <h2 className="font-display text-2xl md:text-3xl font-extrabold text-slate-900">
-                Ready to Ace Your Next Interview?
-              </h2>
-              <p className="text-sm text-slate-600 font-medium mt-2 max-w-xl">
-                Join thousands of learners improving their interview skills with Sutra AI.
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center gap-2 shrink-0">
-              <button onClick={onStart} className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl px-7 py-4 text-sm font-bold shadow-[0_4px_14px_rgba(37,99,235,0.2)] flex items-center justify-center gap-2 cursor-pointer transition-all">
-                <span>Start Free Session</span> <ArrowRight size={16} />
-              </button>
-              <span className="text-[10px] text-slate-400 font-semibold">No credit card required</span>
-            </div>
-          </div>
-        </section>
 
       </main>
 
@@ -8767,34 +9462,34 @@ function Billing() {
 
   const creditPlans = [
     {
-      title: '3 Sessions Pack',
-      originalPrice: '₹599',
-      price: '₹399',
-      discount: '33% OFF',
-      desc: 'Get 3 full-length live mock sessions. Realtime transcripts and AI feedback history included.',
+      title: '1 Session Credit',
+      originalPrice: '₹199',
+      price: '₹149',
+      discount: '25% OFF',
+      desc: 'Get 1 full-length live mock session with real-time feedback, transcripts, and AI analysis.',
       validity: 'Valid for 30 days',
       badge: '',
       popular: false,
     },
     {
-      title: '6 Sessions Pack',
-      originalPrice: '₹1199',
-      price: '₹699',
-      discount: '42% OFF',
-      desc: 'Get 6 live mock sessions + 1 bonus session free! Complete resume and reference docs context matching.',
+      title: '2 Sessions Pack',
+      originalPrice: '₹399',
+      price: '₹249',
+      discount: '37% OFF',
+      desc: 'Get 2 live mock sessions. Resume matching and reference docs context injection included.',
       validity: 'Valid for 60 days',
-      badge: 'Popular Choice',
-      popular: true,
+      badge: '',
+      popular: false,
     },
     {
-      title: '10 Sessions Pack',
-      originalPrice: '₹1999',
-      price: '₹999',
-      discount: '50% OFF',
-      desc: 'Get 10 live mock sessions + 3 bonus sessions free! Best format to prepare extensively for complex loops.',
+      title: '3 Sessions Pack',
+      originalPrice: '₹599',
+      price: '₹349',
+      discount: '41% OFF',
+      desc: 'Get 3 live mock sessions. Priority support access and detailed history archive matching.',
       validity: 'Valid for 90 days',
-      badge: 'Best Value',
-      popular: false,
+      badge: 'Popular Choice',
+      popular: true,
     },
   ];
 
@@ -8845,12 +9540,12 @@ function Billing() {
   return (
     <Page title="Billing & Pricing" subtitle="Choose between session-based credits or unlimited time-based subscriptions. Offers applied automatically.">
       {/* Toggle Selector */}
-      <div className="flex border border-white/10 p-1 rounded-2xl max-w-md bg-slate-900/60 mb-8 shrink-0">
+      <div className="flex border border-slate-200 p-1 rounded-2xl max-w-md bg-slate-100/80 mb-8 shrink-0 shadow-sm">
         <button
           onClick={() => setBillingTab('periods')}
           className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${billingTab === 'periods'
-            ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-glow'
-            : 'text-slate-400 hover:text-slate-200'
+            ? 'bg-violet-600 text-white shadow-sm'
+            : 'text-slate-500 hover:text-slate-800'
             }`}
         >
           <SlidersHorizontal size={14} /> Subscription Periods
@@ -8858,8 +9553,8 @@ function Billing() {
         <button
           onClick={() => setBillingTab('credits')}
           className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${billingTab === 'credits'
-            ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-glow'
-            : 'text-slate-400 hover:text-slate-200'
+            ? 'bg-violet-600 text-white shadow-sm'
+            : 'text-slate-500 hover:text-slate-800'
             }`}
         >
           <Zap size={14} /> Session Credits
@@ -8872,7 +9567,9 @@ function Billing() {
           creditPlans.map((plan) => (
             <Card
               key={plan.title}
-              className={`relative overflow-hidden flex flex-col justify-between h-full border transition-all ${plan.popular ? 'border-violet-500/40 bg-violet-950/20 shadow-glow' : 'border-white/10 bg-slate-900/40'
+              className={`relative overflow-hidden flex flex-col justify-between h-full border transition-all ${plan.popular
+                ? 'border-violet-500/40 bg-violet-500/10 shadow-sm'
+                : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
                 }`}
             >
               {plan.badge && (
@@ -8912,7 +9609,9 @@ function Billing() {
           periodPlans.map((plan) => (
             <Card
               key={plan.title}
-              className={`relative overflow-hidden flex flex-col justify-between h-full border transition-all ${plan.popular ? 'border-violet-500/40 bg-violet-950/20 shadow-glow' : 'border-white/10 bg-slate-900/40'
+              className={`relative overflow-hidden flex flex-col justify-between h-full border transition-all ${plan.popular
+                ? 'border-violet-500/40 bg-violet-500/10 shadow-sm'
+                : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
                 }`}
             >
               {plan.badge && (
@@ -8942,6 +9641,7 @@ function Billing() {
                 <Button
                   className="w-full py-2.5"
                   variant={plan.popular ? 'primary' : 'secondary'}
+                  onClick={() => {}}
                 >
                   {plan.isCurrent ? 'Current Plan' : 'Subscribe'}
                 </Button>

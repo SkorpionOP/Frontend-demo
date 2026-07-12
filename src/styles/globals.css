@@ -43,7 +43,8 @@
 
 /* Custom Base styles */
 body {
-  background-color: #f8fafc;
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 45%, #f0fdf4 80%, #ffffff 100%);
+  background-attachment: fixed;
   color: #0f172a;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
