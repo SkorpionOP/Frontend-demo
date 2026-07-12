@@ -8,7 +8,8 @@ import {
   PlusCircle, Copy, Save, Camera, Pause, Pin, Minimize2, Maximize2, Move,
   SlidersHorizontal, CheckCircle2, Crown, Zap, Target, Layers, ScreenShare, AlertCircle, ExternalLink,
   Volume2, VolumeX, Activity, MonitorSpeaker, HelpCircle, ChevronDown, ChevronUp, ChevronRight, Cpu,
-  Laptop, Globe, ArrowRight, PlayCircle as MonitorPlay, EyeOff, BellOff
+  Laptop, Globe, ArrowRight, PlayCircle as MonitorPlay, EyeOff, BellOff,
+  Trash, Edit3, MessageSquare, Check, Video
 } from 'lucide-react';
 import './styles/globals.css';
 import { signInWithGoogle, logOut, type AppUser, isFirebaseConfigured } from './firebase';
@@ -70,7 +71,8 @@ type Screen =
   | 'Knowledge'
   | 'Settings'
   | 'Billing'
-  | 'Help';
+  | 'Help'
+  | 'Admin';
 
 type SessionType = 'Interview' | 'Coding' | 'HR' | 'Interview+Coding';
 
@@ -708,10 +710,687 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: (u: AppUser) => void })
             <span>{loading ? 'Authenticating...' : 'Sign in with Google'}</span>
           </button>
 
+          <button
+            type="button"
+            onClick={() => onLoginSuccess({ uid: 'admin', email: 'admin@sutra.ai', displayName: 'Admin User', isMock: true } as any)}
+            className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 active:scale-98 px-5 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 shadow-sm transition-all cursor-pointer"
+          >
+            <span>🔑 Log in as Admin Bypass</span>
+          </button>
+
           <p className="mt-6 text-center text-[10px] text-slate-400 leading-normal font-semibold">
             Secure Google authentication protocol active. Data synced with your active local dashboard profile.
           </p>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Admin Panel & Support Hub Component ──
+interface AdminPanelProps {
+  reviews: any[];
+  setReviews: React.Dispatch<React.SetStateAction<any[]>>;
+  appVideoUrl: string;
+  setAppVideoUrl: (v: string) => void;
+  supportTickets: any[];
+  setSupportTickets: React.Dispatch<React.SetStateAction<any[]>>;
+  onBack: () => void;
+}
+
+function AdminPanel({
+  reviews,
+  setReviews,
+  appVideoUrl,
+  setAppVideoUrl,
+  supportTickets,
+  setSupportTickets,
+  onBack
+}: AdminPanelProps) {
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'reviews' | 'video' | 'tickets'>('dashboard');
+
+  // Review Form States
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [authorName, setAuthorName] = useState('');
+  const [authorRole, setAuthorRole] = useState('');
+  const [authorCompany, setAuthorCompany] = useState('');
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [avatar, setAvatar] = useState('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80');
+
+  // Support Chat States
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+
+  // Video Form State
+  const [tempVideoUrl, setTempVideoUrl] = useState(appVideoUrl);
+
+  const selectedTicket = supportTickets.find(t => t.id === selectedTicketId);
+
+  // Auto-fill form when editing
+  const startEditReview = (r: any) => {
+    setEditingReviewId(r.id);
+    setAuthorName(r.name);
+    setAuthorRole(r.role);
+    setAuthorCompany(r.company);
+    setRating(r.rating);
+    setComment(r.comment);
+    setAvatar(r.avatar);
+  };
+
+  const clearReviewForm = () => {
+    setEditingReviewId(null);
+    setAuthorName('');
+    setAuthorRole('');
+    setAuthorCompany('');
+    setRating(5);
+    setComment('');
+    setAvatar('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80');
+  };
+
+  const handleSaveReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!authorName.trim() || !comment.trim()) return alert('Name and review content are required!');
+
+    if (editingReviewId) {
+      // Edit mode
+      setReviews(prev => prev.map(r => r.id === editingReviewId ? {
+        ...r,
+        name: authorName,
+        role: authorRole,
+        company: authorCompany,
+        rating,
+        comment,
+        avatar
+      } : r));
+    } else {
+      // Add mode
+      const newReview = {
+        id: String(Date.now()),
+        name: authorName,
+        role: authorRole,
+        company: authorCompany,
+        rating,
+        comment,
+        avatar: avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100&q=80'
+      };
+      setReviews(prev => [...prev, newReview]);
+    }
+    clearReviewForm();
+  };
+
+  const handleDeleteReview = (id: string) => {
+    if (!window.confirm('Delete this review from landing page?')) return;
+    setReviews(prev => prev.filter(r => r.id !== id));
+  };
+
+  const handleUpdateVideo = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tempVideoUrl.trim()) return alert('Video URL cannot be empty.');
+    setAppVideoUrl(tempVideoUrl);
+    alert('Vip Demo Video updated successfully!');
+  };
+
+  const handleSendTicketReply = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!replyText.trim() || !selectedTicketId) return;
+
+    // Append admin reply
+    setSupportTickets(prev => prev.map(t => {
+      if (t.id === selectedTicketId) {
+        const newMsg = { sender: 'admin' as const, text: replyText, time: 'Just now' };
+        return {
+          ...t,
+          status: 'Pending' as const,
+          messages: [...t.messages, newMsg]
+        };
+      }
+      return t;
+    }));
+
+    const sentText = replyText;
+    setReplyText('');
+
+    // Simulate real-time customer feedback response
+    setTimeout(() => {
+      setSupportTickets(prev => prev.map(t => {
+        if (t.id === selectedTicketId) {
+          const autoResponseText = sentText.toLowerCase().includes('help') || sentText.toLowerCase().includes('resolve')
+            ? "Thank you! I will try doing that now and let you know if it resolves the issue."
+            : "Awesome, thank you for checking into that. I appreciate the quick support!";
+          return {
+            ...t,
+            messages: [...t.messages, { sender: 'user' as const, text: autoResponseText, time: 'Just now' }]
+          };
+        }
+        return t;
+      }));
+    }, 2500);
+  };
+
+  const toggleTicketStatus = (ticketId: string, status: 'Open' | 'Pending' | 'Resolved') => {
+    setSupportTickets(prev => prev.map(t => t.id === ticketId ? { ...t, status } : t));
+  };
+
+  const toggleTicketPriority = (ticketId: string, priority: 'Low' | 'Medium' | 'High') => {
+    setSupportTickets(prev => prev.map(t => t.id === ticketId ? { ...t, priority } : t));
+  };
+
+  return (
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans relative overflow-hidden">
+      {/* Drifting Aura Lights */}
+      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-blue-100/40 blur-[130px] z-0" />
+      <div className="pointer-events-none absolute bottom-20 right-1/4 h-[500px] w-[500px] rounded-full bg-indigo-50/50 blur-[120px] z-0" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(circle_at_50%_30%,black_60%,transparent_100%)] opacity-85 z-0" />
+
+      {/* Header */}
+      <header className="relative z-10 bg-white/85 backdrop-blur-md border-b border-slate-200/80 px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 shadow-[0_4px_12px_rgba(245,158,11,0.25)]">
+            <SutraLogo size={18} className="text-white" />
+          </div>
+          <div>
+            <h1 className="text-sm font-bold text-slate-900 leading-none">Sutra AI</h1>
+            <span className="text-[10px] text-orange-600 font-extrabold uppercase tracking-wider block mt-0.5">Admin Console</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-xs bg-slate-100 border border-slate-200 text-slate-600 font-bold px-2.5 py-1 rounded-lg">Mock Database Active</span>
+          <button 
+            onClick={onBack}
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer shadow-sm"
+          >
+            ← View Landing
+          </button>
+        </div>
+      </header>
+
+      {/* Main Workspace */}
+      <div className="relative z-10 flex-1 flex flex-col md:flex-row">
+        {/* Admin Sidebar Navigation */}
+        <aside className="w-full md:w-64 bg-white/70 backdrop-blur-md border-r border-slate-200 p-4 space-y-1.5">
+          {[
+            { id: 'dashboard', label: 'Dashboard Overview', icon: LayoutDashboard },
+            { id: 'reviews', label: 'Manage Reviews', icon: Edit3 },
+            { id: 'video', label: 'Video Showcase', icon: Video },
+            { id: 'tickets', label: 'Support Hub', icon: MessageSquare, badge: supportTickets.filter(t => t.status !== 'Resolved').length },
+          ].map(tab => {
+            const Icon = tab.icon;
+            const active = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`w-full flex items-center justify-between rounded-xl px-3.5 py-3 text-xs font-bold transition-all cursor-pointer border ${active
+                  ? 'bg-blue-50 text-blue-600 border-blue-100 shadow-sm'
+                  : 'text-slate-600 border-transparent hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Icon size={16} />
+                  <span>{tab.label}</span>
+                </div>
+                {tab.badge && tab.badge > 0 ? (
+                  <span className="bg-rose-100 text-rose-600 rounded-full px-1.5 py-0.5 text-[9px] font-black">{tab.badge}</span>
+                ) : null}
+              </button>
+            );
+          })}
+        </aside>
+
+        {/* Content Panel */}
+        <main className="flex-1 p-6 md:p-8 overflow-y-auto">
+          {/* TAB 1: DASHBOARD OVERVIEW */}
+          {activeTab === 'dashboard' && (
+            <div className="space-y-6">
+              <div className="text-left">
+                <h2 className="text-xl font-extrabold text-slate-900">System Operations Overview</h2>
+                <p className="text-xs text-slate-500 mt-1">Live metrics from your mock candidate portal, video configurations, and support hub.</p>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+                <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col justify-between shadow-sm text-left">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Candidate Reviews</span>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-slate-900">{reviews.length}</span>
+                    <span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded">★ 4.86</span>
+                  </div>
+                </div>
+                <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col justify-between shadow-sm text-left">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Active Showcase Video</span>
+                  <div className="mt-3">
+                    <span className="text-xs text-blue-600 font-bold truncate block" title={appVideoUrl}>
+                      {appVideoUrl.substring(appVideoUrl.lastIndexOf('/') + 1) || 'Sample Video'}
+                    </span>
+                    <span className="text-[9px] text-slate-500 block mt-0.5 font-mono">Dynamic update active</span>
+                  </div>
+                </div>
+                <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col justify-between shadow-sm text-left">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Open Support Tickets</span>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-slate-900">
+                      {supportTickets.filter(t => t.status !== 'Resolved').length}
+                    </span>
+                    <span className="text-[10px] text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded">Unresolved</span>
+                  </div>
+                </div>
+                <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col justify-between shadow-sm text-left">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Customer SLA Speed</span>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-slate-900">Instant</span>
+                    <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded">Mock SLA</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Layout Content */}
+              <div className="grid md:grid-cols-2 gap-6 pt-2">
+                <div className="bg-white/80 border border-slate-200/80 rounded-2xl p-5 space-y-4">
+                  <h3 className="text-sm font-bold text-slate-950 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2 text-left">
+                    <MessageSquare size={14} className="text-blue-500" /> Recent Service Tickets
+                  </h3>
+                  <div className="space-y-2">
+                    {supportTickets.slice(0, 3).map(ticket => (
+                      <div 
+                        key={ticket.id}
+                        onClick={() => { setSelectedTicketId(ticket.id); setActiveTab('tickets'); }}
+                        className="p-3 bg-slate-50/50 hover:bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between hover:border-slate-300 transition-all cursor-pointer text-left"
+                      >
+                        <div>
+                          <p className="text-xs font-bold text-slate-800 truncate max-w-[200px]">{ticket.subject}</p>
+                          <p className="text-[10px] text-slate-500 mt-0.5">{ticket.userName} • {ticket.createdTime}</p>
+                        </div>
+                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                          ticket.status === 'Open' ? 'bg-rose-100 text-rose-600' : ticket.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'
+                        }`}>
+                          {ticket.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white/80 border border-slate-200/80 rounded-2xl p-5 space-y-4">
+                  <h3 className="text-sm font-bold text-slate-950 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2 text-left">
+                    <Edit3 size={14} className="text-emerald-500" /> Landing Reviews Preview
+                  </h3>
+                  <div className="space-y-2.5 text-left">
+                    {reviews.slice(0, 2).map(r => (
+                      <div key={r.id} className="p-3 bg-slate-50/50 border border-slate-200/80 rounded-xl">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <img src={r.avatar} alt="" className="h-6 w-6 rounded-full object-cover border border-slate-200" />
+                          <div>
+                            <p className="text-xs font-bold text-slate-850">{r.name}</p>
+                            <p className="text-[9px] text-slate-500">{r.role} at {r.company}</p>
+                          </div>
+                        </div>
+                        <p className="text-[10px] text-slate-650 italic line-clamp-2">&ldquo;{r.comment}&rdquo;</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: MANAGE REVIEWS */}
+          {activeTab === 'reviews' && (
+            <div className="grid gap-6 lg:grid-cols-[1.2fr_.8fr]">
+              <div className="space-y-4">
+                <div className="text-left">
+                  <h2 className="text-xl font-extrabold text-slate-900">Review & Testimonial Editor</h2>
+                  <p className="text-xs text-slate-500 mt-1">Add, update, or remove candidate quotes displayed dynamically on the landing page.</p>
+                </div>
+
+                <div className="space-y-3">
+                  {reviews.map(r => (
+                    <div key={r.id} className="p-4 bg-white border border-slate-200/80 rounded-2xl text-left flex items-start justify-between gap-4 shadow-sm">
+                      <div className="flex gap-3">
+                        <img src={r.avatar} alt={r.name} className="h-10 w-10 rounded-xl object-cover border border-slate-200 mt-0.5 shrink-0" />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-bold text-slate-900">{r.name}</h4>
+                            <span className="text-[10px] text-slate-500">{r.role} at {r.company}</span>
+                          </div>
+                          <div className="flex text-yellow-500 text-[10px] my-1">
+                            {Array.from({ length: r.rating }).map((_, i) => <span key={i}>★</span>)}
+                          </div>
+                          <p className="text-xs text-slate-650 leading-relaxed font-medium mt-1.5">{r.comment}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => startEditReview(r)}
+                          className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 hover:text-slate-900 transition-all cursor-pointer"
+                          title="Edit"
+                        >
+                          <Edit3 size={13} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteReview(r.id)}
+                          className="p-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-100 transition-all cursor-pointer"
+                          title="Delete"
+                        >
+                          <Trash size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Form card */}
+              <div className="bg-white border border-slate-200/80 rounded-2xl p-5 h-fit space-y-4 shadow-sm">
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center justify-between">
+                  <span>{editingReviewId ? '✏️ Edit Review' : '➕ Add Landing Review'}</span>
+                  {editingReviewId && (
+                    <button onClick={clearReviewForm} className="text-[10px] text-slate-500 hover:text-slate-900 uppercase font-black cursor-pointer bg-slate-105 border border-slate-200 px-2 py-0.5 rounded">Cancel</button>
+                  )}
+                </h3>
+
+                <form onSubmit={handleSaveReview} className="space-y-4 text-left">
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mb-1">Author Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Liam Sterling"
+                      value={authorName}
+                      onChange={e => setAuthorName(e.target.value)}
+                      className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500 text-slate-900 placeholder:text-slate-400 focus:bg-white transition-all font-semibold"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mb-1">Role Title</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Lead Developer"
+                        value={authorRole}
+                        onChange={e => setAuthorRole(e.target.value)}
+                        className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500 text-slate-900 placeholder:text-slate-400 focus:bg-white transition-all font-semibold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mb-1">Company</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Meta"
+                        value={authorCompany}
+                        onChange={e => setAuthorCompany(e.target.value)}
+                        className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500 text-slate-900 placeholder:text-slate-400 focus:bg-white transition-all font-semibold"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mb-1">Rating Stars</label>
+                      <select
+                        value={rating}
+                        onChange={e => setRating(Number(e.target.value))}
+                        className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-3 outline-none focus:border-blue-500 text-slate-900 transition-all font-semibold cursor-pointer focus:bg-white"
+                      >
+                        {[5, 4, 3, 2, 1].map(n => (
+                          <option key={n} value={n}>{n} Stars</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mb-1">Avatar Profile Image</label>
+                      <select
+                        value={avatar}
+                        onChange={e => setAvatar(e.target.value)}
+                        className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-3 outline-none focus:border-blue-500 text-slate-900 transition-all font-semibold cursor-pointer focus:bg-white"
+                      >
+                        <option value="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80">Female Professional (Sarah)</option>
+                        <option value="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80">Male Professional (Rohit)</option>
+                        <option value="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&h=100&q=80">Young Female (Emily)</option>
+                        <option value="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&h=100&q=80">Young Male (Candidate)</option>
+                        <option value="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100&q=80">Tech Executive (Admin)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mb-1">Review Comment Content</label>
+                    <textarea
+                      placeholder="Type testimonial comment here..."
+                      rows={3}
+                      value={comment}
+                      onChange={e => setComment(e.target.value)}
+                      className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500 text-slate-900 placeholder:text-slate-400 focus:bg-white transition-all font-semibold leading-relaxed"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full bg-blue-600 hover:bg-blue-700 active:scale-98 text-white py-3.5 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all uppercase tracking-wider"
+                  >
+                    {editingReviewId ? '💾 Save Changes' : '➕ Publish Review'}
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: VIDEO SHOWCASE SETTINGS */}
+          {activeTab === 'video' && (
+            <div className="max-w-3xl space-y-6 text-left">
+              <div>
+                <h2 className="text-xl font-extrabold text-slate-900">Product Demo Video Showcase</h2>
+                <p className="text-xs text-slate-500 mt-1">Configure the product video displayed directly on the landing page.</p>
+              </div>
+
+              <form onSubmit={handleUpdateVideo} className="bg-white border border-slate-200/80 rounded-2xl p-5 space-y-4 shadow-sm">
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mb-1">Showcase Video Link</label>
+                  <input
+                    type="text"
+                    value={tempVideoUrl}
+                    onChange={e => setTempVideoUrl(e.target.value)}
+                    className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500 text-slate-900 transition-all font-mono font-bold focus:bg-white"
+                  />
+                  <p className="text-[10px] text-slate-500 mt-1.5 leading-normal">
+                    Provide an absolute URL pointing to a raw video file (MP4/WebM). This video will load dynamically on the landing page video section.
+                  </p>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white py-3.5 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all uppercase tracking-wider"
+                  >
+                    Update Showcase Video
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const presets = [
+                        'https://www.w3schools.com/html/mov_bbb.mp4',
+                        'https://www.w3schools.com/html/movie.mp4',
+                        'https://assets.mixkit.co/videos/preview/mixkit-software-developer-working-on-his-computer-34287-large.mp4'
+                      ];
+                      const randomPreset = presets[Math.floor(Math.random() * presets.length)];
+                      setTempVideoUrl(randomPreset);
+                    }}
+                    className="px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all cursor-pointer bg-white"
+                  >
+                    🎲 Load Preset Link
+                  </button>
+                </div>
+              </form>
+
+              {/* Live Preview player */}
+              <div className="bg-white border border-slate-200/80 rounded-2xl p-5 space-y-3 shadow-sm">
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                  <PlayCircle size={14} className="text-blue-500" /> Admin Console Preview
+                </h3>
+                <div className="aspect-video bg-black rounded-xl overflow-hidden border border-slate-200">
+                  <video
+                    key={appVideoUrl}
+                    src={appVideoUrl}
+                    controls
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <p className="text-[10px] text-slate-500 font-medium">Video is currently live. Open the landing page to verify formatting.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: CUSTOMER SUPPORT HUB */}
+          {activeTab === 'tickets' && (
+            <div className="h-[74vh] flex flex-col md:flex-row border border-slate-200 bg-white rounded-2xl overflow-hidden shadow-sm">
+              {/* Left Column: Tickets List */}
+              <div className="w-full md:w-80 border-r border-slate-200 flex flex-col bg-slate-50/20">
+                <div className="p-4 border-b border-slate-200/80 text-left bg-white">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Service Tickets Queue</span>
+                  <span className="text-xs font-bold text-slate-900 mt-1 block">Active Inboxes ({supportTickets.filter(t => t.status !== 'Resolved').length})</span>
+                </div>
+                <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                  {supportTickets.map(ticket => {
+                    const isSelected = selectedTicketId === ticket.id;
+                    return (
+                      <div
+                        key={ticket.id}
+                        onClick={() => setSelectedTicketId(ticket.id)}
+                        className={`p-3 rounded-xl text-left cursor-pointer transition-all flex flex-col gap-1.5 border ${
+                          isSelected ? 'bg-blue-50 border-blue-200 shadow-sm' : 'border-transparent hover:bg-slate-50 hover:text-slate-900'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-[10px] font-mono text-slate-400 font-bold shrink-0">{ticket.id}</span>
+                          <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full leading-none shrink-0 ${
+                            ticket.priority === 'High' ? 'bg-rose-100 text-rose-600 border border-rose-200' : ticket.priority === 'Medium' ? 'bg-amber-100 text-amber-600 border border-amber-200' : 'bg-slate-100 text-slate-600 border border-slate-200'
+                          }`}>
+                            {ticket.priority} Priority
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-xs font-extrabold text-slate-800 leading-snug truncate" title={ticket.subject}>
+                            {ticket.subject}
+                          </p>
+                          <span className="text-[9px] text-slate-500 font-semibold block mt-0.5">{ticket.userName}</span>
+                        </div>
+                        <div className="flex items-center justify-between mt-0.5">
+                          <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md ${
+                            ticket.status === 'Open' ? 'bg-rose-100 text-rose-600' : ticket.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'
+                          }`}>
+                            {ticket.status}
+                          </span>
+                          <span className="text-[8px] text-slate-500">{ticket.createdTime}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Right Column: Chat window */}
+              <div className="flex-1 flex flex-col bg-slate-50/5">
+                {selectedTicket ? (
+                  <div className="flex-1 flex flex-col min-h-0">
+                    {/* Chat Header */}
+                    <div className="p-4 border-b border-slate-200 bg-white flex flex-wrap items-center justify-between gap-3 text-left">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-xs font-black text-slate-900 truncate max-w-[280px]" title={selectedTicket.subject}>
+                            {selectedTicket.subject}
+                          </h3>
+                          <span className="text-[9px] font-mono text-slate-450 font-bold bg-slate-100 px-1.5 py-0.5 rounded">{selectedTicket.id}</span>
+                        </div>
+                        <p className="text-[10px] text-slate-500 mt-0.5">
+                          From: <strong>{selectedTicket.userName}</strong> ({selectedTicket.userEmail})
+                        </p>
+                      </div>
+
+                      {/* Dropdown status toggles */}
+                      <div className="flex items-center gap-2">
+                        <div className="text-left">
+                          <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Status</label>
+                          <select
+                            value={selectedTicket.status}
+                            onChange={e => toggleTicketStatus(selectedTicket.id, e.target.value as any)}
+                            className="text-[9px] font-bold rounded bg-white border border-slate-200 px-2 py-1 text-slate-700 cursor-pointer focus:border-blue-500 outline-none"
+                          >
+                            <option value="Open">Open</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Resolved">Resolved</option>
+                          </select>
+                        </div>
+                        <div className="text-left">
+                          <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Priority</label>
+                          <select
+                            value={selectedTicket.priority}
+                            onChange={e => toggleTicketPriority(selectedTicket.id, e.target.value as any)}
+                            className="text-[9px] font-bold rounded bg-white border border-slate-200 px-2 py-1 text-slate-700 cursor-pointer focus:border-blue-500 outline-none"
+                          >
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Chat history list */}
+                    <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
+                      {selectedTicket.messages.map((msg: any, idx: number) => {
+                        const isAdmin = msg.sender === 'admin';
+                        return (
+                          <div
+                            key={idx}
+                            className={`flex flex-col ${isAdmin ? 'items-end' : 'items-start'} space-y-1`}
+                          >
+                            <span className="text-[9px] font-bold text-slate-500">
+                              {isAdmin ? 'Admin Console (Support)' : selectedTicket.userName}
+                            </span>
+                            <div className={`max-w-[70%] rounded-2xl px-4 py-2.5 text-xs font-semibold leading-relaxed border ${
+                              isAdmin
+                                ? 'bg-blue-600 text-white border-transparent rounded-tr-none shadow-sm'
+                                : 'bg-slate-100 text-slate-800 border-slate-200/60 rounded-tl-none'
+                            }`}>
+                              {msg.text}
+                            </div>
+                            <span className="text-[8px] text-slate-400">{msg.time}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Reply editor input */}
+                    <form onSubmit={handleSendTicketReply} className="p-3 border-t border-slate-200 bg-white flex gap-2 items-center">
+                      <input
+                        type="text"
+                        placeholder="Type reply to candidate..."
+                        value={replyText}
+                        onChange={e => setReplyText(e.target.value)}
+                        className="flex-1 min-w-0 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-xs text-slate-850 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:bg-white transition-all font-semibold"
+                      />
+                      <button
+                        type="submit"
+                        className="flex h-9 items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 cursor-pointer shadow-sm transition-all flex items-center gap-1.5"
+                      >
+                        <Send size={12} />
+                        <span>Send</span>
+                      </button>
+                    </form>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400 mb-3 border border-slate-200">
+                      <MessageSquare size={20} />
+                    </div>
+                    <p className="text-xs font-bold text-slate-700">No support ticket selected</p>
+                    <p className="text-[10px] text-slate-500 mt-1 max-w-[200px] leading-relaxed">Choose a service request from the queue to start helper interaction.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </main>
       </div>
     </div>
   );
@@ -742,6 +1421,91 @@ function App() {
   const [showAppChoice, setShowAppChoice] = useState(false);
   const [currentTranscript, setCurrentTranscript] = useState<TranscriptItem[]>([]);
   const [sessionTime, setSessionTime] = useState(0);
+
+  // Dynamic reviews state
+  const [reviews, setReviews] = useState<any[]>(() => {
+    try {
+      const saved = localStorage.getItem('sutra-landing-reviews');
+      return saved ? JSON.parse(saved) : [
+        { id: '1', name: 'Sarah Jenkins', role: 'Staff Engineer', company: 'Google', rating: 5, comment: 'Sutra AI was a complete game-changer. The overlay sat invisibly on my screen during screen share, and the contextual bullet points let me answer design questions effortlessly.', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80' },
+        { id: '2', name: 'Rohit Mehta', role: 'Software Engineer II', company: 'Amazon', rating: 5, comment: 'The resume intelligence feature tailored the AI responses specifically to my past experience. I could see the bullet points clearly without looking away from the camera. Highly recommended!', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80' },
+        { id: '3', name: 'Emily Chen', role: 'Senior Frontend Dev', company: 'Stripe', rating: 5, comment: 'I was worried about the interviewers detecting the tool on Zoom. Tested screen share with a friend and it was 100% invisible. Passed my Stripe loop on the first try.', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&h=100&q=80' }
+      ];
+    } catch {
+      return [];
+    }
+  });
+
+  // Persist reviews
+  useEffect(() => {
+    localStorage.setItem('sutra-landing-reviews', JSON.stringify(reviews));
+  }, [reviews]);
+
+  // Showcase Video URL state
+  const [appVideoUrl, setAppVideoUrl] = useState<string>(() => {
+    return localStorage.getItem('sutra-landing-video') || 'https://www.w3schools.com/html/mov_bbb.mp4';
+  });
+
+  // Persist video URL
+  useEffect(() => {
+    localStorage.setItem('sutra-landing-video', appVideoUrl);
+  }, [appVideoUrl]);
+
+  // Support tickets queue state
+  const [supportTickets, setSupportTickets] = useState<any[]>(() => {
+    try {
+      const saved = localStorage.getItem('sutra-support-tickets');
+      return saved ? JSON.parse(saved) : [
+        {
+          id: 'T-1001',
+          userEmail: 'dev.jackson@gmail.com',
+          userName: 'Jackson Carter',
+          subject: 'Microphone permission block on macOS Sequoia',
+          status: 'Open',
+          priority: 'High',
+          createdTime: '2 hours ago',
+          messages: [
+            { sender: 'user', text: "Hey support team, I'm trying to start a Live Session but it keeps saying my microphone permission is blocked. I already allowed it in system settings.", time: '2h ago' }
+          ]
+        },
+        {
+          id: 'T-1002',
+          userEmail: 'priya.sharma@yahoo.com',
+          userName: 'Priya Sharma',
+          subject: 'Stripe subscription invoice request',
+          status: 'Pending',
+          priority: 'Medium',
+          createdTime: '4 hours ago',
+          messages: [
+            { sender: 'user', text: "Hi, I recently upgraded to the Pro plan but did not receive my invoice on my registered email. Can you please send it?", time: '4h ago' },
+            { sender: 'admin', text: "Hello Priya, we've updated your billing info. Let me check the invoice system.", time: '3h ago' },
+            { sender: 'user', text: "Thanks, please let me know when you email it.", time: '2h ago' }
+          ]
+        },
+        {
+          id: 'T-1003',
+          userEmail: 'sam.wilson@outlook.com',
+          userName: 'Sam Wilson',
+          subject: 'Auto-answer latency is too high',
+          status: 'Resolved',
+          priority: 'Low',
+          createdTime: '1 day ago',
+          messages: [
+            { sender: 'user', text: "Sometimes the auto-answer takes 4-5 seconds to display on my screen share. Is this expected?", time: '1d ago' },
+            { sender: 'admin', text: "Hi Sam, this is usually due to high server load or network routing latency. Try switching your model to gemini-2.5-flash which has low TTFT.", time: '18h ago' },
+            { sender: 'user', text: "That solved it, thank you!", time: '12h ago' }
+          ]
+        }
+      ];
+    } catch {
+      return [];
+    }
+  });
+
+  // Persist tickets
+  useEffect(() => {
+    localStorage.setItem('sutra-support-tickets', JSON.stringify(supportTickets));
+  }, [supportTickets]);
 
   const [isMockSessionActive, setIsMockSessionActive] = useState(false);
   const [mockSessionQuestions, setMockSessionQuestions] = useState<Array<{
@@ -1424,13 +2188,32 @@ function App() {
     return <Landing
       onSignIn={() => setScreen('Login')}
       onStart={handleStartSession}
+      reviews={reviews}
+      appVideoUrl={appVideoUrl}
+      setScreen={setScreen}
+    />;
+  }
+
+  if (screen === 'Admin') {
+    return <AdminPanel
+      reviews={reviews}
+      setReviews={setReviews}
+      appVideoUrl={appVideoUrl}
+      setAppVideoUrl={setAppVideoUrl}
+      supportTickets={supportTickets}
+      setSupportTickets={setSupportTickets}
+      onBack={() => setScreen('Landing')}
     />;
   }
 
   if (!user || screen === 'Login') {
     return <LoginPage onLoginSuccess={(u) => {
       setUser(u);
-      setScreen('Dashboard');
+      if (u.email === 'admin@sutra.ai' || u.uid === 'admin') {
+        setScreen('Admin');
+      } else {
+        setScreen('Dashboard');
+      }
     }} />;
   }
 
@@ -1995,12 +2778,25 @@ const previewScenarios = {
   }
 };
 
-function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => void }) {
+function Landing({
+  onSignIn,
+  onStart,
+  reviews,
+  appVideoUrl,
+  setScreen
+}: {
+  onSignIn: () => void;
+  onStart: () => void;
+  reviews: any[];
+  appVideoUrl: string;
+  setScreen: (s: Screen) => void;
+}) {
   // Live session preview simulator state
   const [activeScenario, setActiveScenario] = useState<'system' | 'sql' | 'react'>('system');
   const [questionLength, setQuestionLength] = useState(0);
   const [answerLength, setAnswerLength] = useState(0);
   const [simulatorState, setSimulatorState] = useState<'idle' | 'typing' | 'thinking' | 'streaming'>('idle');
+  const [hoveredLoop, setHoveredLoop] = useState<number | null>(null);
 
   // Pricing state
   const [pricingPeriod, setPricingPeriod] = useState<'monthly' | 'annual'>('annual');
@@ -2194,7 +2990,7 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
               <button onClick={onStart} className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl px-7 py-4 text-sm font-bold shadow-[0_8px_20px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2 cursor-pointer transition-all">
                 <span>Start Free Session</span> <ArrowRight size={16} />
               </button>
-              <a href="#simulator" className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-6 py-4 text-sm font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+              <a href="#showcase-video" className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-6 py-4 text-sm font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
                 <PlayCircle size={16} className="text-slate-500" /> Watch Demo
               </a>
             </div>
@@ -2790,6 +3586,36 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
           </div>
         </motion.section>
 
+        {/* Showcase Video Section */}
+        <motion.section 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          id="showcase-video"
+          className="relative z-10 mx-auto w-full max-w-5xl px-6 py-12 text-center"
+        >
+          <div className="max-w-2xl mx-auto mb-8">
+            <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 mb-3">
+              🎥 Video Walkthrough
+            </span>
+            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              Sutra AI in Action
+            </h2>
+            <p className="mt-2 text-slate-500 text-sm font-medium">
+              See how the invisible click-through overlay helps candidates perform flawlessly during interviews.
+            </p>
+          </div>
+          <div className="relative rounded-3xl bg-slate-950 border border-slate-850 p-2.5 shadow-2xl overflow-hidden aspect-video max-w-3xl mx-auto group">
+            <video 
+              key={appVideoUrl}
+              src={appVideoUrl} 
+              controls 
+              className="w-full h-full object-contain rounded-2xl"
+            />
+          </div>
+        </motion.section>
+
         {/* Features Section */}
         <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.6, type: "spring", bounce: 0.2 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center">
           <div className="max-w-3xl mx-auto mb-16">
@@ -2874,14 +3700,47 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
         </motion.section>
 
         {/* Dual-Loop Framework */}
+        {/* Dual-Loop Framework */}
         <motion.section
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.7, type: "spring", bounce: 0.2 }}
+          transition={{ duration: 0.7, type: "spring", bounce: 0.1 }}
           id="how-it-works"
           className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center"
         >
+          {/* Custom style block for flow animations */}
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes loopFlow {
+              to { stroke-dashoffset: -32; }
+            }
+            .flow-line-blue {
+              stroke-dasharray: 6, 6;
+              animation: loopFlow 1.2s linear infinite;
+              stroke: #3b82f6;
+              filter: drop-shadow(0 0 3px rgba(59,130,246,0.6));
+            }
+            .flow-line-emerald {
+              stroke-dasharray: 6, 6;
+              animation: loopFlow 1.2s linear infinite;
+              stroke: #10b981;
+              filter: drop-shadow(0 0 3px rgba(16,185,129,0.6));
+            }
+            .memory-orb-pulse {
+              animation: orbGlow 3s ease-in-out infinite;
+            }
+            @keyframes orbGlow {
+              0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 8px rgba(59,130,246,0.3)) drop-shadow(0 0 8px rgba(16,185,129,0.3));
+              }
+              50% {
+                transform: scale(1.06);
+                filter: drop-shadow(0 0 16px rgba(59,130,246,0.6)) drop-shadow(0 0 16px rgba(16,185,129,0.6));
+              }
+            }
+          `}} />
+
           <div className="max-w-3xl mx-auto mb-14">
             <span className="inline-flex items-center rounded-full bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600 mb-4">
               The Only Tool That Bridges Both Worlds
@@ -2889,68 +3748,132 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
             <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
               The Dual-Loop Framework
             </h2>
-            <p className="mt-4 text-slate-500 font-medium text-sm leading-relaxed">
+            <p className="mt-4 text-slate-500 font-medium text-sm leading-relaxed max-w-xl mx-auto">
               Your practice sessions build a personalized memory store. When the real interview happens, Sutra AI surfaces <em>your own</em> stories, not generic AI text.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto text-left">
-            {/* Loop 1: Rehearsal */}
+          <div className="grid lg:grid-cols-[1fr_240px_1fr] gap-8 max-w-6xl mx-auto text-left items-center">
+            {/* Loop 1: Rehearsal Card */}
             <motion.div
-              whileHover={{ y: -4 }}
-              className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm flex flex-col gap-5"
+              whileHover={{ y: -6, scale: 1.01 }}
+              onMouseEnter={() => setHoveredLoop(1)}
+              onMouseLeave={() => setHoveredLoop(null)}
+              className={`bg-white border rounded-3xl p-8 shadow-sm flex flex-col gap-6 transition-all duration-350 cursor-pointer ${
+                hoveredLoop === 1 ? 'border-blue-400 shadow-[0_8px_30px_rgba(59,130,246,0.08)]' : 'border-slate-200/80'
+              }`}
             >
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                <div className={`h-11 w-11 rounded-2xl flex items-center justify-center transition-all ${
+                  hoveredLoop === 1 ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-50 text-blue-600'
+                }`}>
                   <NotebookPen size={20} />
                 </div>
                 <div>
-                  <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Loop 1</span>
+                  <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest block leading-none mb-1">Loop 1</span>
                   <h3 className="font-display text-xl font-bold text-slate-900 leading-tight">Rehearsal Mode</h3>
                 </div>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {[
                   { step: '01', title: 'Upload your resume + job docs', desc: 'Sutra AI learns your experience, projects, and skill set.' },
                   { step: '02', title: 'Run unlimited mock interviews', desc: 'AI plays the interviewer. You build real, natural answers.' },
                   { step: '03', title: 'Responses saved to memory store', desc: 'Your best answers are stored privately, locally, and securely.' },
                 ].map(({ step, title, desc }) => (
-                  <div key={step} className="flex gap-3">
-                    <span className="text-[10px] font-black text-blue-400 w-5 shrink-0 mt-0.5">{step}</span>
+                  <div key={step} className="flex gap-3.5 group/item">
+                    <span className="text-[11px] font-black text-blue-500 bg-blue-50/60 w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-colors group-hover/item:bg-blue-100">{step}</span>
                     <div>
-                      <p className="text-sm font-bold text-slate-800">{title}</p>
-                      <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
+                      <p className="text-sm font-bold text-slate-800 transition-colors group-hover/item:text-blue-600">{title}</p>
+                      <p className="text-xs text-slate-500 leading-relaxed mt-0.5">{desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </motion.div>
 
-            {/* Loop 2: Live Performance */}
+            {/* Central SVG Interactive Diagram */}
+            <div className="flex flex-col items-center justify-center py-6 lg:py-0 relative">
+              <svg width="240" height="240" viewBox="0 0 240 240" fill="none" className="overflow-visible select-none">
+                {/* Background flow paths */}
+                <path d="M 40 120 C 40 50, 120 50, 120 120" stroke="#f1f5f9" strokeWidth="6" strokeLinecap="round" />
+                <path d="M 120 120 C 120 190, 200 190, 200 120" stroke="#f1f5f9" strokeWidth="6" strokeLinecap="round" />
+
+                {/* Animated active paths */}
+                <path 
+                  d="M 40 120 C 40 50, 120 50, 120 120" 
+                  stroke="#3b82f6" 
+                  strokeWidth="4" 
+                  strokeLinecap="round"
+                  className={`transition-opacity duration-300 ${hoveredLoop === 1 ? 'path-flow-active flow-line-blue' : 'opacity-30'}`} 
+                />
+                <path 
+                  d="M 120 120 C 120 190, 200 190, 200 120" 
+                  stroke="#10b981" 
+                  strokeWidth="4" 
+                  strokeLinecap="round"
+                  className={`transition-opacity duration-300 ${hoveredLoop === 2 ? 'path-flow-active flow-line-emerald' : 'opacity-30'}`} 
+                />
+
+                {/* Flow Direction Indicators */}
+                <circle cx="120" cy="120" r="28" fill="url(#orbGrad)" className="memory-orb-pulse" />
+                
+                {/* SVG definitions */}
+                <defs>
+                  <linearGradient id="orbGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#3b82f6" />
+                    <stop offset="100%" stopColor="#10b981" />
+                  </linearGradient>
+                </defs>
+
+                {/* Inner icons inside central orb */}
+                <g transform="translate(108, 108)" className="pointer-events-none">
+                  {/* Database / Core storage drawing */}
+                  <path d="M4 2 L20 2 L20 6 L4 6 Z M4 9 L20 9 L20 13 L4 13 Z M4 16 L20 16 L20 20 L4 20 Z" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <line x1="7" y1="4" x2="7" y2="4" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+                  <line x1="7" y1="11" x2="7" y2="11" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+                  <line x1="7" y1="18" x2="7" y2="18" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+                </g>
+
+                {/* Visual Label text above orb */}
+                <text x="120" y="80" textAnchor="middle" fill="#475569" className="text-[10px] font-black uppercase tracking-wider">Memory Store</text>
+              </svg>
+
+              <div className="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                <span className="text-[9px] font-black uppercase tracking-widest text-white mt-12 block drop-shadow-sm">SECURE</span>
+              </div>
+            </div>
+
+            {/* Loop 2: Live Performance Card */}
             <motion.div
-              whileHover={{ y: -4 }}
-              className="bg-slate-900 border border-slate-700 rounded-2xl p-8 flex flex-col gap-5"
+              whileHover={{ y: -6, scale: 1.01 }}
+              onMouseEnter={() => setHoveredLoop(2)}
+              onMouseLeave={() => setHoveredLoop(null)}
+              className={`bg-white border rounded-3xl p-8 shadow-sm flex flex-col gap-6 transition-all duration-350 cursor-pointer ${
+                hoveredLoop === 2 ? 'border-emerald-400 shadow-[0_8px_30px_rgba(16,185,129,0.08)]' : 'border-slate-200/80'
+              }`}
             >
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                <div className={`h-11 w-11 rounded-2xl flex items-center justify-center transition-all ${
+                  hoveredLoop === 2 ? 'bg-emerald-600 text-white shadow-md' : 'bg-emerald-50 text-emerald-600'
+                }`}>
                   <Radio size={20} />
                 </div>
                 <div>
-                  <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Loop 2</span>
-                  <h3 className="font-display text-xl font-bold text-white leading-tight">Live Performance</h3>
+                  <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block leading-none mb-1">Loop 2</span>
+                  <h3 className="font-display text-xl font-bold text-slate-900 leading-tight">Live Performance</h3>
                 </div>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {[
                   { step: '01', title: 'Copilot activates invisibly', desc: 'The click-through overlay launches over Zoom, Teams, or Meet.' },
                   { step: '02', title: 'AI detects the interview topic', desc: 'Natural language processing matches the question context in real-time.' },
                   { step: '03', title: 'Your stories surface automatically', desc: 'The HUD shows your own personalized answers — not generic AI text.' },
                 ].map(({ step, title, desc }) => (
-                  <div key={step} className="flex gap-3">
-                    <span className="text-[10px] font-black text-emerald-400 w-5 shrink-0 mt-0.5">{step}</span>
+                  <div key={step} className="flex gap-3.5 group/item">
+                    <span className="text-[11px] font-black text-emerald-500 bg-emerald-50/60 w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-colors group-hover/item:bg-emerald-100">{step}</span>
                     <div>
-                      <p className="text-sm font-bold text-white">{title}</p>
-                      <p className="text-xs text-slate-400 leading-relaxed">{desc}</p>
+                      <p className="text-sm font-bold text-slate-800 transition-colors group-hover/item:text-emerald-600">{title}</p>
+                      <p className="text-xs text-slate-500 leading-relaxed mt-0.5">{desc}</p>
                     </div>
                   </div>
                 ))}
@@ -2959,13 +3882,72 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
           </div>
 
           {/* Center connector */}
-          <div className="flex items-center justify-center my-6 gap-3">
-            <div className="h-px bg-slate-200 flex-1" />
-            <div className="flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5">
-              <ArrowRight size={12} className="text-blue-600" />
-              <span className="text-xs font-bold text-blue-600">Rehearsal builds your Live performance</span>
+          <div className="flex items-center justify-center mt-12 gap-3 max-w-md mx-auto">
+            <div className="h-px bg-slate-200 flex-1 animate-pulse" />
+            <div className="flex items-center gap-2 rounded-full border border-blue-150 bg-blue-50 px-4 py-2 shadow-sm">
+              <ArrowRight size={12} className="text-blue-600 animate-bounceHorizontal" />
+              <span className="text-xs font-bold text-blue-600">Continuous Sync Loop Active</span>
             </div>
-            <div className="h-px bg-slate-200 flex-1" />
+            <div className="h-px bg-slate-200 flex-1 animate-pulse" />
+          </div>
+        </motion.section>
+
+        {/* Dynamic Reviews Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6 }}
+          id="reviews"
+          className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center"
+        >
+          <div className="max-w-3xl mx-auto mb-16">
+            <span className="inline-flex items-center rounded-full bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600 mb-4">
+              Candidate Success Stories
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Loved by Engineers. Trusted Globally.
+            </h2>
+            <p className="mt-4 text-slate-600 text-base sm:text-lg font-medium max-w-xl mx-auto leading-relaxed">
+              Discover how software engineers, product managers, and developers use Sutra AI to build confidence and land offers.
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto text-left">
+            {reviews.map((r, i) => (
+              <motion.div
+                key={r.id || i}
+                whileHover={{ y: -6, scale: 1.02 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:shadow-xl hover:border-blue-200 transition-all duration-300 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <img src={r.avatar} alt={r.name} className="h-10 w-10 rounded-full object-cover border border-slate-100 shadow-sm" />
+                      <div>
+                        <h4 className="font-display text-sm font-bold text-slate-900 leading-tight">{r.name}</h4>
+                        <span className="text-[10px] font-semibold text-slate-500">{r.role} at {r.company}</span>
+                      </div>
+                    </div>
+                    <span className="text-xs bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-emerald-600 font-bold shrink-0">Verified</span>
+                  </div>
+
+                  <div className="flex text-yellow-400 text-xs mb-3">
+                    {Array.from({ length: r.rating }).map((_, idx) => (
+                      <span key={idx}>★</span>
+                    ))}
+                  </div>
+
+                  <p className="text-xs text-slate-600 leading-relaxed font-medium italic">
+                    &ldquo;{r.comment}&rdquo;
+                  </p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </motion.section>
 
@@ -3229,6 +4211,13 @@ function Landing({ onSignIn, onStart }: { onSignIn: () => void; onStart: () => v
           <div className="flex gap-4">
             <a href="mailto:support@sutra.ai" className="hover:text-slate-600 transition-colors">Support</a>
             <a href="https://github.com" target="_blank" className="hover:text-slate-600 transition-colors">GitHub project</a>
+            <button
+              type="button"
+              onClick={() => setScreen('Admin')}
+              className="hover:text-slate-600 transition-colors text-slate-400 font-semibold cursor-pointer text-xs bg-transparent border-none p-0 inline-flex items-center gap-1"
+            >
+              🔑 Admin Console
+            </button>
           </div>
         </div>
       </footer>
