@@ -120,7 +120,7 @@ body {
 
   /* Premium buttons (Teal to Emerald) */
   .btn-gradient {
-    background: linear-gradient(135deg, #0d9488 0%, #059669 100%);
+    background: #0d9488;
     background-size: 200% auto;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 8px 24px rgba(13, 148, 136, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);

@@ -9,7 +9,7 @@ import {
   SlidersHorizontal, CheckCircle2, Crown, Zap, Target, Layers, ScreenShare, AlertCircle, ExternalLink,
   Volume2, VolumeX, Activity, MonitorSpeaker, HelpCircle, ChevronDown, ChevronUp, ChevronRight, Cpu,
   Laptop, Globe, Monitor, ArrowRight, PlayCircle as MonitorPlay, EyeOff, BellOff,
-  Trash, Edit3, MessageSquare, Check, Video
+  Trash, Edit3, MessageSquare, Check, Video, Settings as SettingsIcon
 } from 'lucide-react';
 import './styles/globals.css';
 import { signInWithGoogle, logOut, type AppUser, isFirebaseConfigured } from './firebase';
@@ -478,13 +478,15 @@ function CustomSelect({
   onChange,
   options,
   placeholder = "Select an option",
-  icon: Icon
+  icon: Icon,
+  theme = 'dark'
 }: {
   value: string;
   onChange: (val: string) => void;
   options: CustomSelectOption[];
   placeholder?: string;
   icon?: any;
+  theme?: 'dark' | 'light';
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -501,32 +503,58 @@ function CustomSelect({
 
   const selectedOption = options.find(opt => opt.value === value);
 
+  const isLight = theme === 'light';
+
   return (
     <div className="relative w-full text-left" ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between rounded-xl border border-white/10 bg-[#0f1123]/95 hover:bg-[#0f1123] px-3.5 py-2.5 text-sm text-slate-200 outline-none transition-all cursor-pointer shadow-inner focus:border-violet-500/50"
+        className={`w-full flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-sm outline-none transition-all cursor-pointer shadow-sm focus:border-teal-500/50 ${
+          isLight 
+            ? 'bg-white border-slate-200 !text-slate-900 hover:bg-slate-50'
+            : 'bg-[#0f1123]/95 border-white/10 text-slate-200 hover:bg-[#0f1123]'
+        }`}
       >
         <span className="flex items-center gap-2 truncate">
-          {Icon && <Icon size={16} className="text-slate-400 shrink-0" />}
+          {Icon && <Icon size={16} className={`${isLight ? 'text-slate-400' : 'text-slate-400'} shrink-0`} />}
           {selectedOption ? (
             <span className="truncate">{selectedOption.label}</span>
           ) : (
-            <span className="text-slate-500 truncate">{placeholder}</span>
+            <span className={`truncate ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>{placeholder}</span>
           )}
         </span>
-        <ChevronDown size={16} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''} ${isLight ? 'text-slate-400' : 'text-slate-400'}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 mt-1.5 z-40 w-full rounded-xl border border-white/10 bg-[#0c0d1e]/98 backdrop-blur-md p-1.5 shadow-2xl max-h-60 overflow-y-auto animate-fadeIn">
+        <div className={`absolute left-0 mt-1.5 z-40 w-full rounded-xl border p-1.5 shadow-2xl max-h-60 overflow-y-auto animate-fadeIn ${
+          isLight 
+            ? 'bg-white border-slate-200 shadow-xl'
+            : 'bg-[#0c0d1e]/98 border-white/10 backdrop-blur-md'
+        }`}>
           {options.length === 0 ? (
-            <div className="px-3 py-2 text-xs text-slate-500 italic">No options available</div>
+            <div className={`px-3 py-2 text-xs italic ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>No options available</div>
           ) : (
             options.map((opt) => {
               const isActive = opt.value === value;
               const isAddBtn = opt.value === 'add_from_computer';
+              
+              let btnClass = '';
+              if (isActive) {
+                btnClass = isLight 
+                  ? 'bg-teal-50 text-teal-700 font-bold border border-teal-100'
+                  : 'bg-teal-600/30 text-white font-bold border border-teal-500/20';
+              } else if (isAddBtn) {
+                btnClass = isLight
+                  ? 'text-teal-600 hover:bg-teal-50 border-t border-slate-100 mt-1 pt-2'
+                  : 'text-cyan-300 hover:bg-cyan-500/10 border-t border-white/5 mt-1 pt-2';
+              } else {
+                btnClass = isLight
+                  ? 'text-slate-700 hover:bg-slate-100'
+                  : 'text-slate-300 hover:bg-white/5 hover:text-white';
+              }
+
               return (
                 <button
                   key={opt.value}
@@ -535,17 +563,12 @@ function CustomSelect({
                     onChange(opt.value);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-xs flex flex-col transition-all cursor-pointer my-0.5 ${isActive
-                    ? 'bg-violet-600/30 text-white font-bold border border-violet-500/20'
-                    : isAddBtn
-                      ? 'text-cyan-300 hover:bg-cyan-500/10 border-t border-white/5 mt-1 pt-2'
-                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                    }`}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-xs flex flex-col transition-all cursor-pointer my-0.5 ${btnClass}`}
                 >
                   <span className="truncate flex items-center gap-1.5">
                     {opt.label}
                   </span>
-                  {opt.sublabel && <span className="text-[10px] text-slate-500 font-normal truncate mt-0.5">{opt.sublabel}</span>}
+                  {opt.sublabel && <span className={`text-[10px] font-normal truncate mt-0.5 ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>{opt.sublabel}</span>}
                 </button>
               );
             })
@@ -625,10 +648,10 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: (u: AppUser) => void })
 
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-[#f8fafc] overflow-hidden text-slate-900 font-sans antialiased">
+    <div className="relative flex min-h-screen items-center justify-center bg-[#f8fafc] overflow-hidden !text-slate-900 font-sans antialiased">
       {/* Drifting Aura Lights */}
-      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-blue-100/50 blur-[130px] z-0" />
-      <div className="pointer-events-none absolute bottom-[-10%] right-[-10%] h-[600px] w-[600px] rounded-full bg-indigo-50/70 blur-[150px] z-0" />
+      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-teal-100/50 blur-[130px] z-0" />
+      <div className="pointer-events-none absolute bottom-[-10%] right-[-10%] h-[600px] w-[600px] rounded-full bg-teal-50/70 blur-[150px] z-0" />
 
       {/* Grid Pattern Pattern Mask */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(circle_at_50%_30%,black_60%,transparent_100%)] opacity-80 z-0" />
@@ -636,11 +659,11 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: (u: AppUser) => void })
       <div className="relative z-10 w-full max-w-md p-6">
         <div className="bg-white border border-slate-200/80 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.05)] relative overflow-hidden backdrop-blur-2xl animate-fadeIn">
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 shadow-[0_4px_12px_rgba(245,158,11,0.3)] mb-5">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-600 shadow-[0_4px_12px_rgba(245,158,11,0.3)] mb-5">
               <SutraLogo size={28} className="text-white" />
             </div>
-            <h1 className="font-display text-3xl font-extrabold tracking-tight text-slate-900">
-              Sutra <span className="text-orange-500">AI</span>
+            <h1 className="font-display text-3xl font-extrabold tracking-tight !text-slate-900">
+              Sutra <span className="text-teal-500">AI</span>
             </h1>
             <p className="mt-2.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
               Interview OS Console
@@ -661,8 +684,8 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: (u: AppUser) => void })
 
           {!isFirebaseConfigured && !isGsiConfigured && (
             <div className="mb-6 space-y-4 animate-fadeIn text-left">
-              <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-4 mb-2">
-                <p className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-1 flex items-center gap-1.5">
+              <div className="rounded-xl border border-teal-100 bg-teal-50/60 p-4 mb-2">
+                <p className="text-xs font-bold text-teal-600 uppercase tracking-wide mb-1 flex items-center gap-1.5">
                   ✨ Developer Mode Fallback
                 </p>
                 <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
@@ -676,7 +699,7 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: (u: AppUser) => void })
                   placeholder="e.g. candidate@gmail.com"
                   value={devEmail}
                   onChange={e => setDevEmail(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500/50 text-slate-950 placeholder:text-slate-400 transition-all font-semibold"
+                  className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-teal-500/50 text-slate-950 placeholder:!text-slate-400 transition-all font-semibold"
                 />
               </div>
               <div>
@@ -686,7 +709,7 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: (u: AppUser) => void })
                   placeholder="e.g. Alex Rivera"
                   value={devName}
                   onChange={e => setDevName(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500/50 text-slate-950 placeholder:text-slate-400 transition-all font-semibold"
+                  className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-teal-500/50 text-slate-950 placeholder:!text-slate-400 transition-all font-semibold"
                 />
               </div>
             </div>
@@ -735,6 +758,8 @@ interface AdminPanelProps {
   setAppVideoUrl: (v: string) => void;
   supportTickets: any[];
   setSupportTickets: React.Dispatch<React.SetStateAction<any[]>>;
+  shorts: any[];
+  setShorts: React.Dispatch<React.SetStateAction<any[]>>;
   onBack: () => void;
 }
 
@@ -745,9 +770,11 @@ function AdminPanel({
   setAppVideoUrl,
   supportTickets,
   setSupportTickets,
+  shorts,
+  setShorts,
   onBack
 }: AdminPanelProps) {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'reviews' | 'video' | 'tickets'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'reviews' | 'video' | 'tickets' | 'shorts'>('dashboard');
 
   // Review Form States
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
@@ -877,20 +904,20 @@ function AdminPanel({
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc] !text-slate-900 flex flex-col font-sans relative overflow-hidden">
       {/* Drifting Aura Lights */}
-      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-blue-100/40 blur-[130px] z-0" />
-      <div className="pointer-events-none absolute bottom-20 right-1/4 h-[500px] w-[500px] rounded-full bg-indigo-50/50 blur-[120px] z-0" />
+      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-teal-100/40 blur-[130px] z-0" />
+      <div className="pointer-events-none absolute bottom-20 right-1/4 h-[500px] w-[500px] rounded-full bg-teal-50/50 blur-[120px] z-0" />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(circle_at_50%_30%,black_60%,transparent_100%)] opacity-85 z-0" />
 
       {/* Header */}
       <header className="relative z-10 bg-white/85 backdrop-blur-md border-b border-slate-200/80 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 shadow-[0_4px_12px_rgba(245,158,11,0.25)]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-600 shadow-[0_4px_12px_rgba(245,158,11,0.25)]">
             <SutraLogo size={18} className="text-white" />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-slate-900 leading-none">Sutra AI</h1>
+            <h1 className="text-sm font-bold !text-slate-900 leading-none">Sutra AI</h1>
             <span className="text-[10px] text-orange-600 font-extrabold uppercase tracking-wider block mt-0.5">Admin Console</span>
           </div>
         </div>
@@ -898,7 +925,7 @@ function AdminPanel({
           <span className="text-xs bg-slate-100 border border-slate-200 text-slate-600 font-bold px-2.5 py-1 rounded-lg">Mock Database Active</span>
           <button 
             onClick={onBack}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer shadow-sm"
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:!text-slate-900 transition-all cursor-pointer shadow-sm"
           >
             ← View Landing
           </button>
@@ -912,6 +939,7 @@ function AdminPanel({
           {[
             { id: 'dashboard', label: 'Dashboard Overview', icon: LayoutDashboard },
             { id: 'reviews', label: 'Manage Reviews', icon: Edit3 },
+            { id: 'shorts', label: 'Manage Shorts', icon: Video },
             { id: 'video', label: 'Video Showcase', icon: Video },
             { id: 'tickets', label: 'Support Hub', icon: MessageSquare, badge: supportTickets.filter(t => t.status !== 'Resolved').length },
           ].map(tab => {
@@ -922,8 +950,8 @@ function AdminPanel({
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`w-full flex items-center justify-between rounded-xl px-3.5 py-3 text-xs font-bold transition-all cursor-pointer border ${active
-                  ? 'bg-blue-50 text-blue-600 border-blue-100 shadow-sm'
-                  : 'text-slate-600 border-transparent hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-teal-50 text-teal-600 border-teal-100 shadow-sm'
+                  : 'text-slate-600 border-transparent hover:bg-slate-50 hover:!text-slate-900'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -944,7 +972,7 @@ function AdminPanel({
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
               <div className="text-left">
-                <h2 className="text-xl font-extrabold text-slate-900">System Operations Overview</h2>
+                <h2 className="text-xl font-extrabold !text-slate-900">System Operations Overview</h2>
                 <p className="text-xs text-slate-500 mt-1">Live metrics from your mock candidate portal, video configurations, and support hub.</p>
               </div>
 
@@ -953,14 +981,22 @@ function AdminPanel({
                 <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col justify-between shadow-sm text-left">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Candidate Reviews</span>
                   <div className="mt-3 flex items-baseline gap-2">
-                    <span className="text-3xl font-black text-slate-900">{reviews.length}</span>
-                    <span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded">★ 4.86</span>
+                    <span className="text-3xl font-black !text-slate-900">{reviews.length}</span>
+                    <span className="text-xs text-teal-600 font-bold bg-teal-50 px-1.5 py-0.5 rounded">↑ 4.86</span>
                   </div>
                 </div>
+
+                <div className="bg-purple-50 border border-purple-100/80 rounded-2xl p-4 flex flex-col justify-between shadow-sm text-left cursor-pointer hover:bg-purple-100 transition-colors" onClick={() => setActiveTab('shorts')}>
+                  <span className="text-[10px] font-bold text-purple-600 uppercase tracking-wider">Active Shorts</span>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-purple-900">{shorts.length}</span>
+                  </div>
+                </div>
+
                 <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col justify-between shadow-sm text-left">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Active Showcase Video</span>
                   <div className="mt-3">
-                    <span className="text-xs text-blue-600 font-bold truncate block" title={appVideoUrl}>
+                    <span className="text-xs text-teal-600 font-bold truncate block" title={appVideoUrl}>
                       {appVideoUrl.substring(appVideoUrl.lastIndexOf('/') + 1) || 'Sample Video'}
                     </span>
                     <span className="text-[9px] text-slate-500 block mt-0.5 font-mono">Dynamic update active</span>
@@ -969,7 +1005,7 @@ function AdminPanel({
                 <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col justify-between shadow-sm text-left">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Open Support Tickets</span>
                   <div className="mt-3 flex items-baseline gap-2">
-                    <span className="text-3xl font-black text-slate-900">
+                    <span className="text-3xl font-black !text-slate-900">
                       {supportTickets.filter(t => t.status !== 'Resolved').length}
                     </span>
                     <span className="text-[10px] text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded">Unresolved</span>
@@ -978,8 +1014,8 @@ function AdminPanel({
                 <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col justify-between shadow-sm text-left">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Customer SLA Speed</span>
                   <div className="mt-3 flex items-baseline gap-2">
-                    <span className="text-3xl font-black text-slate-900">Instant</span>
-                    <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded">Mock SLA</span>
+                    <span className="text-3xl font-black !text-slate-900">Instant</span>
+                    <span className="text-[10px] text-teal-600 font-bold bg-teal-50 px-1.5 py-0.5 rounded">Mock SLA</span>
                   </div>
                 </div>
               </div>
@@ -988,7 +1024,7 @@ function AdminPanel({
               <div className="grid md:grid-cols-2 gap-6 pt-2">
                 <div className="bg-white/80 border border-slate-200/80 rounded-2xl p-5 space-y-4">
                   <h3 className="text-sm font-bold text-slate-950 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2 text-left">
-                    <MessageSquare size={14} className="text-blue-500" /> Recent Service Tickets
+                    <MessageSquare size={14} className="text-teal-500" /> Recent Service Tickets
                   </h3>
                   <div className="space-y-2">
                     {supportTickets.slice(0, 3).map(ticket => (
@@ -998,11 +1034,11 @@ function AdminPanel({
                         className="p-3 bg-slate-50/50 hover:bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between hover:border-slate-300 transition-all cursor-pointer text-left"
                       >
                         <div>
-                          <p className="text-xs font-bold text-slate-800 truncate max-w-[200px]">{ticket.subject}</p>
+                          <p className="text-xs font-bold !text-slate-900 truncate max-w-[200px]">{ticket.subject}</p>
                           <p className="text-[10px] text-slate-500 mt-0.5">{ticket.userName} • {ticket.createdTime}</p>
                         </div>
                         <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
-                          ticket.status === 'Open' ? 'bg-rose-100 text-rose-600' : ticket.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'
+                          ticket.status === 'Open' ? 'bg-rose-100 text-rose-600' : ticket.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-teal-100 text-teal-600'
                         }`}>
                           {ticket.status}
                         </span>
@@ -1013,7 +1049,7 @@ function AdminPanel({
 
                 <div className="bg-white/80 border border-slate-200/80 rounded-2xl p-5 space-y-4">
                   <h3 className="text-sm font-bold text-slate-950 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2 text-left">
-                    <Edit3 size={14} className="text-emerald-500" /> Landing Reviews Preview
+                    <Edit3 size={14} className="text-teal-500" /> Landing Reviews Preview
                   </h3>
                   <div className="space-y-2.5 text-left">
                     {reviews.slice(0, 2).map(r => (
@@ -1039,7 +1075,7 @@ function AdminPanel({
             <div className="grid gap-6 lg:grid-cols-[1.2fr_.8fr]">
               <div className="space-y-4">
                 <div className="text-left">
-                  <h2 className="text-xl font-extrabold text-slate-900">Review & Testimonial Editor</h2>
+                  <h2 className="text-xl font-extrabold !text-slate-900">Review & Testimonial Editor</h2>
                   <p className="text-xs text-slate-500 mt-1">Add, update, or remove candidate quotes displayed dynamically on the landing page.</p>
                 </div>
 
@@ -1050,7 +1086,7 @@ function AdminPanel({
                         <img src={r.avatar} alt={r.name} className="h-10 w-10 rounded-xl object-cover border border-slate-200 mt-0.5 shrink-0" />
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="text-sm font-bold text-slate-900">{r.name}</h4>
+                            <h4 className="text-sm font-bold !text-slate-900">{r.name}</h4>
                             <span className="text-[10px] text-slate-500">{r.role} at {r.company}</span>
                           </div>
                           <div className="flex text-yellow-500 text-[10px] my-1">
@@ -1063,7 +1099,7 @@ function AdminPanel({
                       <div className="flex items-center gap-1 shrink-0">
                         <button
                           onClick={() => startEditReview(r)}
-                          className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 hover:text-slate-900 transition-all cursor-pointer"
+                          className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 hover:!text-slate-900 transition-all cursor-pointer"
                           title="Edit"
                         >
                           <Edit3 size={13} />
@@ -1083,10 +1119,10 @@ function AdminPanel({
 
               {/* Form card */}
               <div className="bg-white border border-slate-200/80 rounded-2xl p-5 h-fit space-y-4 shadow-sm">
-                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center justify-between">
+                <h3 className="text-sm font-bold !text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center justify-between">
                   <span>{editingReviewId ? '✏️ Edit Review' : '➕ Add Landing Review'}</span>
                   {editingReviewId && (
-                    <button onClick={clearReviewForm} className="text-[10px] text-slate-500 hover:text-slate-900 uppercase font-black cursor-pointer bg-slate-105 border border-slate-200 px-2 py-0.5 rounded">Cancel</button>
+                    <button onClick={clearReviewForm} className="text-[10px] text-slate-500 hover:!text-slate-900 uppercase font-black cursor-pointer bg-slate-105 border border-slate-200 px-2 py-0.5 rounded">Cancel</button>
                   )}
                 </h3>
 
@@ -1098,7 +1134,7 @@ function AdminPanel({
                       placeholder="e.g. Liam Sterling"
                       value={authorName}
                       onChange={e => setAuthorName(e.target.value)}
-                      className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500 text-slate-900 placeholder:text-slate-400 focus:bg-white transition-all font-semibold"
+                      className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-teal-500 !text-slate-900 placeholder:!text-slate-400 focus:bg-white transition-all font-semibold"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -1109,7 +1145,7 @@ function AdminPanel({
                         placeholder="e.g. Lead Developer"
                         value={authorRole}
                         onChange={e => setAuthorRole(e.target.value)}
-                        className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500 text-slate-900 placeholder:text-slate-400 focus:bg-white transition-all font-semibold"
+                        className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-teal-500 !text-slate-900 placeholder:!text-slate-400 focus:bg-white transition-all font-semibold"
                       />
                     </div>
                     <div>
@@ -1119,7 +1155,7 @@ function AdminPanel({
                         placeholder="e.g. Meta"
                         value={authorCompany}
                         onChange={e => setAuthorCompany(e.target.value)}
-                        className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500 text-slate-900 placeholder:text-slate-400 focus:bg-white transition-all font-semibold"
+                        className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-teal-500 !text-slate-900 placeholder:!text-slate-400 focus:bg-white transition-all font-semibold"
                       />
                     </div>
                   </div>
@@ -1129,7 +1165,7 @@ function AdminPanel({
                       <select
                         value={rating}
                         onChange={e => setRating(Number(e.target.value))}
-                        className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-3 outline-none focus:border-blue-500 text-slate-900 transition-all font-semibold cursor-pointer focus:bg-white"
+                        className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-3 outline-none focus:border-teal-500 !text-slate-900 transition-all font-semibold cursor-pointer focus:bg-white"
                       >
                         {[5, 4, 3, 2, 1].map(n => (
                           <option key={n} value={n}>{n} Stars</option>
@@ -1141,7 +1177,7 @@ function AdminPanel({
                       <select
                         value={avatar}
                         onChange={e => setAvatar(e.target.value)}
-                        className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-3 outline-none focus:border-blue-500 text-slate-900 transition-all font-semibold cursor-pointer focus:bg-white"
+                        className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-3 outline-none focus:border-teal-500 !text-slate-900 transition-all font-semibold cursor-pointer focus:bg-white"
                       >
                         <option value="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80">Female Professional (Sarah)</option>
                         <option value="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80">Male Professional (Rohit)</option>
@@ -1158,12 +1194,12 @@ function AdminPanel({
                       rows={3}
                       value={comment}
                       onChange={e => setComment(e.target.value)}
-                      className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500 text-slate-900 placeholder:text-slate-400 focus:bg-white transition-all font-semibold leading-relaxed"
+                      className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-teal-500 !text-slate-900 placeholder:!text-slate-400 focus:bg-white transition-all font-semibold leading-relaxed"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 active:scale-98 text-white py-3.5 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all uppercase tracking-wider"
+                    className="w-full bg-teal-600 hover:bg-teal-700 active:scale-98 text-white py-3.5 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all uppercase tracking-wider"
                   >
                     {editingReviewId ? '💾 Save Changes' : '➕ Publish Review'}
                   </button>
@@ -1172,11 +1208,55 @@ function AdminPanel({
             </div>
           )}
 
+          {/* TAB: MANAGE SHORTS */}
+          {activeTab === 'shorts' && (
+            <div className="space-y-6 animate-fadeIn">
+              <div>
+                <h2 className="font-display text-xl font-bold !text-slate-900">Manage Shorts</h2>
+                <p className="text-sm text-slate-500">Modify the 3 YouTube Shorts shown below the video walkthrough.</p>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h3 className="text-sm font-bold text-slate-700">Showcase Shorts (4 Slots)</h3>
+                  {shorts.map((short, idx) => (
+                    <div key={idx} className="p-4 bg-white border border-slate-200 rounded-xl flex items-center justify-between shadow-sm">
+                      <div className="flex flex-col flex-1 space-y-2">
+                        <span className="font-bold !text-slate-900 text-sm mb-1">Slot {idx + 1}</span>
+                        <input 
+                          type="text" 
+                          value={short.videoId}
+                          onChange={(e) => {
+                            const newShorts = [...shorts];
+                            let val = e.target.value;
+                            const match = val.match(/shorts\/([^?]+)/);
+                            if(match) val = match[1];
+                            const vMatch = val.match(/v=([^&]+)/);
+                            if(vMatch) val = vMatch[1];
+                            const youtuMatch = val.match(/youtu\.be\/([^?]+)/);
+                            if(youtuMatch) val = youtuMatch[1];
+                            newShorts[idx] = { ...short, videoId: val };
+                            setShorts(newShorts);
+                          }}
+                          className="w-full text-xs rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 outline-none focus:border-purple-500"
+                          placeholder="YouTube Short URL or ID"
+                        />
+                        <input type="text" value={short.name} onChange={(e) => { const newShorts = [...shorts]; newShorts[idx] = { ...short, name: e.target.value }; setShorts(newShorts); }} className="w-full text-xs rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 outline-none focus:border-purple-500" placeholder="Name" />
+                        <input type="text" value={short.role} onChange={(e) => { const newShorts = [...shorts]; newShorts[idx] = { ...short, role: e.target.value }; setShorts(newShorts); }} className="w-full text-xs rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 outline-none focus:border-purple-500" placeholder="Role (e.g., Backend Engineer @ Stripe)" />
+                        <input type="text" value={short.outcome} onChange={(e) => { const newShorts = [...shorts]; newShorts[idx] = { ...short, outcome: e.target.value }; setShorts(newShorts); }} className="w-full text-xs rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 outline-none focus:border-purple-500" placeholder="Outcome (e.g., Landed offer after 3 rounds)" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* TAB 3: VIDEO SHOWCASE SETTINGS */}
           {activeTab === 'video' && (
             <div className="max-w-3xl space-y-6 text-left">
               <div>
-                <h2 className="text-xl font-extrabold text-slate-900">Product Demo Video Showcase</h2>
+                <h2 className="text-xl font-extrabold !text-slate-900">Product Demo Video Showcase</h2>
                 <p className="text-xs text-slate-500 mt-1">Configure the product video displayed directly on the landing page.</p>
               </div>
 
@@ -1187,7 +1267,7 @@ function AdminPanel({
                     type="text"
                     value={tempVideoUrl}
                     onChange={e => setTempVideoUrl(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-blue-500 text-slate-900 transition-all font-mono font-bold focus:bg-white"
+                    className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 outline-none focus:border-teal-500 !text-slate-900 transition-all font-mono font-bold focus:bg-white"
                   />
                   <p className="text-[10px] text-slate-500 mt-1.5 leading-normal">
                     Provide an absolute URL pointing to a raw video file (MP4/WebM). This video will load dynamically on the landing page video section.
@@ -1197,7 +1277,7 @@ function AdminPanel({
                 <div className="flex gap-2">
                   <button
                     type="submit"
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white py-3.5 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all uppercase tracking-wider"
+                    className="flex-1 bg-teal-600 hover:bg-teal-700 active:scale-98 text-white py-3.5 rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all uppercase tracking-wider"
                   >
                     Update Showcase Video
                   </button>
@@ -1221,8 +1301,8 @@ function AdminPanel({
 
               {/* Live Preview player */}
               <div className="bg-white border border-slate-200/80 rounded-2xl p-5 space-y-3 shadow-sm">
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
-                  <PlayCircle size={14} className="text-blue-500" /> Admin Console Preview
+                <h3 className="text-xs font-bold !text-slate-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                  <PlayCircle size={14} className="text-teal-500" /> Admin Console Preview
                 </h3>
                 <div className="aspect-video bg-black rounded-xl overflow-hidden border border-slate-200">
                   <video
@@ -1233,7 +1313,7 @@ function AdminPanel({
                   />
                 </div>
                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-3 rounded-xl">
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <div className="h-2 w-2 rounded-full bg-teal-500 animate-pulse" />
                   <p className="text-[10px] text-slate-500 font-medium">Video is currently live. Open the landing page to verify formatting.</p>
                 </div>
               </div>
@@ -1247,7 +1327,7 @@ function AdminPanel({
               <div className="w-full md:w-80 border-r border-slate-200 flex flex-col bg-slate-50/20">
                 <div className="p-4 border-b border-slate-200/80 text-left bg-white">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Service Tickets Queue</span>
-                  <span className="text-xs font-bold text-slate-900 mt-1 block">Active Inboxes ({supportTickets.filter(t => t.status !== 'Resolved').length})</span>
+                  <span className="text-xs font-bold !text-slate-900 mt-1 block">Active Inboxes ({supportTickets.filter(t => t.status !== 'Resolved').length})</span>
                 </div>
                 <div className="flex-1 overflow-y-auto p-2 space-y-1">
                   {supportTickets.map(ticket => {
@@ -1257,7 +1337,7 @@ function AdminPanel({
                         key={ticket.id}
                         onClick={() => setSelectedTicketId(ticket.id)}
                         className={`p-3 rounded-xl text-left cursor-pointer transition-all flex flex-col gap-1.5 border ${
-                          isSelected ? 'bg-blue-50 border-blue-200 shadow-sm' : 'border-transparent hover:bg-slate-50 hover:text-slate-900'
+                          isSelected ? 'bg-teal-50 border-teal-200 shadow-sm' : 'border-transparent hover:bg-slate-50 hover:!text-slate-900'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2">
@@ -1269,14 +1349,14 @@ function AdminPanel({
                           </span>
                         </div>
                         <div>
-                          <p className="text-xs font-extrabold text-slate-800 leading-snug truncate" title={ticket.subject}>
+                          <p className="text-xs font-extrabold !text-slate-900 leading-snug truncate" title={ticket.subject}>
                             {ticket.subject}
                           </p>
                           <span className="text-[9px] text-slate-500 font-semibold block mt-0.5">{ticket.userName}</span>
                         </div>
                         <div className="flex items-center justify-between mt-0.5">
                           <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md ${
-                            ticket.status === 'Open' ? 'bg-rose-100 text-rose-600' : ticket.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'
+                            ticket.status === 'Open' ? 'bg-rose-100 text-rose-600' : ticket.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-teal-100 text-teal-600'
                           }`}>
                             {ticket.status}
                           </span>
@@ -1296,7 +1376,7 @@ function AdminPanel({
                     <div className="p-4 border-b border-slate-200 bg-white flex flex-wrap items-center justify-between gap-3 text-left">
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-xs font-black text-slate-900 truncate max-w-[280px]" title={selectedTicket.subject}>
+                          <h3 className="text-xs font-black !text-slate-900 truncate max-w-[280px]" title={selectedTicket.subject}>
                             {selectedTicket.subject}
                           </h3>
                           <span className="text-[9px] font-mono text-slate-450 font-bold bg-slate-100 px-1.5 py-0.5 rounded">{selectedTicket.id}</span>
@@ -1313,7 +1393,7 @@ function AdminPanel({
                           <select
                             value={selectedTicket.status}
                             onChange={e => toggleTicketStatus(selectedTicket.id, e.target.value as any)}
-                            className="text-[9px] font-bold rounded bg-white border border-slate-200 px-2 py-1 text-slate-700 cursor-pointer focus:border-blue-500 outline-none"
+                            className="text-[9px] font-bold rounded bg-white border border-slate-200 px-2 py-1 text-slate-700 cursor-pointer focus:border-teal-500 outline-none"
                           >
                             <option value="Open">Open</option>
                             <option value="Pending">Pending</option>
@@ -1325,7 +1405,7 @@ function AdminPanel({
                           <select
                             value={selectedTicket.priority}
                             onChange={e => toggleTicketPriority(selectedTicket.id, e.target.value as any)}
-                            className="text-[9px] font-bold rounded bg-white border border-slate-200 px-2 py-1 text-slate-700 cursor-pointer focus:border-blue-500 outline-none"
+                            className="text-[9px] font-bold rounded bg-white border border-slate-200 px-2 py-1 text-slate-700 cursor-pointer focus:border-teal-500 outline-none"
                           >
                             <option value="Low">Low</option>
                             <option value="Medium">Medium</option>
@@ -1349,8 +1429,8 @@ function AdminPanel({
                             </span>
                             <div className={`max-w-[70%] rounded-2xl px-4 py-2.5 text-xs font-semibold leading-relaxed border ${
                               isAdmin
-                                ? 'bg-blue-600 text-white border-transparent rounded-tr-none shadow-sm'
-                                : 'bg-slate-100 text-slate-800 border-slate-200/60 rounded-tl-none'
+                                ? 'bg-teal-600 text-white border-transparent rounded-tr-none shadow-sm'
+                                : 'bg-slate-100 !text-slate-900 border-slate-200/60 rounded-tl-none'
                             }`}>
                               {msg.text}
                             </div>
@@ -1367,11 +1447,11 @@ function AdminPanel({
                         placeholder="Type reply to candidate..."
                         value={replyText}
                         onChange={e => setReplyText(e.target.value)}
-                        className="flex-1 min-w-0 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-xs text-slate-850 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:bg-white transition-all font-semibold"
+                        className="flex-1 min-w-0 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-xs text-slate-850 outline-none placeholder:!text-slate-400 focus:border-teal-500 focus:bg-white transition-all font-semibold"
                       />
                       <button
                         type="submit"
-                        className="flex h-9 items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 cursor-pointer shadow-sm transition-all flex items-center gap-1.5"
+                        className="flex h-9 items-center justify-center rounded-xl bg-teal-600 px-4 py-2 text-xs font-bold text-white hover:bg-teal-700 cursor-pointer shadow-sm transition-all flex items-center gap-1.5"
                       >
                         <Send size={12} />
                         <span>Send</span>
@@ -1440,6 +1520,31 @@ function App() {
   useEffect(() => {
     localStorage.setItem('sutra-landing-reviews', JSON.stringify(reviews));
   }, [reviews]);
+
+  // Dynamic shorts state
+  const [shorts, setShorts] = useState<any[]>(() => {
+    try {
+      const saved = localStorage.getItem('sutra-landing-shorts-v2');
+      return saved ? JSON.parse(saved) : [
+        { videoId: 'bQzMvjiu6_k', name: 'Sarah K.', role: 'Backend Engineer @ Stripe', outcome: 'Landed offer after 3 rounds' },
+        { videoId: 'T60qC5BEA9w', name: 'Marcus T.', role: 'Frontend Dev @ Vercel', outcome: 'Passed system design on first try' },
+        { videoId: '9ae7y_UQ39g', name: 'David L.', role: 'Fullstack @ Meta', outcome: 'Aced the live coding round' },
+        { videoId: 'bQzMvjiu6_k', name: 'Priya R.', role: 'Data Scientist @ Netflix', outcome: 'Cleared the SQL interview easily' }
+      ];
+    } catch {
+      return [
+        { videoId: 'bQzMvjiu6_k', name: 'Sarah K.', role: 'Backend Engineer @ Stripe', outcome: 'Landed offer after 3 rounds' },
+        { videoId: 'T60qC5BEA9w', name: 'Marcus T.', role: 'Frontend Dev @ Vercel', outcome: 'Passed system design on first try' },
+        { videoId: '9ae7y_UQ39g', name: 'David L.', role: 'Fullstack @ Meta', outcome: 'Aced the live coding round' },
+        { videoId: 'bQzMvjiu6_k', name: 'Priya R.', role: 'Data Scientist @ Netflix', outcome: 'Cleared the SQL interview easily' }
+      ];
+    }
+  });
+
+  // Persist shorts
+  useEffect(() => {
+    localStorage.setItem('sutra-landing-shorts-v2', JSON.stringify(shorts));
+  }, [shorts]);
 
   // Showcase Video URL state
   const [appVideoUrl, setAppVideoUrl] = useState<string>(() => {
@@ -2189,6 +2294,7 @@ function App() {
       onSignIn={() => setScreen('Login')}
       onStart={handleStartSession}
       reviews={reviews}
+      shorts={shorts}
       appVideoUrl={appVideoUrl}
       setScreen={setScreen}
     />;
@@ -2202,6 +2308,8 @@ function App() {
       setAppVideoUrl={setAppVideoUrl}
       supportTickets={supportTickets}
       setSupportTickets={setSupportTickets}
+      shorts={shorts}
+      setShorts={setShorts}
       onBack={() => setScreen('Landing')}
     />;
   }
@@ -2220,10 +2328,10 @@ function App() {
   const isSessionStarted = isSessionActive || isMockSessionActive;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f8fafc] text-slate-900 font-sans relative">
+    <div className="flex h-screen overflow-hidden bg-[#f8fafc] !text-slate-900 font-sans relative">
       {/* Drifting Aura Lights for Dashboard / App */}
-      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-blue-100/50 blur-[130px] z-0" />
-      <div className="pointer-events-none absolute bottom-20 right-1/4 h-[500px] w-[500px] rounded-full bg-indigo-50/50 blur-[120px] z-0" />
+      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-teal-100/50 blur-[130px] z-0" />
+      <div className="pointer-events-none absolute bottom-20 right-1/4 h-[500px] w-[500px] rounded-full bg-teal-50/50 blur-[120px] z-0" />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(circle_at_50%_30%,black_60%,transparent_100%)] opacity-80 z-0" />
 
       {!isSessionStarted && (
@@ -2353,14 +2461,14 @@ function App() {
         {screen === 'Live Session' && !isSessionActive && (
           <Page title="Live Session" subtitle="Prepare and customize your live interview settings.">
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-violet-500/10 text-violet-300 border border-violet-500/20 shadow-glow animate-pulse">
+              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-teal-500/10 text-teal-300 border border-teal-500/20 shadow-glow animate-pulse">
                 <Mic size={36} />
               </div>
               <h2 className="text-2xl font-black text-white">Setup Your Live Session</h2>
               <p className="mt-2 max-w-md text-sm text-slate-400">Configure your target company, role, context sources, and response style before launching the session.</p>
               <button
                 onClick={() => setShowWizard(true)}
-                className="mt-8 rounded-2xl bg-violet-600 px-6 py-3.5 text-sm font-black text-white hover:bg-violet-500 transition-all shadow-glow flex items-center gap-2"
+                className="mt-8 rounded-2xl bg-teal-600 px-6 py-3.5 text-sm font-black text-white hover:bg-teal-500 transition-all shadow-glow flex items-center gap-2"
               >
                 <Plus size={16} /> Open Setup Wizard
               </button>
@@ -2410,7 +2518,7 @@ function App() {
                   <button
                     onClick={() => setModalTab('transcript')}
                     className={`py-2 px-3 text-xs font-bold transition-all relative ${modalTab === 'transcript'
-                      ? 'border-b-2 border-violet-500 text-violet-300'
+                      ? 'border-b-2 border-teal-500 text-teal-300'
                       : 'text-slate-500 hover:text-slate-300'
                       }`}
                   >
@@ -2419,7 +2527,7 @@ function App() {
                   <button
                     onClick={() => setModalTab('notes')}
                     className={`py-2 px-3 text-xs font-bold transition-all relative ${modalTab === 'notes'
-                      ? 'border-b-2 border-violet-500 text-violet-300'
+                      ? 'border-b-2 border-teal-500 text-teal-300'
                       : 'text-slate-500 hover:text-slate-300'
                       }`}
                   >
@@ -2446,14 +2554,14 @@ function App() {
                         {detailSession.transcript.map((item: any) => (
                           <div key={item.id} className="space-y-1.5">
                             <div className="flex justify-between items-center text-[10px] text-slate-500 px-1">
-                              <span className="font-bold text-violet-400">
+                              <span className="font-bold text-teal-400">
                                 {item.speaker === 'Interviewer' ? 'Question' : 'Your Answer'}
                               </span>
                               <span>{item.time}</span>
                             </div>
 
                             <div className={`p-4 rounded-2xl border relative ${item.speaker === 'Interviewer'
-                              ? 'border-violet-500/20 bg-violet-500/5'
+                              ? 'border-teal-500/20 bg-teal-500/5'
                               : 'border-white/5 bg-slate-900'
                               }`}>
                               <p className="text-xs leading-5 text-slate-200 whitespace-pre-wrap">{item.text}</p>
@@ -2471,13 +2579,13 @@ function App() {
                         {detailSession.qas && detailSession.qas.length > 0 && (
                           <>
                             <div className="flex items-center gap-2 pt-2">
-                              <div className="h-px flex-1 bg-violet-500/20" />
-                              <span className="text-[10px] font-black text-violet-400 uppercase tracking-widest">AI Q&A Answers</span>
-                              <div className="h-px flex-1 bg-violet-500/20" />
+                              <div className="h-px flex-1 bg-teal-500/20" />
+                              <span className="text-[10px] font-black text-teal-400 uppercase tracking-widest">AI Q&A Answers</span>
+                              <div className="h-px flex-1 bg-teal-500/20" />
                             </div>
                             {detailSession.qas.map((n: any) => (
-                              <div key={n.id} className="p-4 rounded-2xl border border-violet-500/10 bg-violet-950/10">
-                                <div className="text-xs font-bold text-violet-300 mb-1">{n.title}</div>
+                              <div key={n.id} className="p-4 rounded-2xl border border-teal-500/10 bg-teal-950/10">
+                                <div className="text-xs font-bold text-teal-300 mb-1">{n.title}</div>
                                 <p className="text-xs text-slate-400 mt-1 leading-5">{n.text}</p>
                               </div>
                             ))}
@@ -2491,7 +2599,7 @@ function App() {
                 {modalTab === 'notes' && (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-black text-violet-300 uppercase tracking-wide">Session Summary</h4>
+                      <h4 className="text-xs font-black text-teal-300 uppercase tracking-wide">Session Summary</h4>
                       {detailSession.notes?.length > 0 && (
                         <button
                           onClick={() => {
@@ -2537,13 +2645,13 @@ function App() {
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 bg-white/[0.02]">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 text-violet-300">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/10 text-teal-300">
                   <SutraLogo size={18} />
                 </div>
                 <div>
                   <h4 className="text-sm font-black text-white">Sutra AI Support AI</h4>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse" />
                     <span className="text-[10px] text-slate-400 font-medium">Online Help Agent</span>
                   </div>
                 </div>
@@ -2562,7 +2670,7 @@ function App() {
                 <div key={i} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
                   <div
                     className={`rounded-2xl px-4 py-2.5 text-xs leading-5 ${msg.sender === 'user'
-                      ? 'bg-violet-600 text-white rounded-tr-none'
+                      ? 'bg-teal-600 text-white rounded-tr-none'
                       : 'bg-white/[0.04] text-slate-200 border border-white/5 rounded-tl-none whitespace-pre-line'
                       }`}
                   >
@@ -2597,7 +2705,7 @@ function App() {
                       <button
                         key={label}
                         onClick={() => sendQuickQuestion(query)}
-                        className="rounded-xl border border-white/5 bg-white/[0.02] hover:bg-violet-500/10 hover:border-violet-500/30 px-2.5 py-1.5 text-[9px] text-slate-300 font-medium transition-all text-left"
+                        className="rounded-xl border border-white/5 bg-white/[0.02] hover:bg-teal-500/10 hover:border-teal-500/30 px-2.5 py-1.5 text-[9px] text-slate-300 font-medium transition-all text-left"
                       >
                         {label}
                       </button>
@@ -2615,7 +2723,7 @@ function App() {
                       <button
                         key={label}
                         onClick={() => sendQuickQuestion(query)}
-                        className="rounded-xl border border-white/5 bg-white/[0.02] hover:bg-violet-500/10 hover:border-violet-500/30 px-2.5 py-1.5 text-[9px] text-slate-300 font-medium transition-all text-left"
+                        className="rounded-xl border border-white/5 bg-white/[0.02] hover:bg-teal-500/10 hover:border-teal-500/30 px-2.5 py-1.5 text-[9px] text-slate-300 font-medium transition-all text-left"
                       >
                         {label}
                       </button>
@@ -2633,12 +2741,12 @@ function App() {
                 value={helpInput}
                 onChange={e => setHelpInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleHelpMessageSend()}
-                className="flex-1 rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2 text-xs outline-none focus:border-violet-500/50 text-white placeholder:text-slate-600"
+                className="flex-1 rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2 text-xs outline-none focus:border-teal-500/50 text-white placeholder:text-slate-600"
               />
               <button
                 onClick={handleHelpMessageSend}
                 disabled={isBotTyping || !helpInput.trim()}
-                className="rounded-xl bg-violet-600 p-2.5 text-white hover:bg-violet-500 disabled:opacity-40 transition-all flex items-center justify-center shrink-0"
+                className="rounded-xl bg-teal-600 p-2.5 text-white hover:bg-teal-500 disabled:opacity-40 transition-all flex items-center justify-center shrink-0"
               >
                 <Send size={14} />
               </button>
@@ -2891,15 +2999,25 @@ function Landing({
   onSignIn,
   onStart,
   reviews,
+  shorts,
   appVideoUrl,
   setScreen
 }: {
   onSignIn: () => void;
   onStart: () => void;
   reviews: any[];
+  shorts: any[];
   appVideoUrl: string;
   setScreen: (s: Screen) => void;
 }) {
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handlePlayClick = () => {
+    setIsVideoPlaying(true);
+    videoRef.current?.play();
+  };
   // Live session preview simulator state
   const [activeScenario, setActiveScenario] = useState<'system' | 'sql' | 'react'>('system');
   const [questionLength, setQuestionLength] = useState(0);
@@ -2918,8 +3036,35 @@ function Landing({
   // Hero active mode state
   const [activeMode, setActiveMode] = useState<'prep' | 'live'>('live');
 
-  // Interactive stealth slider position (0-100)
-  const [sliderPos, setSliderPos] = useState(50);
+  // Magnetic CTA offsets
+  const [ctaOffset, setCtaOffset] = useState({ x: 0, y: 0 });
+  const handleCtaMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const relX = e.clientX - rect.left - rect.width / 2;
+    const relY = e.clientY - rect.top - rect.height / 2;
+    const MAX_OFFSET = 6;
+    setCtaOffset({
+      x: Math.max(-MAX_OFFSET, Math.min(MAX_OFFSET, relX * 0.15)),
+      y: Math.max(-MAX_OFFSET, Math.min(MAX_OFFSET, relY * 0.15)),
+    });
+  };
+  const handleCtaMouseLeave = () => setCtaOffset({ x: 0, y: 0 });
+
+  // Track if slider range input is actively dragged to de-couple 3D tilt coordinates
+  const [isSliderDragging, setIsSliderDragging] = useState(false);
+
+  // Toggle state for Live Mode views (replacing slider)
+  const [liveViewMode, setLiveViewMode] = useState<'hud' | 'clean'>('hud');
+
+  // 3D perspective tilt offsets
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const handleSimulatorMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: x * 8, y: -y * 8 });
+  };
+  const handleSimulatorMouseLeave = () => setTilt({ x: 0, y: 0 });
 
   useEffect(() => {
     let timeout: any;
@@ -2967,9 +3112,9 @@ function Landing({
         // Flash metrics container
         const metricsContainer = document.getElementById('mockup-metrics');
         if (metricsContainer) {
-          metricsContainer.classList.add('ring-4', 'ring-blue-500/50', 'ring-offset-2');
+          metricsContainer.classList.add('ring-4', 'ring-teal-500/50', 'ring-offset-2');
           setTimeout(() => {
-            metricsContainer.classList.remove('ring-4', 'ring-blue-500/50', 'ring-offset-2');
+            metricsContainer.classList.remove('ring-4', 'ring-teal-500/50', 'ring-offset-2');
           }, 1500);
         }
       }
@@ -3042,7 +3187,7 @@ function Landing({
       const totalLen = headerText.length;
       return (
         <div className="space-y-1">
-          <h4 className="text-[11px] font-black text-slate-800 tracking-tight leading-snug">
+          <h4 className="text-[11px] font-black !text-slate-900 tracking-tight leading-snug">
             {headerText.slice(0, length)}
           </h4>
           {length > totalLen && (
@@ -3057,7 +3202,7 @@ function Landing({
       const totalLen = headerText.length;
       return (
         <div className="space-y-1">
-          <h4 className="text-[11px] font-black text-slate-800 tracking-tight leading-snug">
+          <h4 className="text-[11px] font-black !text-slate-900 tracking-tight leading-snug">
             {headerText.slice(0, length)}
           </h4>
           {length > totalLen && (
@@ -3072,7 +3217,7 @@ function Landing({
       const totalLen = headerText.length;
       return (
         <div className="space-y-1">
-          <h4 className="text-[11px] font-black text-slate-800 tracking-tight leading-snug">
+          <h4 className="text-[11px] font-black !text-slate-900 tracking-tight leading-snug">
             {headerText.slice(0, length)}
           </h4>
           {length > totalLen && (
@@ -3086,13 +3231,23 @@ function Landing({
   };
 
   return (
-    <div className="min-h-screen text-slate-900 flex flex-col relative overflow-hidden font-sans" style={{ background: '#ffffff' }}>
+    <div className="min-h-screen !text-slate-900 flex flex-col relative overflow-hidden font-sans" style={{ background: '#ffffff' }}>
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes audioWave {
+          0%, 100% { transform: scaleY(0.35); }
+          50% { transform: scaleY(1); }
+        }
+        .animate-audio-wave {
+          animation: audioWave 1.2s ease-in-out infinite;
+          transform-origin: bottom;
+        }
+      `}} />
 
       {/* === BASE CANVAS: Clean white with a soft blue wash at top === */}
       <div className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(180deg, #eff6ff 0%, #ffffff 45%, #f0fdf4 80%, #ffffff 100%)' }} />
 
       {/* === AURA ORBS — matched to page accent colors === */}
-      {/* Top-left: Blue — matches CTA button (blue-600) */}
+      {/* Top-left: Blue — matches CTA button (teal-600) */}
       <motion.div
         animate={{
           x: [0, 40, -25, 15, 0],
@@ -3149,7 +3304,7 @@ function Landing({
           opacity: 0.18
         }}
       />
-      {/* Mid-left: Emerald — matches live indicators & badges */}
+      {/* Mid-left: teal — matches live indicators & badges */}
       <motion.div
         animate={{
           x: [0, -45, 35, -20, 0],
@@ -3210,10 +3365,10 @@ function Landing({
       {/* === HERO SPOTLIGHT: Directional white light from top keeps text readable === */}
       <div className="pointer-events-none absolute top-0 left-0 right-0 h-[700px]" style={{ background: 'radial-gradient(ellipse 90% 60% at 50% 0%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 40%, transparent 100%)' }} />
 
-      {/* === DOT GRID: Blue-tinted to match CTA === */}
+      {/* === DOT GRID: teal-tinted to match CTA === */}
       <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, rgba(37,99,235,0.12) 1px, transparent 1px)', backgroundSize: '30px 30px', maskImage: 'radial-gradient(ellipse 85% 55% at 50% 10%, black 10%, rgba(0,0,0,0.35) 45%, transparent 75%)', opacity: 0.9 }} />
 
-      {/* === TOP ACCENT LINE: Blue-to-amber matches brand === */}
+      {/* === TOP ACCENT LINE: teal-to-amber matches brand === */}
       <div className="pointer-events-none absolute top-0 inset-x-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent 0%, #3b82f6 25%, #2563eb 45%, #f59e0b 65%, #f97316 80%, transparent 100%)' }} />
 
       {/* Navbar — sticky glass bar */}
@@ -3221,11 +3376,11 @@ function Landing({
         <div className="mx-auto w-full max-w-7xl px-6 py-4 flex items-center justify-between">
           {/* Brand */}
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 shadow-[0_4px_12px_rgba(245,158,11,0.35)]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-600 shadow-[0_4px_12px_rgba(245,158,11,0.35)]">
               <SutraLogo size={18} className="text-white" />
             </div>
-            <span className="font-display text-lg font-bold tracking-tight text-slate-900">
-              Sutra <span className="text-orange-500">AI</span>
+            <span className="font-display text-lg font-bold tracking-tight !text-slate-900">
+              Sutra <span className="text-teal-500">AI</span>
             </span>
           </div>
 
@@ -3268,14 +3423,20 @@ function Landing({
         {/* Hero Section */}
         <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, type: "spring", bounce: 0.3 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-12 md:py-20 grid items-center gap-12 lg:grid-cols-[1.1fr_.9fr]">
           <div className="flex flex-col items-start text-left">
+            {/* Glowing live engine pill */}
+            <div className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-teal-500/10 text-teal-700 px-3 py-1 text-[11px] font-black uppercase tracking-wider border border-teal-500/20 shadow-[0_0_12px_rgba(59,130,246,0.1)]">
+              <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-ping" />
+              <span>Sutra 2.0 Engine Live</span>
+            </div>
+
             {/* Dynamic Segmented Switch */}
             <div className="mb-6 flex items-center gap-1 rounded-2xl border border-slate-200/80 bg-slate-100 p-1">
               <button
                 onClick={() => setActiveMode('prep')}
-                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer ${
                   activeMode === 'prep' 
                     ? 'bg-white text-teal-900 shadow-sm border border-slate-200/30' 
-                    : 'text-slate-500 hover:text-slate-800'
+                    : 'text-slate-500 hover:!text-slate-900'
                 }`}
               >
                 <Volume2 size={13} className={activeMode === 'prep' ? 'text-teal-600' : 'text-slate-400'} />
@@ -3283,10 +3444,10 @@ function Landing({
               </button>
               <button
                 onClick={() => setActiveMode('live')}
-                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer ${
                   activeMode === 'live' 
                     ? 'bg-white text-teal-900 shadow-sm border border-slate-200/30' 
-                    : 'text-slate-500 hover:text-slate-800'
+                    : 'text-slate-500 hover:!text-slate-900'
                 }`}
               >
                 <Monitor size={13} className={activeMode === 'live' ? 'text-teal-600' : 'text-slate-400'} />
@@ -3294,38 +3455,65 @@ function Landing({
               </button>
             </div>
 
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-[70px] font-black leading-[1.08] tracking-tight text-slate-900">
-              The Invisible, <br />
-              <span className="text-blue-600">Local-First AI Interview Copilot.</span>
+            <h1 className="font-display text-5xl sm:text-6xl lg:text-[72px] font-black leading-[1.04] tracking-tight !text-slate-900">
+              The <span className="text-teal-600 drop-shadow-sm">Invisible</span>, <br />
+              <span className="text-teal-600">Local-First AI</span> <br />
+              <span className="!text-slate-900">Interview Copilot.</span>
             </h1>
             
-            <p className="mt-6 max-w-xl text-slate-600 text-base sm:text-lg leading-relaxed font-medium">
+            <p className="mt-6 max-w-xl text-slate-650 text-base sm:text-lg leading-relaxed font-semibold" style={{ color: '#475569' }}>
               Sutra AI is the only platform built as a native desktop overlay. Practice with structured voice mock interviews before, and perform flawlessly during live calls — without anyone ever knowing it's there.
             </p>
-            <p className="mt-2 text-xs text-slate-500 font-semibold flex items-center gap-1.5">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <p className="mt-2 text-xs text-slate-500 font-bold flex items-center gap-1.5">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse" />
               Built for Glances, Not Reading. Speak like a human, not a teleprompter.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-4 w-full sm:w-auto">
-              <button onClick={onStart} className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl px-7 py-4 text-sm font-bold shadow-[0_8px_20px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2 cursor-pointer transition-all">
-                <span>Start Free Session</span> <ArrowRight size={16} />
-              </button>
-              <a href="#showcase-video" className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-6 py-4 text-sm font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
-                <PlayCircle size={16} className="text-slate-500" /> Watch Demo
-              </a>
+            <div className="mt-8 flex flex-col items-start w-full">
+              <div className="flex flex-wrap items-start gap-4 w-full sm:w-auto">
+                <div className="relative inline-block">
+                  {/* Ambient glowing button halo */}
+                  <div className="absolute -inset-1.5 rounded-xl bg-teal-600 opacity-25 blur-lg animate-pulse" />
+
+                  <button
+                    onClick={onStart}
+                    onMouseMove={handleCtaMouseMove}
+                    onMouseLeave={handleCtaMouseLeave}
+                    style={{
+                      transform: `translate(${ctaOffset.x}px, ${ctaOffset.y}px)`,
+                      transition: ctaOffset.x === 0 && ctaOffset.y === 0 ? 'transform 0.4s ease-out' : 'transform 0.05s ease-out',
+                    }}
+                    className="group relative overflow-hidden bg-teal-600 hover:bg-teal-500 text-white rounded-xl px-7 py-4 text-sm font-bold shadow-[0_8px_24px_rgba(37,99,235,0.35)] hover:shadow-[0_14px_34px_rgba(37,99,235,0.5)] active:scale-[0.96] flex items-center justify-center gap-2 cursor-pointer transition-all duration-300"
+                  >
+                    {/* Hover light sheen animation */}
+                    <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12" />
+                    <span className="relative z-10">Start Free Session</span>
+                    <ArrowRight size={16} className="relative z-10 transition-transform duration-300 group-hover:translate-x-1" />
+                  </button>
+                </div>
+
+                <a 
+                  href="#showcase-video" 
+                  className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-6 py-4 text-sm font-bold shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 self-start"
+                >
+                  <PlayCircle size={16} className="text-slate-500" /> Watch Demo
+                </a>
+              </div>
+              <p className="mt-2 text-[11px] text-slate-400 font-bold ml-1">
+                No credit card required · 2-minute setup
+              </p>
             </div>
 
             {/* High trust Feature Check */}
-            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-500 font-bold">
-              <span className="flex items-center gap-1.5 text-emerald-600">
-                <CheckCircle2 size={13} className="text-emerald-500" /> True system-level invisibility
+            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-500 font-bold">
+              <span className="flex items-center gap-1.5 text-teal-600">
+                <CheckCircle2 size={13} className="text-teal-500" /> True system-level invisibility
               </span>
-              <span className="flex items-center gap-1.5 text-emerald-600">
-                <CheckCircle2 size={13} className="text-emerald-500" /> No browser extension flags
+              <span className="flex items-center gap-1.5 text-teal-600">
+                <CheckCircle2 size={13} className="text-teal-500" /> No browser extension flags
               </span>
-              <span className="flex items-center gap-1.5 text-emerald-600">
-                <CheckCircle2 size={13} className="text-emerald-500" /> Dynamic STAR-method talking points
+              <span className="flex items-center gap-1.5 text-teal-600">
+                <CheckCircle2 size={13} className="text-teal-500" /> Dynamic STAR-method talking points
               </span>
             </div>
 
@@ -3351,28 +3539,40 @@ function Landing({
           </div>
 
           {/* Right Column: Premium Mockup */}
-          <div id="simulator" className="relative group w-full flex justify-center">
-            {/* Subtle blue/indigo background glow */}
-            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-blue-500 to-indigo-500 opacity-[0.08] blur-2xl animate-pulse" />
+          <div 
+            id="simulator" 
+            className="relative group w-full flex justify-center"
+            onMouseMove={handleSimulatorMouseMove}
+            onMouseLeave={handleSimulatorMouseLeave}
+            onMouseUp={() => setTilt({ x: 0, y: 0 })}
+          >
+            {/* Subtle blue/teal background glow */}
+            <div className="absolute -inset-2 rounded-3xl bg-teal-600 opacity-[0.08] blur-2xl animate-pulse" />
             
             {activeMode === 'prep' ? (
               // PREP MODE MOCKUP
-              <div className="relative w-full max-w-[540px] bg-white border border-slate-200/80 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col">
+              <div 
+                style={{
+                  transform: `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
+                  transition: 'transform 0.15s ease-out'
+                }}
+                className="relative w-full max-w-[540px] bg-white border border-slate-200/80 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col"
+              >
                 
                 {/* Mockup Header */}
                 <div className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200/80 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Prep Mode: AI Mock
+                    <div className="flex items-center gap-1.5 rounded-lg border border-teal-200 bg-teal-50 px-2 py-0.5 text-[10px] font-bold text-teal-600">
+                      <span className="h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse" /> Prep Mode: AI Mock
                     </div>
                     {simulatorState === 'typing' && (
-                      <span className="text-[10px] text-blue-600 font-bold bg-blue-50 border border-blue-100 rounded px-1.5 py-0.5 animate-pulse">🎙️ Listening...</span>
+                      <span className="text-[10px] text-teal-600 font-bold bg-teal-50 border border-teal-100 rounded px-1.5 py-0.5 animate-pulse">🎙️ Listening...</span>
                     )}
                     {simulatorState === 'thinking' && (
                       <span className="text-[10px] text-purple-600 font-bold bg-purple-50 border border-purple-100 rounded px-1.5 py-0.5 animate-pulse">⚡ Thinking...</span>
                     )}
                     {simulatorState === 'streaming' && (
-                      <span className="text-[10px] text-indigo-600 font-bold bg-indigo-50 border border-indigo-100 rounded px-1.5 py-0.5">💡 Copilot Streaming...</span>
+                      <span className="text-[10px] text-teal-600 font-bold bg-teal-50 border border-teal-100 rounded px-1.5 py-0.5">💡 Copilot Streaming...</span>
                     )}
                   </div>
                   <div className="flex items-center gap-3 text-xs text-slate-500 font-semibold">
@@ -3390,12 +3590,12 @@ function Landing({
                     {/* AI Interviewer bubble */}
                     <div className="bg-white border border-slate-200/60 rounded-xl p-3.5 shadow-sm text-left border-teal-500/30 ring-2 ring-teal-500/5">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                        <div className="h-6 w-6 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
                           <Volume2 size={13} />
                         </div>
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">AI Interviewer</span>
                       </div>
-                      <p className="text-[13px] text-slate-800 font-semibold min-h-[40px]">
+                      <p className="text-[13px] !text-slate-900 font-semibold min-h-[40px]">
                         {questionLength > 0 ? previewScenarios[activeScenario].question.slice(0, questionLength) : <span className="text-slate-400 italic">Listening for voice signals...</span>}
                       </p>
                     </div>
@@ -3404,18 +3604,19 @@ function Landing({
                     <div className="bg-white border border-slate-200/60 rounded-xl p-3.5 shadow-sm text-left border-teal-500/30 ring-2 ring-teal-500/5">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Your Response</span>
-                        <span className="text-[11px] font-bold text-emerald-600">01:24</span>
+                        <span className="text-[11px] font-bold text-teal-600">01:24</span>
                       </div>
-                      <div className="h-8 flex items-center gap-1">
+                      <div className="h-8 flex items-end gap-0.5">
                         {Array.from({ length: 28 }).map((_, i) => {
                           const heights = [3,6,12,18,12,6,3,8,14,24,18,10,4,8,18,32,24,14,6,8,16,28,16,8,4,8,12,6];
                           const h = heights[i % heights.length];
                           return (
                             <span 
                               key={i} 
-                              className="flex-1 rounded-sm transition-all duration-300"
+                              className="flex-1 rounded-sm animate-audio-wave transition-all duration-300"
                               style={{
-                                height: `${Math.max(3, h * (0.3 + Math.random() * 0.7))}px`,
+                                height: `${h}px`,
+                                animationDelay: `${i * 0.04}s`,
                                 backgroundColor: '#2563eb'
                               }}
                             />
@@ -3438,9 +3639,9 @@ function Landing({
                             <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f1f5f9" strokeWidth="2.5"/>
                             <circle cx="18" cy="18" r="15.915" fill="none" stroke="#10b981" strokeWidth="2.5" strokeDasharray="82, 100" strokeLinecap="round"/>
                           </svg>
-                          <span className="absolute text-[11px] font-extrabold text-slate-800">82%</span>
+                          <span className="absolute text-[11px] font-extrabold !text-slate-900">82%</span>
                         </div>
-                        <span className="text-[9px] font-bold text-emerald-600 mt-1">Good</span>
+                        <span className="text-[9px] font-bold text-teal-600 mt-1">Good</span>
                       </div>
 
                       <div className="bg-white border border-slate-200/60 rounded-xl p-2.5 shadow-sm flex flex-col items-center">
@@ -3450,7 +3651,7 @@ function Landing({
                             <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f1f5f9" strokeWidth="2.5"/>
                             <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f97316" strokeWidth="2.5" strokeDasharray="78, 100" strokeLinecap="round"/>
                           </svg>
-                          <span className="absolute text-[11px] font-extrabold text-slate-800">78%</span>
+                          <span className="absolute text-[11px] font-extrabold !text-slate-900">78%</span>
                         </div>
                         <span className="text-[9px] font-bold text-orange-600 mt-1">Good</span>
                       </div>
@@ -3462,9 +3663,9 @@ function Landing({
                             <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f1f5f9" strokeWidth="2.5"/>
                             <circle cx="18" cy="18" r="15.915" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeDasharray="91, 100" strokeLinecap="round"/>
                           </svg>
-                          <span className="absolute text-[11px] font-extrabold text-slate-800">91%</span>
+                          <span className="absolute text-[11px] font-extrabold !text-slate-900">91%</span>
                         </div>
-                        <span className="text-[9px] font-bold text-blue-600 mt-1">Excellent</span>
+                        <span className="text-[9px] font-bold text-teal-600 mt-1">Excellent</span>
                       </div>
                     </motion.div>
 
@@ -3508,13 +3709,13 @@ function Landing({
                     {/* Job Role info */}
                     <div className="bg-white border border-slate-200/60 rounded-xl p-3 shadow-sm text-left">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Job Role</span>
-                      <span className="text-xs font-bold text-slate-800">Backend Developer</span>
+                      <span className="text-xs font-bold !text-slate-900">Backend Developer</span>
                     </div>
 
                     {/* Question Ratio card */}
                     <div className="bg-white border border-slate-200/60 rounded-xl p-3 shadow-sm text-left">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Question</span>
-                      <span className="text-xs font-black text-slate-800">5 / 12</span>
+                      <span className="text-xs font-black !text-slate-900">5 / 12</span>
                     </div>
 
                   </div>
@@ -3525,19 +3726,19 @@ function Landing({
                 <div className="bg-slate-50 border-t border-slate-200/80 px-4 py-2.5 flex items-center justify-center gap-2 overflow-x-auto">
                   <button 
                     onClick={() => setActiveScenario('system')}
-                    className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'system' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
+                    className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'system' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
                   >
                     System Design
                   </button>
                   <button 
                     onClick={() => setActiveScenario('sql')}
-                    className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'sql' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
+                    className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'sql' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
                   >
                     Database Tuning
                   </button>
                   <button 
                     onClick={() => setActiveScenario('react')}
-                    className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'react' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
+                    className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'react' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/60'}`}
                   >
                     React 19 Reconciler
                   </button>
@@ -3546,82 +3747,73 @@ function Landing({
               </div>
             ) : (
               // LIVE STEALTH SLIDER MODE
-              <div className="relative w-full max-w-[540px] aspect-[4/3] bg-[#0d1117] border border-slate-850 rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col select-none" style={{ borderColor: '#1f242c' }}>
+              <div 
+                style={{
+                  transform: `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
+                  transition: 'transform 0.15s ease-out',
+                  borderColor: '#1f242c'
+                }}
+                className="relative w-full max-w-[540px] aspect-[4/3] bg-[#0d1117] border border-slate-850 rounded-2xl shadow-[0_30px_70px_-15px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col select-none"
+              >
                 
-                {/* 1. Background Layer: What They See (Clean IDE) */}
+                {/* Clean IDE Layer */}
                 <div className="absolute inset-0 flex flex-col">
                   {/* Mock IDE view */}
                   <MockIDE scenario={activeScenario} />
                 </div>
 
-                {/* 2. Foreground Layer: Your View (Overlay HUD active) */}
-                <div 
-                  className="absolute inset-0 z-10 flex flex-col overflow-hidden pointer-events-none"
-                  style={{ clipPath: `polygon(0 0, ${sliderPos}% 0, ${sliderPos}% 100%, 0 100%)` }}
-                >
-                  <MockIDE scenario={activeScenario} />
+                {/* Conditional Foreground Layer: Your View (Overlay HUD active) */}
+                {liveViewMode === 'hud' && (
+                  <div className="absolute inset-0 z-10 flex flex-col pointer-events-none">
+                    {/* Floating Glassmorphic Sutra HUD Overlay */}
+                    <div className="absolute top-[85px] left-8 w-[250px] sm:w-[280px] bg-white/75 backdrop-blur-md border border-white/40 shadow-[0_25px_50px_rgba(13,148,136,0.25)] rounded-2xl p-4 text-left pointer-events-auto transition-shadow duration-300 hover:shadow-[0_25px_50px_rgba(13,148,136,0.4)]">
+                      {/* Header */}
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sutra AI Overlay</span>
+                        <span className="flex items-center gap-1 bg-teal-500/10 text-teal-700 px-2.5 py-0.5 rounded-full text-[9px] font-bold border border-teal-500/20 shadow-[0_0_12px_rgba(16,185,129,0.2)]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+                          GLANCE MODE
+                        </span>
+                      </div>
 
-                  {/* Floating Glassmorphic Sutra HUD Overlay */}
-                  <div className="absolute top-[85px] left-8 w-[250px] sm:w-[280px] bg-white/75 backdrop-blur-md border border-white/40 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] rounded-2xl p-4 text-left pointer-events-auto">
-                    {/* Header */}
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sutra AI Overlay</span>
-                      <span className="flex items-center gap-1 bg-emerald-500/10 text-emerald-700 px-2.5 py-0.5 rounded-full text-[9px] font-bold border border-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.2)]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        GLANCE MODE
-                      </span>
-                    </div>
+                      {/* SAY FIRST block */}
+                      <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-3 mb-3">
+                        <span className="text-[9px] font-black text-teal-600 tracking-widest uppercase block mb-1">SAY FIRST</span>
+                        <p className="text-[10.5px] font-semibold !text-slate-900 leading-relaxed italic">
+                          &ldquo;{getStealthScenarioContent(activeScenario).sayFirst}&rdquo;
+                        </p>
+                      </div>
 
-                    {/* SAY FIRST block */}
-                    <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-3 mb-3">
-                      <span className="text-[9px] font-black text-teal-600 tracking-widest uppercase block mb-1">SAY FIRST</span>
-                      <p className="text-[10.5px] font-semibold text-slate-800 leading-relaxed italic">
-                        &ldquo;{getStealthScenarioContent(activeScenario).sayFirst}&rdquo;
-                      </p>
-                    </div>
-
-                    {/* STAR outline block */}
-                    <div className="space-y-1.5 pt-1 border-t border-slate-100">
-                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block">STAR Outline</span>
-                      {getStealthScenarioContent(activeScenario).star.map((point, i) => (
-                        <div key={i} className="flex items-start gap-1.5">
-                          <span className="mt-0.5 px-1 bg-slate-100 border border-slate-200 rounded text-[7px] font-black text-slate-500 shrink-0">{point.label}</span>
-                          <span className="text-[9px] text-slate-600 font-bold leading-snug">{point.desc}</span>
-                        </div>
-                      ))}
+                      {/* STAR outline block */}
+                      <div className="space-y-1.5 pt-1 border-t border-slate-100">
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block">STAR Outline</span>
+                        {getStealthScenarioContent(activeScenario).star.map((point, i) => (
+                          <div key={i} className="flex items-start gap-1.5">
+                            <span className="mt-0.5 px-1 bg-slate-100 border border-slate-200 rounded text-[7px] font-black text-slate-500 shrink-0">{point.label}</span>
+                            <span className="text-[9px] text-slate-600 font-bold leading-snug">{point.desc}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
-                {/* Floating Labels / Annotations */}
-                <div className="absolute top-12 left-4 z-20 pointer-events-none">
-                  <span className="bg-emerald-600 text-white font-black text-[8px] uppercase tracking-wider px-2 py-0.5 rounded shadow-sm border border-emerald-500/20">
-                    👁️ Your View (HUD Active)
-                  </span>
-                </div>
-                <div className="absolute top-12 right-4 z-20 pointer-events-none">
-                  <span className="bg-red-600/90 text-white font-black text-[8px] uppercase tracking-wider px-2 py-0.5 rounded shadow-sm border border-red-500/20">
-                    💻 Screen Share (Invisible)
-                  </span>
-                </div>
-
-                {/* 3. Slider Control Handle */}
-                <div 
-                  className="absolute top-0 bottom-0 w-1 bg-teal-500/80 cursor-ew-resize flex items-center justify-center z-30"
-                  style={{ left: `${sliderPos}%` }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-teal-600 border-2 border-white shadow-lg flex items-center justify-center text-white text-xs select-none hover:bg-teal-500 transition-colors cursor-ew-resize">
-                    ↔
+                {/* View Mode Toggle Controls */}
+                <div className="absolute top-4 inset-x-0 flex justify-center z-30">
+                  <div className="bg-slate-900/80 backdrop-blur-md p-1 rounded-lg border border-slate-700 flex gap-1 shadow-lg">
+                    <button 
+                      onClick={() => setLiveViewMode('hud')}
+                      className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all ${liveViewMode === 'hud' ? 'bg-teal-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                    >
+                      👁️ Your View (HUD)
+                    </button>
+                    <button 
+                      onClick={() => setLiveViewMode('clean')}
+                      className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all ${liveViewMode === 'clean' ? 'bg-red-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                    >
+                      💻 Screen Share
+                    </button>
                   </div>
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max="100" 
-                    value={sliderPos} 
-                    onChange={(e) => setSliderPos(Number(e.target.value))}
-                    className="absolute inset-0 opacity-0 w-8 h-full cursor-ew-resize"
-                    style={{ transform: 'translateX(-50%)', width: '40px' }}
-                  />
                 </div>
 
                 {/* Quick Scenario Toggles at the bottom inside the slider mode */}
@@ -3665,13 +3857,13 @@ function Landing({
             {/* Top Row: Copy + Badges */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
               <div className="flex-1">
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-400 mb-4">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-teal-500/10 border border-teal-500/20 px-3 py-1 text-xs font-bold text-teal-400 mb-4">
                   <ShieldCheck size={14} />
                   100% Invisible to Screen Share
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
                   They see your screen. <br className="hidden sm:block" />
-                  <span className="text-emerald-400">They never see Sutra AI.</span>
+                  <span className="text-teal-400">They never see Sutra AI.</span>
                 </h2>
                 <p className="text-sm text-slate-400 max-w-lg leading-relaxed">
                   Our click-through overlay sits invisibly above any video platform. You type in your IDE, maintain eye contact, and the AI speaks to you silently — no tab-switch alerts, no extension permissions, no traces.
@@ -3688,7 +3880,7 @@ function Landing({
                     key={text} 
                     className="flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-800/50 px-3.5 py-1.5 cursor-default shadow-sm backdrop-blur-sm"
                   >
-                    <Icon size={12} className="text-emerald-400 shrink-0" />
+                    <Icon size={12} className="text-teal-400 shrink-0" />
                     <span className="text-[11px] font-bold text-slate-300 tracking-wide">{text}</span>
                   </motion.div>
                 ))}
@@ -3700,9 +3892,9 @@ function Landing({
               {(['listening', 'thinking', 'response'] as const).map((phase, idx) => {
                 const labels = ['1. Listening', '2. Processing', '3. Responding'];
                 const colors = {
-                  listening: { active: 'bg-blue-500', text: 'text-blue-400', ring: 'ring-blue-500/40' },
+                  listening: { active: 'bg-teal-500', text: 'text-teal-400', ring: 'ring-teal-500/40' },
                   thinking:  { active: 'bg-yellow-400', text: 'text-yellow-400', ring: 'ring-yellow-400/40' },
-                  response:  { active: 'bg-emerald-500', text: 'text-emerald-400', ring: 'ring-emerald-500/40' },
+                  response:  { active: 'bg-teal-500', text: 'text-teal-400', ring: 'ring-teal-500/40' },
                 };
                 const isActive = stealthPhase === phase;
                 const isDone = (stealthPhase === 'thinking' && idx === 0) || (stealthPhase === 'response' && idx < 2);
@@ -3714,18 +3906,18 @@ function Landing({
                         animate={isActive ? { scale: [1, 1.15, 1] } : { scale: 1 }}
                         transition={{ repeat: isActive ? Infinity : 0, duration: 1.2, ease: 'easeInOut' }}
                         className={`h-6 w-6 rounded-full flex items-center justify-center text-[9px] font-black transition-all duration-500
-                          ${isActive ? `${c.active} ring-4 ${c.ring} shadow-lg text-white` : isDone ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+                          ${isActive ? `${c.active} ring-4 ${c.ring} shadow-lg text-white` : isDone ? 'bg-teal-600 text-white' : 'bg-slate-700 text-slate-300'}`}
                       >
                         {isDone ? '✓' : idx + 1}
                       </motion.div>
-                      <span className={`text-[9px] font-bold tracking-wide transition-colors duration-500 ${isActive ? c.text : isDone ? 'text-emerald-400' : 'text-slate-400'}`}>
+                      <span className={`text-[9px] font-bold tracking-wide transition-colors duration-500 ${isActive ? c.text : isDone ? 'text-teal-400' : 'text-slate-400'}`}>
                         {labels[idx]}
                       </span>
                     </div>
                     {idx < 2 && (
                       <div className="h-px flex-1 mb-4 relative overflow-hidden bg-slate-700">
                         <motion.div
-                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 to-emerald-400"
+                          className="absolute inset-y-0 left-0 bg-teal-600"
                           animate={{ width: isDone ? '100%' : isActive ? '50%' : '0%' }}
                           transition={{ duration: 0.6, ease: 'easeInOut' }}
                         />
@@ -3741,20 +3933,20 @@ function Landing({
 
               {/* LEFT: What YOU See */}
               <motion.div
-                className="relative bg-slate-800 border border-emerald-500/30 rounded-xl p-4 overflow-hidden"
+                className="relative bg-slate-800 border border-teal-500/30 rounded-xl p-4 overflow-hidden"
                 animate={{ borderColor: stealthPhase === 'response' ? 'rgba(16,185,129,0.4)' : 'rgba(16,185,129,0.1)' }}
                 transition={{ duration: 0.5 }}
               >
                 {/* Corner glow */}
                 <motion.div
-                  className="absolute -top-6 -left-6 h-20 w-20 rounded-full bg-emerald-500/10 blur-xl pointer-events-none"
+                  className="absolute -top-6 -left-6 h-20 w-20 rounded-full bg-teal-500/10 blur-xl pointer-events-none"
                   animate={{ opacity: stealthPhase === 'response' ? 0.7 : 0.2 }}
                   transition={{ duration: 0.6 }}
                 />
 
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400">👤 You</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-teal-400">👤 You</span>
                     <span className="text-[9px] text-slate-400">— your private view</span>
                   </div>
                   <motion.span
@@ -3763,7 +3955,7 @@ function Landing({
                     transition={{ duration: 0.4 }}
                   >
                     <motion.span
-                      className={`h-1.5 w-1.5 rounded-full ${stealthPhase === 'listening' ? 'bg-blue-400' : stealthPhase === 'thinking' ? 'bg-yellow-400' : 'bg-emerald-400'} animate-pulse`}
+                      className={`h-1.5 w-1.5 rounded-full ${stealthPhase === 'listening' ? 'bg-teal-400' : stealthPhase === 'thinking' ? 'bg-yellow-400' : 'bg-teal-400'} animate-pulse`}
                     />
                     {stealthPhase === 'listening' ? 'Listening...' : stealthPhase === 'thinking' ? 'Processing...' : 'Copilot Active'}
                   </motion.span>
@@ -3785,7 +3977,7 @@ function Landing({
                   </AnimatePresence>
 
                   <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-800">
-                    <div className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-amber-400 to-orange-600">
+                    <div className="flex h-5 w-5 items-center justify-center rounded-md bg-teal-600">
                       <SutraLogo size={10} className="text-white" />
                     </div>
                     <span className="text-[10px] font-bold text-slate-300">Sutra AI Overlay</span>
@@ -3802,11 +3994,11 @@ function Landing({
                       <motion.div key="listening" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.35 }} className="flex flex-col items-center justify-center py-6 gap-3">
                         <div className="flex items-end gap-0.5 h-6">
                           {[0, 1, 2, 3, 4, 5, 6].map(i => (
-                            <motion.span key={i} className="w-1 rounded-full bg-blue-400 inline-block" animate={{ height: ['3px', `${8 + Math.sin(i) * 10}px`, '3px'] }} transition={{ repeat: Infinity, duration: 0.7 + i * 0.05, delay: i * 0.1, ease: 'easeInOut' }} />
+                            <motion.span key={i} className="w-1 rounded-full bg-teal-400 inline-block" animate={{ height: ['3px', `${8 + Math.sin(i) * 10}px`, '3px'] }} transition={{ repeat: Infinity, duration: 0.7 + i * 0.05, delay: i * 0.1, ease: 'easeInOut' }} />
                           ))}
                         </div>
                         <div className="text-center">
-                          <span className="text-[10px] text-blue-300 font-semibold block">Detecting interview question...</span>
+                          <span className="text-[10px] text-teal-300 font-semibold block">Detecting interview question...</span>
                           <span className="text-[8px] text-slate-400 mt-0.5 block">Transcribing audio in real-time</span>
                         </div>
                       </motion.div>
@@ -3828,16 +4020,16 @@ function Landing({
 
                     {stealthPhase === 'response' && (
                       <motion.div key="response" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="space-y-2">
-                        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="bg-blue-900/40 border border-blue-500/30 rounded-md px-2.5 py-2">
-                          <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest block mb-1">💬 SAY FIRST</span>
+                        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="bg-teal-900/40 border border-teal-500/30 rounded-md px-2.5 py-2">
+                          <span className="text-[8px] font-black text-teal-400 uppercase tracking-widest block mb-1">💬 SAY FIRST</span>
                           <p className="text-[10px] text-slate-200 italic leading-snug">&ldquo;That&rsquo;s similar to a bottleneck we solved last quarter...&rdquo;</p>
                         </motion.div>
                         <div className="space-y-1.5 px-0.5">
-                          <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest block">Key Points</span>
+                          <span className="text-[8px] font-black text-teal-400 uppercase tracking-widest block">Key Points</span>
                           {['Use async workers + message queue', 'Cache at CDN edge layer', 'Auto-scale horizontally'].map((b, i) => (
                             visibleBullets > i && (
                               <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="flex items-center gap-1.5">
-                                <span className="h-3.5 w-3.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-[7px] flex items-center justify-center text-emerald-400 font-black shrink-0">{i + 1}</span>
+                                <span className="h-3.5 w-3.5 rounded-full bg-teal-500/20 border border-teal-500/40 text-[7px] flex items-center justify-center text-teal-400 font-black shrink-0">{i + 1}</span>
                                 <span className="text-[10px] text-slate-300 font-medium">{b}</span>
                               </motion.div>
                             )
@@ -3851,16 +4043,16 @@ function Landing({
 
               {/* CENTER: Invisible barrier divider */}
               <div className="hidden md:flex flex-col items-center justify-center gap-2 px-2 min-w-[44px]">
-                <div className="flex-1 w-px bg-gradient-to-b from-transparent via-emerald-500/30 to-transparent" />
+                <div className="flex-1 w-px bg-gradient-to-b from-transparent via-teal-500/30 to-transparent" />
                 <motion.div
-                  className="h-8 w-8 rounded-full bg-slate-900 border border-emerald-500/40 flex items-center justify-center shadow-[0_0_16px_rgba(16,185,129,0.2)]"
+                  className="h-8 w-8 rounded-full bg-slate-900 border border-teal-500/40 flex items-center justify-center shadow-[0_0_16px_rgba(16,185,129,0.2)]"
                   animate={{ boxShadow: ['0 0 8px rgba(16,185,129,0.15)', '0 0 20px rgba(16,185,129,0.35)', '0 0 8px rgba(16,185,129,0.15)'] }}
                   transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
                 >
-                  <ShieldCheck size={14} className="text-emerald-400" />
+                  <ShieldCheck size={14} className="text-teal-400" />
                 </motion.div>
-                <span className="text-[7px] font-black uppercase tracking-widest text-emerald-400 text-center leading-tight">Invisible<br/>Barrier</span>
-                <div className="flex-1 w-px bg-gradient-to-b from-transparent via-emerald-500/30 to-transparent" />
+                <span className="text-[7px] font-black uppercase tracking-widest text-teal-400 text-center leading-tight">Invisible<br/>Barrier</span>
+                <div className="flex-1 w-px bg-gradient-to-b from-transparent via-teal-500/30 to-transparent" />
               </div>
 
               {/* RIGHT: What Interviewer Sees */}
@@ -3888,7 +4080,7 @@ function Landing({
                     <div className="flex gap-1">
                       <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
                       <span className="h-2.5 w-2.5 rounded-full bg-yellow-500" />
-                      <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
+                      <span className="h-2.5 w-2.5 rounded-full bg-teal-500" />
                     </div>
                     <span className="text-[9px] text-slate-500 font-mono">your-project/index.ts</span>
                     <div className="ml-auto flex items-center gap-1.5">
@@ -3906,7 +4098,7 @@ function Landing({
                     {[
                       { w: 'w-full',  color: 'bg-slate-800' },
                       { w: 'w-3/4',  color: 'bg-slate-800' },
-                      { w: 'w-5/6',  color: 'bg-blue-900/50' },
+                      { w: 'w-5/6',  color: 'bg-teal-900/50' },
                       { w: 'w-4/5',  color: 'bg-slate-800' },
                       { w: 'w-2/3',  color: 'bg-slate-800' },
                     ].map((line, i) => (
@@ -3923,7 +4115,7 @@ function Landing({
                     animate={{ opacity: [0.6, 1, 0.6] }}
                     transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
                   >
-                    <CheckCircle2 size={10} className="text-emerald-400 shrink-0" />
+                    <CheckCircle2 size={10} className="text-teal-400 shrink-0" />
                     <span className="text-[9px] text-slate-400">No overlay visible — clean screen share</span>
                   </motion.div>
 
@@ -3945,9 +4137,9 @@ function Landing({
             {/* ── How It Works — 3-step mini timeline ── */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-700">
               {[
-                { step: '01', icon: Mic, title: 'Audio Captured', desc: "Sutra silently listens to the interviewer's voice via your mic.", color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/30' },
+                { step: '01', icon: Mic, title: 'Audio Captured', desc: "Sutra silently listens to the interviewer's voice via your mic.", color: 'text-teal-400', bg: 'bg-teal-500/10 border-teal-500/30' },
                 { step: '02', icon: Brain, title: 'AI Generates Answer', desc: 'Your profile + context shapes a tailored talking point in <2s.', color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/30' },
-                { step: '03', icon: EyeOff, title: 'Zero Screen Exposure', desc: 'The overlay is click-through — never captured by any screen share tool.', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
+                { step: '03', icon: EyeOff, title: 'Zero Screen Exposure', desc: 'The overlay is click-through — never captured by any screen share tool.', color: 'text-teal-400', bg: 'bg-teal-500/10 border-teal-500/30' },
               ].map(({ step, icon: Icon, title, desc, color, bg }, i) => (
                 <motion.div
                   key={step}
@@ -3987,8 +4179,8 @@ function Landing({
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 bg-slate-100/80 px-3.5 py-1.5 rounded-full border border-slate-200/80 shadow-sm">
               COMPATIBLE WITH ANY CALL PLATFORM — 100% INVISIBLE & DETECTED-FREE
             </span>
-            <div className="flex items-center gap-1.5 text-[10px] text-emerald-600 font-bold bg-emerald-50 border border-emerald-100 px-3.5 py-1.5 rounded-full shadow-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="flex items-center gap-1.5 text-[10px] text-teal-600 font-bold bg-teal-50 border border-teal-100 px-3.5 py-1.5 rounded-full shadow-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse" />
               <span>Undetectable: Verified secure 8 hours ago</span>
             </div>
           </div>
@@ -4058,113 +4250,273 @@ function Landing({
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           id="showcase-video"
-          className="relative z-10 mx-auto w-full max-w-5xl px-6 py-12 text-center"
+          className="relative z-10 mx-auto w-full max-w-5xl px-6 py-16 text-center"
         >
-          <div className="max-w-2xl mx-auto mb-8">
-            <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 mb-3">
-              🎥 Video Walkthrough
+          <div className="max-w-2xl mx-auto mb-10">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 border border-teal-100 px-3 py-1 text-[11px] font-bold text-teal-600 mb-4">
+              <PlayCircle size={12} /> Video Walkthrough
             </span>
-            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-black !text-slate-900 tracking-tight">
               Sutra AI in Action
             </h2>
-            <p className="mt-2 text-slate-500 text-sm font-medium">
-              See how the invisible click-through overlay helps candidates perform flawlessly during interviews.
+            <p className="mt-3 text-slate-500 text-sm sm:text-base font-medium max-w-xl mx-auto">
+              See how the overlay helps candidates perform flawlessly during interviews.
             </p>
           </div>
-          <div className="relative rounded-3xl bg-slate-950 border border-slate-850 p-2.5 shadow-2xl overflow-hidden aspect-video max-w-3xl mx-auto group">
-            <video 
-              key={appVideoUrl}
-              src={appVideoUrl} 
-              controls 
-              className="w-full h-full object-contain rounded-2xl"
-            />
+
+          {/* Ambient glow behind the player, matching the hero mockup treatment */}
+          <div className="relative max-w-3xl mx-auto">
+            <div className="absolute -inset-3 rounded-[2rem] bg-teal-600 opacity-[0.12] blur-2xl" />
+
+            <div className="relative rounded-3xl bg-slate-950 border border-slate-800 p-2.5 shadow-[0_25px_60px_rgba(15,23,42,0.35)] overflow-hidden aspect-video group">
+              <video 
+                ref={videoRef}
+                key={appVideoUrl}
+                src={appVideoUrl}
+                controls={isVideoPlaying}
+                onPause={() => setIsVideoPlaying(false)}
+                className="w-full h-full object-contain rounded-2xl"
+              />
+
+              {/* Custom play overlay — shown until first play, keeps the frame clean/branded */}
+              {!isVideoPlaying && (
+                <button
+                  onClick={handlePlayClick}
+                  className="absolute inset-2.5 flex items-center justify-center rounded-2xl bg-slate-950/20 hover:bg-slate-950/30 transition-colors duration-300 cursor-pointer"
+                  aria-label="Play video"
+                >
+                  <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-xl transition-transform duration-300 group-hover:scale-110">
+                    <PlayCircle size={32} className="text-teal-600 ml-1" fill="currentColor" fillOpacity={0.12} />
+                  </div>
+                </button>
+              )}
+            </div>
+          </div>
+        </motion.section>
+
+        {/* Success Stories Section */}
+        <motion.section 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="relative z-10 mx-auto w-full max-w-6xl px-6 py-20 overflow-hidden text-center"
+        >
+          <div className="max-w-3xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-200/60 bg-teal-50 px-3 py-1 text-[10px] font-bold text-teal-700 uppercase tracking-wider mb-4">
+              Real Candidates
+            </div>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black !text-slate-900 tracking-tight leading-tight">
+              Success stories from{' '}
+              <span className="text-teal-600">
+                our candidates
+              </span>
+            </h2>
+            <p className="mt-4 text-slate-600 text-sm sm:text-base font-medium max-w-xl mx-auto">
+              Real results from developers who nailed their interviews.
+            </p>
+          </div>
+        
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-center">
+            {shorts.slice(0, 4).map((short, idx) => {
+              const isPlaying = playingId === short.videoId;
+              return (
+                <div
+                  key={`${short.videoId}-${idx}`}
+                  className="group relative w-full aspect-[9/16] bg-slate-900 rounded-2xl overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.1)] ring-1 ring-slate-200 hover:ring-2 hover:ring-teal-400/60 hover:shadow-[0_20px_40px_rgba(13,148,136,0.2)] transition-all duration-300 transform hover:-translate-y-2"
+                >
+                  {isPlaying ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${short.videoId}?autoplay=1&loop=1&playlist=${short.videoId}&controls=1&modestbranding=1&playsinline=1&rel=0`}
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <button
+                      onClick={() => setPlayingId(short.videoId)}
+                      className="relative w-full h-full cursor-pointer block"
+                      aria-label={`Play testimonial from ${short.name}`}
+                    >
+                      {/* Thumbnail */}
+                      <img
+                        src={`https://img.youtube.com/vi/${short.videoId}/hqdefault.jpg`}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      {/* Gradient scrim so text stays legible over any thumbnail */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/30" />
+        
+                      {/* Custom on-brand play button (replaces default red YouTube button) */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="h-14 w-14 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110">
+                          <PlayCircle size={26} className="text-teal-600 ml-0.5" fill="currentColor" fillOpacity={0.15} />
+                        </div>
+                      </div>
+        
+                      {/* Name / role card, bottom-anchored */}
+                      <div className="absolute bottom-0 left-0 right-0 p-4 text-left">
+                        <p className="text-white font-bold text-sm leading-tight">{short.name}</p>
+                        <p className="text-white/70 text-[11px] font-semibold mt-0.5">{short.role}</p>
+                        <p className="text-teal-300 text-[10px] font-bold mt-1.5 flex items-center gap-1">
+                          <CheckCircle2 size={11} /> {short.outcome}
+                        </p>
+                      </div>
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </motion.section>
 
         {/* Features Section */}
-        <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.6, type: "spring", bounce: 0.2 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center">
+        <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.6, type: "spring", bounce: 0.2 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-24 mt-12 text-center overflow-hidden">
+
+          {/* Faint background mesh — gives the section depth without competing with the cards */}
+          <div className="pointer-events-none absolute inset-0 -z-10 [background:radial-gradient(circle_at_20%_20%,rgba(37,99,235,0.05),transparent_40%),radial-gradient(circle_at_80%_60%,rgba(139,92,246,0.05),transparent_40%)]" />
+
           <div className="max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center rounded-full bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600 mb-4">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 border border-teal-100 px-3.5 py-1 text-xs font-bold text-teal-600 mb-4">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-teal-500" />
+              </span>
               Everything you need to succeed
             </span>
-            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
-              Smarter Practice. Better Results.
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black !text-slate-900 tracking-tight">
+              Smarter Practice.{' '}
+              <span className="bg-teal-600 bg-clip-text text-transparent">
+                Better Results.
+              </span>
             </h2>
             <p className="mt-4 text-slate-600 text-base sm:text-lg font-medium max-w-xl mx-auto leading-relaxed">
               Build confidence, improve communication, and land your dream role with AI that adapts to you.
             </p>
           </div>
 
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+
             {/* Card 1: Real-time AI Interviews */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} whileHover={{ y: -6, scale: 1.02 }} className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('system')}>
-              <div>
-                <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-5">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              whileHover={{ y: -8 }}
+              className="relative bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(37,99,235,0.12)] hover:border-teal-300/70 transition-all duration-300 flex flex-col justify-between group cursor-pointer overflow-hidden"
+              onClick={() => handleLearnMore('system')}
+            >
+              {/* Corner glow that blooms on hover */}
+              <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-teal-500/0 group-hover:bg-teal-500/10 blur-2xl transition-colors duration-500" />
+
+              <div className="relative">
+                <div className="h-12 w-12 rounded-xl bg-teal-600/60 ring-1 ring-teal-200/50 flex items-center justify-center text-teal-600 mb-5 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
                   <Mic size={20} />
                 </div>
-                <h3 className="font-display text-lg font-bold text-slate-900 mb-2">Real-time AI Interviews</h3>
+                <h3 className="font-display text-lg font-bold !text-slate-900 mb-2">Real-time AI Interviews</h3>
                 <p className="text-sm text-slate-500 leading-relaxed font-medium">
                   Practice with AI interviewers that adapt to your answers and give instant feedback.
                 </p>
               </div>
-              <span className="mt-6 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group-hover:translate-x-1 transition-all duration-200">
-                Learn more <ArrowRight size={12} />
+              <span className="relative mt-6 text-xs font-bold text-teal-600 flex items-center gap-1.5">
+                Learn more
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-teal-50 transition-all duration-300 group-hover:bg-teal-600 group-hover:text-white group-hover:translate-x-0.5">
+                  <ArrowRight size={11} />
+                </span>
               </span>
             </motion.div>
 
             {/* Card 2: Resume Intelligence */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} whileHover={{ y: -6, scale: 1.02 }} className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('sql')}>
-              <div>
-                <div className="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-5">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.05 }}
+              whileHover={{ y: -8 }}
+              className="relative bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(16,185,129,0.12)] hover:border-teal-300/70 transition-all duration-300 flex flex-col justify-between group cursor-pointer overflow-hidden"
+              onClick={() => handleLearnMore('sql')}
+            >
+              <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-teal-500/0 group-hover:bg-teal-500/10 blur-2xl transition-colors duration-500" />
+
+              <div className="relative">
+                <div className="h-12 w-12 rounded-xl bg-teal-600/60 ring-1 ring-teal-200/50 flex items-center justify-center text-teal-600 mb-5 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
                   <FileText size={20} />
                 </div>
-                <h3 className="font-display text-lg font-bold text-slate-900 mb-2">Resume Intelligence</h3>
+                <h3 className="font-display text-lg font-bold !text-slate-900 mb-2">Resume Intelligence</h3>
                 <p className="text-sm text-slate-500 leading-relaxed font-medium">
                   AI analyzes your resume and tailors questions to your experience and skills.
                 </p>
               </div>
-              <span className="mt-6 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group-hover:translate-x-1 transition-all duration-200">
-                Learn more <ArrowRight size={12} />
+              <span className="relative mt-6 text-xs font-bold text-teal-600 flex items-center gap-1.5">
+                Learn more
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-teal-50 transition-all duration-300 group-hover:bg-teal-600 group-hover:text-white group-hover:translate-x-0.5">
+                  <ArrowRight size={11} />
+                </span>
               </span>
             </motion.div>
 
             {/* Card 3: Knowledge Base */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} whileHover={{ y: -6, scale: 1.02 }} className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('react')}>
-              <div>
-                <div className="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 mb-5">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              whileHover={{ y: -8 }}
+              className="relative bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(147,51,234,0.12)] hover:border-purple-300/70 transition-all duration-300 flex flex-col justify-between group cursor-pointer overflow-hidden"
+              onClick={() => handleLearnMore('react')}
+            >
+              <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-purple-500/0 group-hover:bg-purple-500/10 blur-2xl transition-colors duration-500" />
+
+              <div className="relative">
+                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100/60 ring-1 ring-purple-200/50 flex items-center justify-center text-purple-600 mb-5 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
                   <Library size={20} />
                 </div>
-                <h3 className="font-display text-lg font-bold text-slate-900 mb-2">Knowledge Base</h3>
+                <h3 className="font-display text-lg font-bold !text-slate-900 mb-2">Knowledge Base</h3>
                 <p className="text-sm text-slate-500 leading-relaxed font-medium">
                   Upload documents, notes, or links and let AI use them during interviews.
                 </p>
               </div>
-              <span className="mt-6 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group-hover:translate-x-1 transition-all duration-200">
-                Learn more <ArrowRight size={12} />
+              <span className="relative mt-6 text-xs font-bold text-purple-600 flex items-center gap-1.5">
+                Learn more
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-50 transition-all duration-300 group-hover:bg-purple-600 group-hover:text-white group-hover:translate-x-0.5">
+                  <ArrowRight size={11} />
+                </span>
               </span>
             </motion.div>
 
             {/* Card 4: Performance Insights */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} whileHover={{ y: -6, scale: 1.02 }} className="bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-lg hover:border-blue-300 transition-all duration-300 flex flex-col justify-between group cursor-pointer" onClick={() => handleLearnMore('insights')}>
-              <div>
-                <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 mb-5">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              whileHover={{ y: -8 }}
+              className="relative bg-white border border-slate-200/85 rounded-2xl p-6 text-left shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(217,119,6,0.12)] hover:border-amber-300/70 transition-all duration-300 flex flex-col justify-between group cursor-pointer overflow-hidden"
+              onClick={() => handleLearnMore('insights')}
+            >
+              <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-amber-500/0 group-hover:bg-amber-500/10 blur-2xl transition-colors duration-500" />
+
+              <div className="relative">
+                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100/60 ring-1 ring-amber-200/50 flex items-center justify-center text-amber-600 mb-5 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
                   <BarChart3 size={20} />
                 </div>
-                <h3 className="font-display text-lg font-bold text-slate-900 mb-2">Performance Insights</h3>
+                <h3 className="font-display text-lg font-bold !text-slate-900 mb-2">Performance Insights</h3>
                 <p className="text-sm text-slate-500 leading-relaxed font-medium">
                   Track your progress with detailed analytics and improve every time.
                 </p>
               </div>
-              <span className="mt-6 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group-hover:translate-x-1 transition-all duration-200">
-                Learn more <ArrowRight size={12} />
+              <span className="relative mt-6 text-xs font-bold text-amber-600 flex items-center gap-1.5">
+                Learn more
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-50 transition-all duration-300 group-hover:bg-amber-600 group-hover:text-white group-hover:translate-x-0.5">
+                  <ArrowRight size={11} />
+                </span>
               </span>
             </motion.div>
 
           </div>
         </motion.section>
 
-        {/* Dual-Loop Framework */}
         {/* Dual-Loop Framework */}
         <motion.section
           initial={{ opacity: 0, y: 40 }}
@@ -4172,7 +4524,7 @@ function Landing({
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.7, type: "spring", bounce: 0.1 }}
           id="how-it-works"
-          className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center"
+          className="relative z-10 mx-auto w-full max-w-7xl px-6 py-24 mt-12 text-center"
         >
           {/* Custom style block for flow animations */}
           <style dangerouslySetInnerHTML={{__html: `
@@ -4180,76 +4532,89 @@ function Landing({
               to { stroke-dashoffset: -32; }
             }
             .flow-line-blue {
-              stroke-dasharray: 6, 6;
-              animation: loopFlow 1.2s linear infinite;
-              stroke: #3b82f6;
-              filter: drop-shadow(0 0 3px rgba(59,130,246,0.6));
+              stroke-dasharray: 5, 7;
+              animation: loopFlow 1.4s linear infinite;
+              stroke: #2563eb;
+              filter: drop-shadow(0 0 4px rgba(37,99,235,0.45));
             }
-            .flow-line-emerald {
-              stroke-dasharray: 6, 6;
-              animation: loopFlow 1.2s linear infinite;
-              stroke: #10b981;
-              filter: drop-shadow(0 0 3px rgba(16,185,129,0.6));
+            .flow-line-teal {
+              stroke-dasharray: 5, 7;
+              animation: loopFlow 1.4s linear infinite;
+              stroke: #059669;
+              filter: drop-shadow(0 0 4px rgba(5,150,105,0.45));
             }
             .memory-orb-pulse {
-              animation: orbGlow 3s ease-in-out infinite;
+              animation: orbGlow 3.4s ease-in-out infinite;
             }
             @keyframes orbGlow {
               0%, 100% {
                 transform: scale(1);
-                filter: drop-shadow(0 0 8px rgba(59,130,246,0.3)) drop-shadow(0 0 8px rgba(16,185,129,0.3));
+                filter: drop-shadow(0 0 10px rgba(37,99,235,0.22)) drop-shadow(0 0 10px rgba(5,150,105,0.22));
               }
               50% {
-                transform: scale(1.06);
-                filter: drop-shadow(0 0 16px rgba(59,130,246,0.6)) drop-shadow(0 0 16px rgba(16,185,129,0.6));
+                transform: scale(1.045);
+                filter: drop-shadow(0 0 20px rgba(37,99,235,0.4)) drop-shadow(0 0 20px rgba(5,150,105,0.4));
               }
+            }
+            .ring-rotate {
+              animation: ringSpin 24s linear infinite;
+              transform-origin: 120px 120px;
+            }
+            @keyframes ringSpin {
+              to { transform: rotate(360deg); }
             }
           `}} />
 
-          <div className="max-w-3xl mx-auto mb-14">
-            <span className="inline-flex items-center rounded-full bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600 mb-4">
-              The Only Tool That Bridges Both Worlds
+          <div className="max-w-2xl mx-auto mb-16">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-teal-100 bg-teal-50/80 px-3.5 py-1 text-[11px] font-semibold tracking-wide text-teal-700 mb-5">
+              <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />
+              The only tool that bridges both worlds
             </span>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="font-display text-3xl sm:text-[2.5rem] font-bold !text-slate-900 tracking-tight leading-[1.1]">
               The Dual-Loop Framework
             </h2>
-            <p className="mt-4 text-slate-500 font-medium text-sm leading-relaxed max-w-xl mx-auto">
-              Your practice sessions build a personalized memory store. When the real interview happens, Sutra AI surfaces <em>your own</em> stories, not generic AI text.
+            <p className="mt-5 text-slate-500 text-[15px] leading-relaxed max-w-lg mx-auto">
+              Your practice sessions build a personalized memory store. When the real interview happens, Sutra AI surfaces <span className="text-slate-700 font-medium">your own</span> stories, not generic AI text.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-[1fr_240px_1fr] gap-8 max-w-6xl mx-auto text-left items-center">
+          <div className="grid lg:grid-cols-[1fr_260px_1fr] gap-6 lg:gap-4 max-w-6xl mx-auto text-left items-center">
             {/* Loop 1: Rehearsal Card */}
             <motion.div
-              whileHover={{ y: -6, scale: 1.01 }}
+              whileHover={{ y: -4 }}
               onMouseEnter={() => setHoveredLoop(1)}
               onMouseLeave={() => setHoveredLoop(null)}
-              className={`bg-white border rounded-3xl p-8 shadow-sm flex flex-col gap-6 transition-all duration-350 cursor-pointer ${
-                hoveredLoop === 1 ? 'border-blue-400 shadow-[0_8px_30px_rgba(59,130,246,0.08)]' : 'border-slate-200/80'
+              className={`relative bg-white border rounded-[28px] p-8 flex flex-col gap-7 transition-all duration-500 ease-out cursor-pointer ${
+                hoveredLoop === 1
+                  ? 'border-teal-200 shadow-[0_20px_40px_-16px_rgba(37,99,235,0.18)]'
+                  : 'border-slate-200/70 shadow-[0_1px_2px_rgba(15,23,42,0.04)]'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <div className={`h-11 w-11 rounded-2xl flex items-center justify-center transition-all ${
-                  hoveredLoop === 1 ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-50 text-blue-600'
+              <div className="flex items-center gap-3.5">
+                <div className={`h-11 w-11 rounded-xl flex items-center justify-center transition-all duration-500 ${
+                  hoveredLoop === 1 ? 'bg-teal-600 text-white shadow-lg shadow-teal-600/25' : 'bg-teal-50 text-teal-600'
                 }`}>
-                  <NotebookPen size={20} />
+                  <NotebookPen size={19} strokeWidth={2.1} />
                 </div>
                 <div>
-                  <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest block leading-none mb-1">Loop 1</span>
-                  <h3 className="font-display text-xl font-bold text-slate-900 leading-tight">Rehearsal Mode</h3>
+                  <span className="text-[10px] font-bold text-teal-500/90 uppercase tracking-[0.14em] block leading-none mb-1.5">Loop 1 &middot; Preparation</span>
+                  <h3 className="font-display text-[19px] font-bold !text-slate-900 leading-tight">Rehearsal Mode</h3>
                 </div>
               </div>
-              <div className="space-y-4">
+              <div className="flex flex-col gap-5">
                 {[
-                  { step: '01', title: 'Upload your resume + job docs', desc: 'Sutra AI learns your experience, projects, and skill set.' },
-                  { step: '02', title: 'Run unlimited mock interviews', desc: 'AI plays the interviewer. You build real, natural answers.' },
-                  { step: '03', title: 'Responses saved to memory store', desc: 'Your best answers are stored privately, locally, and securely.' },
-                ].map(({ step, title, desc }) => (
-                  <div key={step} className="flex gap-3.5 group/item">
-                    <span className="text-[11px] font-black text-blue-500 bg-blue-50/60 w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-colors group-hover/item:bg-blue-100">{step}</span>
-                    <div>
-                      <p className="text-sm font-bold text-slate-800 transition-colors group-hover/item:text-blue-600">{title}</p>
-                      <p className="text-xs text-slate-500 leading-relaxed mt-0.5">{desc}</p>
+                  { title: 'Upload your resume + job docs', desc: 'Sutra AI learns your experience, projects, and skill set.' },
+                  { title: 'Run unlimited mock interviews', desc: 'AI plays the interviewer. You build real, natural answers.' },
+                  { title: 'Responses saved to memory store', desc: 'Your best answers are stored privately, locally, and securely.' },
+                ].map(({ title, desc }, idx) => (
+                  <div key={title} className="flex gap-3.5">
+                    <div className="flex flex-col items-center pt-0.5">
+                      <span className="h-[7px] w-[7px] rounded-full bg-teal-500/70 shrink-0" />
+                      {idx < 2 && <span className="w-px flex-1 bg-slate-100 mt-1.5" />}
+                    </div>
+                    <div className="pb-1">
+                      <p className="text-[13.5px] font-semibold !text-slate-900 leading-snug">{title}</p>
+                      <p className="text-[12.5px] text-slate-500 leading-relaxed mt-1">{desc}</p>
                     </div>
                   </div>
                 ))}
@@ -4257,88 +4622,94 @@ function Landing({
             </motion.div>
 
             {/* Central SVG Interactive Diagram */}
-            <div className="flex flex-col items-center justify-center py-6 lg:py-0 relative">
+            <div className="flex flex-col items-center justify-center py-8 lg:py-0 relative">
               <svg width="240" height="240" viewBox="0 0 240 240" fill="none" className="overflow-visible select-none">
+                {/* Outer static ring */}
+                <circle cx="120" cy="120" r="98" stroke="#f1f5f9" strokeWidth="1" fill="none" />
+
                 {/* Background flow paths */}
-                <path d="M 40 120 C 40 50, 120 50, 120 120" stroke="#f1f5f9" strokeWidth="6" strokeLinecap="round" />
-                <path d="M 120 120 C 120 190, 200 190, 200 120" stroke="#f1f5f9" strokeWidth="6" strokeLinecap="round" />
+                <path d="M 40 120 C 40 50, 120 50, 120 120" stroke="#f1f5f9" strokeWidth="5" strokeLinecap="round" />
+                <path d="M 120 120 C 120 190, 200 190, 200 120" stroke="#f1f5f9" strokeWidth="5" strokeLinecap="round" />
 
                 {/* Animated active paths */}
-                <path 
-                  d="M 40 120 C 40 50, 120 50, 120 120" 
-                  stroke="#3b82f6" 
-                  strokeWidth="4" 
+                <path
+                  d="M 40 120 C 40 50, 120 50, 120 120"
+                  stroke="#2563eb"
+                  strokeWidth="3"
                   strokeLinecap="round"
-                  className={`transition-opacity duration-300 ${hoveredLoop === 1 ? 'path-flow-active flow-line-blue' : 'opacity-30'}`} 
+                  className={`transition-opacity duration-500 ${hoveredLoop === 1 ? 'flow-line-blue' : 'opacity-25'}`}
                 />
-                <path 
-                  d="M 120 120 C 120 190, 200 190, 200 120" 
-                  stroke="#10b981" 
-                  strokeWidth="4" 
+                <path
+                  d="M 120 120 C 120 190, 200 190, 200 120"
+                  stroke="#059669"
+                  strokeWidth="3"
                   strokeLinecap="round"
-                  className={`transition-opacity duration-300 ${hoveredLoop === 2 ? 'path-flow-active flow-line-emerald' : 'opacity-30'}`} 
+                  className={`transition-opacity duration-500 ${hoveredLoop === 2 ? 'flow-line-teal' : 'opacity-25'}`}
                 />
 
-                {/* Flow Direction Indicators */}
-                <circle cx="120" cy="120" r="28" fill="url(#orbGrad)" className="memory-orb-pulse" />
-                
-                {/* SVG definitions */}
+                {/* Faint rotating orbit ring for depth */}
+                <circle cx="120" cy="120" r="42" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="1 6" strokeLinecap="round" className="ring-rotate" />
+
+                {/* Central orb */}
+                <circle cx="120" cy="120" r="27" fill="url(#orbGrad)" className="memory-orb-pulse" />
+                <circle cx="120" cy="120" r="27" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1" />
+
                 <defs>
                   <linearGradient id="orbGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" />
-                    <stop offset="100%" stopColor="#10b981" />
+                    <stop offset="0%" stopColor="#2563eb" />
+                    <stop offset="100%" stopColor="#059669" />
                   </linearGradient>
                 </defs>
 
-                {/* Inner icons inside central orb */}
-                <g transform="translate(108, 108)" className="pointer-events-none">
-                  {/* Database / Core storage drawing */}
-                  <path d="M4 2 L20 2 L20 6 L4 6 Z M4 9 L20 9 L20 13 L4 13 Z M4 16 L20 16 L20 20 L4 20 Z" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <line x1="7" y1="4" x2="7" y2="4" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-                  <line x1="7" y1="11" x2="7" y2="11" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-                  <line x1="7" y1="18" x2="7" y2="18" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+                {/* Inner icon inside central orb */}
+                <g transform="translate(109, 109)" className="pointer-events-none">
+                  <path d="M4 2 L20 2 L20 6 L4 6 Z M4 9 L20 9 L20 13 L4 13 Z M4 16 L20 16 L20 20 L4 20 Z" stroke="#ffffff" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
                 </g>
 
-                {/* Visual Label text above orb */}
-                <text x="120" y="80" textAnchor="middle" fill="#475569" className="text-[10px] font-black uppercase tracking-wider">Memory Store</text>
+                <text x="120" y="76" textAnchor="middle" fill="#64748b" className="text-[10px] font-bold uppercase" style={{ letterSpacing: '0.12em' }}>Memory Store</text>
               </svg>
 
-              <div className="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-                <span className="text-[9px] font-black uppercase tracking-widest text-white mt-12 block drop-shadow-sm">SECURE</span>
+              <div className="absolute top-[54%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                <span className="text-[8.5px] font-bold uppercase text-white/95" style={{ letterSpacing: '0.16em' }}>Secure</span>
               </div>
             </div>
 
             {/* Loop 2: Live Performance Card */}
             <motion.div
-              whileHover={{ y: -6, scale: 1.01 }}
+              whileHover={{ y: -4 }}
               onMouseEnter={() => setHoveredLoop(2)}
               onMouseLeave={() => setHoveredLoop(null)}
-              className={`bg-white border rounded-3xl p-8 shadow-sm flex flex-col gap-6 transition-all duration-350 cursor-pointer ${
-                hoveredLoop === 2 ? 'border-emerald-400 shadow-[0_8px_30px_rgba(16,185,129,0.08)]' : 'border-slate-200/80'
+              className={`relative bg-white border rounded-[28px] p-8 flex flex-col gap-7 transition-all duration-500 ease-out cursor-pointer ${
+                hoveredLoop === 2
+                  ? 'border-teal-200 shadow-[0_20px_40px_-16px_rgba(5,150,105,0.18)]'
+                  : 'border-slate-200/70 shadow-[0_1px_2px_rgba(15,23,42,0.04)]'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <div className={`h-11 w-11 rounded-2xl flex items-center justify-center transition-all ${
-                  hoveredLoop === 2 ? 'bg-emerald-600 text-white shadow-md' : 'bg-emerald-50 text-emerald-600'
+              <div className="flex items-center gap-3.5">
+                <div className={`h-11 w-11 rounded-xl flex items-center justify-center transition-all duration-500 ${
+                  hoveredLoop === 2 ? 'bg-teal-600 text-white shadow-lg shadow-teal-600/25' : 'bg-teal-50 text-teal-600'
                 }`}>
-                  <Radio size={20} />
+                  <Radio size={19} strokeWidth={2.1} />
                 </div>
                 <div>
-                  <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block leading-none mb-1">Loop 2</span>
-                  <h3 className="font-display text-xl font-bold text-slate-900 leading-tight">Live Performance</h3>
+                  <span className="text-[10px] font-bold text-teal-500/90 uppercase tracking-[0.14em] block leading-none mb-1.5">Loop 2 &middot; Delivery</span>
+                  <h3 className="font-display text-[19px] font-bold !text-slate-900 leading-tight">Live Performance</h3>
                 </div>
               </div>
-              <div className="space-y-4">
+              <div className="flex flex-col gap-5">
                 {[
-                  { step: '01', title: 'Copilot activates invisibly', desc: 'The click-through overlay launches over Zoom, Teams, or Meet.' },
-                  { step: '02', title: 'AI detects the interview topic', desc: 'Natural language processing matches the question context in real-time.' },
-                  { step: '03', title: 'Your stories surface automatically', desc: 'The HUD shows your own personalized answers — not generic AI text.' },
-                ].map(({ step, title, desc }) => (
-                  <div key={step} className="flex gap-3.5 group/item">
-                    <span className="text-[11px] font-black text-emerald-500 bg-emerald-50/60 w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-colors group-hover/item:bg-emerald-100">{step}</span>
-                    <div>
-                      <p className="text-sm font-bold text-slate-800 transition-colors group-hover/item:text-emerald-600">{title}</p>
-                      <p className="text-xs text-slate-500 leading-relaxed mt-0.5">{desc}</p>
+                  { title: 'Copilot activates invisibly', desc: 'The click-through overlay launches over Zoom, Teams, or Meet.' },
+                  { title: 'AI detects the interview topic', desc: 'Natural language processing matches the question context in real-time.' },
+                  { title: 'Your stories surface automatically', desc: 'The HUD shows your own personalized answers — not generic AI text.' },
+                ].map(({ title, desc }, idx) => (
+                  <div key={title} className="flex gap-3.5">
+                    <div className="flex flex-col items-center pt-0.5">
+                      <span className="h-[7px] w-[7px] rounded-full bg-teal-500/70 shrink-0" />
+                      {idx < 2 && <span className="w-px flex-1 bg-slate-100 mt-1.5" />}
+                    </div>
+                    <div className="pb-1">
+                      <p className="text-[13.5px] font-semibold !text-slate-900 leading-snug">{title}</p>
+                      <p className="text-[12.5px] text-slate-500 leading-relaxed mt-1">{desc}</p>
                     </div>
                   </div>
                 ))}
@@ -4347,13 +4718,16 @@ function Landing({
           </div>
 
           {/* Center connector */}
-          <div className="flex items-center justify-center mt-12 gap-3 max-w-md mx-auto">
-            <div className="h-px bg-slate-200 flex-1 animate-pulse" />
-            <div className="flex items-center gap-2 rounded-full border border-blue-150 bg-blue-50 px-4 py-2 shadow-sm">
-              <ArrowRight size={12} className="text-blue-600 animate-bounceHorizontal" />
-              <span className="text-xs font-bold text-blue-600">Continuous Sync Loop Active</span>
+          <div className="flex items-center justify-center mt-14 gap-4 max-w-md mx-auto">
+            <div className="h-px bg-gradient-to-r from-transparent to-slate-200 flex-1" />
+            <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-500" />
+              </span>
+              <span className="text-[11.5px] font-semibold text-slate-600 tracking-wide">Continuous sync loop active</span>
             </div>
-            <div className="h-px bg-slate-200 flex-1 animate-pulse" />
+            <div className="h-px bg-gradient-to-l from-transparent to-slate-200 flex-1" />
           </div>
         </motion.section>
 
@@ -4367,10 +4741,10 @@ function Landing({
           className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 mt-12 text-center"
         >
           <div className="max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center rounded-full bg-blue-50 px-3.5 py-1 text-xs font-semibold text-blue-600 mb-4">
+            <span className="inline-flex items-center rounded-full bg-teal-50 px-3.5 py-1 text-xs font-semibold text-teal-600 mb-4">
               Candidate Success Stories
             </span>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold !text-slate-900 tracking-tight">
               Loved by Engineers. Trusted Globally.
             </h2>
             <p className="mt-4 text-slate-600 text-base sm:text-lg font-medium max-w-xl mx-auto leading-relaxed">
@@ -4387,18 +4761,18 @@ function Landing({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:shadow-xl hover:border-blue-200 transition-all duration-300 flex flex-col justify-between"
+                className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:shadow-xl hover:border-teal-200 transition-all duration-300 flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <img src={r.avatar} alt={r.name} className="h-10 w-10 rounded-full object-cover border border-slate-100 shadow-sm" />
                       <div>
-                        <h4 className="font-display text-sm font-bold text-slate-900 leading-tight">{r.name}</h4>
+                        <h4 className="font-display text-sm font-bold !text-slate-900 leading-tight">{r.name}</h4>
                         <span className="text-[10px] font-semibold text-slate-500">{r.role} at {r.company}</span>
                       </div>
                     </div>
-                    <span className="text-xs bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-emerald-600 font-bold shrink-0">Verified</span>
+                    <span className="text-xs bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-teal-600 font-bold shrink-0">Verified</span>
                   </div>
 
                   <div className="flex text-yellow-400 text-xs mb-3">
@@ -4433,7 +4807,7 @@ function Landing({
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-teal-200 bg-teal-50 px-4 py-1.5 text-xs font-bold text-teal-700 mb-5 tracking-wider uppercase">
                   <Zap size={11} /> Simple, Transparent Pricing
                 </span>
-                <h2 className="font-display text-4xl sm:text-5xl lg:text-[56px] font-black text-slate-900 tracking-tight leading-tight mb-4">
+                <h2 className="font-display text-4xl sm:text-5xl lg:text-[56px] font-black !text-slate-900 tracking-tight leading-tight mb-4">
                   Choose Your Plan
                 </h2>
                 <p className="text-slate-500 text-base sm:text-lg font-medium max-w-xl mx-auto leading-relaxed">
@@ -4589,7 +4963,7 @@ function Landing({
                       <div className="p-7 flex flex-col flex-1">
                         {/* Header */}
                         <div className="mb-5">
-                          <h3 className="font-display text-xl font-black text-slate-900 mb-1">{plan.name}</h3>
+                          <h3 className="font-display text-xl font-black !text-slate-900 mb-1">{plan.name}</h3>
                           <p className="text-slate-400 text-xs font-medium">{plan.desc}</p>
                         </div>
 
@@ -4605,7 +4979,7 @@ function Landing({
                         {/* Price */}
                         <div className="mb-5">
                           <div className="flex items-baseline gap-1">
-                            <span className="text-4xl font-black text-slate-900">{plan.price}</span>
+                            <span className="text-4xl font-black !text-slate-900">{plan.price}</span>
                             <span className="text-slate-400 text-sm font-medium">
                               {plan.unit}
                             </span>
@@ -4618,11 +4992,11 @@ function Landing({
                         <ul className="space-y-3 flex-1 mb-7">
                           {plan.features.map((f) => (
                             <li key={f} className="flex items-start gap-2.5 text-sm text-slate-600 font-medium text-left">
-                              <div className="mt-0.5 h-4 w-4 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
-                                <Check size={9} className="text-emerald-600" />
+                              <div className="mt-0.5 h-4 w-4 rounded-full bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0">
+                                <Check size={9} className="text-teal-600" />
                               </div>
                               {f.includes('Unlimited') ? (
-                                <span className="font-bold text-slate-800">{f}</span>
+                                <span className="font-bold !text-slate-900">{f}</span>
                               ) : f}
                             </li>
                           ))}
@@ -4664,7 +5038,7 @@ function Landing({
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 border border-teal-200 px-3 py-1 text-xs font-black text-teal-700 mb-5 tracking-wider uppercase">
                     <Zap size={10} /> Sessions & Subscriptions
                   </span>
-                  <h3 className="font-display text-2xl sm:text-3xl font-black text-slate-900 mb-3">
+                  <h3 className="font-display text-2xl sm:text-3xl font-black !text-slate-900 mb-3">
                     Flexible options for<br />every interview prep
                   </h3>
                   <p className="text-slate-500 text-sm leading-relaxed font-medium max-w-md">
@@ -4674,15 +5048,15 @@ function Landing({
                 <div className="grid grid-cols-2 gap-3 shrink-0">
                   {[
                     { icon: Mic, label: '1 Live Mock Session', cost: 'Consumes 1 Credit', color: 'text-teal-600', bg: 'bg-teal-50 border-teal-200' },
-                    { icon: Brain, label: 'Real-time AI Feedback', cost: 'Included in all plans', color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
-                    { icon: FileText, label: 'Resume Analyzer', cost: 'Included in all plans', color: 'text-violet-600', bg: 'bg-violet-50 border-violet-200' },
+                    { icon: Brain, label: 'Real-time AI Feedback', cost: 'Included in all plans', color: 'text-teal-600', bg: 'bg-teal-50 border-teal-200' },
+                    { icon: FileText, label: 'Resume Analyzer', cost: 'Included in all plans', color: 'text-teal-600', bg: 'bg-teal-50 border-teal-200' },
                     { icon: Sparkles, label: 'Unlimited Practice', cost: 'With any Subscription', color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' },
                   ].map(({ icon: Icon, label, cost, color, bg }) => (
                     <div key={label} className={`flex flex-col gap-2 rounded-2xl border p-4 min-w-[140px] ${bg}`}>
                       <div className="h-8 w-8 rounded-xl bg-white/70 flex items-center justify-center border border-current/10">
                         <Icon size={15} className={color} />
                       </div>
-                      <span className="text-xs font-bold text-slate-800">{label}</span>
+                      <span className="text-xs font-bold !text-slate-900">{label}</span>
                       <span className="text-[10px] font-semibold text-slate-400">{cost}</span>
                     </div>
                   ))}
@@ -4698,7 +5072,7 @@ function Landing({
               transition={{ duration: 0.5, delay: 0.1 }}
               className="mt-16"
             >
-              <h3 className="font-display text-2xl font-black text-slate-900 text-center mb-8">Full Feature Comparison</h3>
+              <h3 className="font-display text-2xl font-black !text-slate-900 text-center mb-8">Full Feature Comparison</h3>
               <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
                 <table className="w-full text-sm">
                   <thead>
@@ -4733,8 +5107,8 @@ function Landing({
                             <td key={j} className="py-4 px-6 text-center">
                               {isBool ? (
                                 boolVal ? (
-                                  <div className="inline-flex items-center justify-center h-5 w-5 rounded-full mx-auto bg-emerald-50 border border-emerald-200">
-                                    <Check size={11} className="text-emerald-600" />
+                                  <div className="inline-flex items-center justify-center h-5 w-5 rounded-full mx-auto bg-teal-50 border border-teal-200">
+                                    <Check size={11} className="text-teal-600" />
                                   </div>
                                 ) : (
                                   <div className="inline-flex items-center justify-center h-5 w-5 rounded-full mx-auto bg-slate-50 border border-slate-200">
@@ -4762,7 +5136,7 @@ function Landing({
               transition={{ duration: 0.5, delay: 0.1 }}
               className="mt-20 max-w-3xl mx-auto"
             >
-              <h3 className="font-display text-2xl font-black text-slate-900 text-center mb-10">Frequently Asked Questions</h3>
+              <h3 className="font-display text-2xl font-black !text-slate-900 text-center mb-10">Frequently Asked Questions</h3>
               <div className="space-y-2">
                 {[
                   { q: 'How do session credits work?', a: 'Session credits allow you to pay-as-you-go. One credit is used to conduct one full-length live mock interview. Your feedback, transcripts, and history are kept for 90 days. Unused credits never expire.' },
@@ -4782,7 +5156,7 @@ function Landing({
                     onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   >
                     <div className="flex items-center justify-between px-6 py-4 gap-4">
-                      <span className="font-bold text-sm text-slate-800">{faq.q}</span>
+                      <span className="font-bold text-sm !text-slate-900">{faq.q}</span>
                       <motion.div animate={{ rotate: openFaq === i ? 45 : 0 }} transition={{ duration: 0.2 }} className="shrink-0">
                         <div className="h-6 w-6 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center">
                           <span className="text-slate-500 text-sm font-bold leading-none">+</span>
@@ -4815,12 +5189,12 @@ function Landing({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="mt-20 relative rounded-3xl overflow-hidden border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-emerald-50 p-10 md:p-14 text-center shadow-[0_8px_40px_rgba(13,148,136,0.08)]"
+              className="mt-20 relative rounded-3xl overflow-hidden border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-teal-50 p-10 md:p-14 text-center shadow-[0_8px_40px_rgba(13,148,136,0.08)]"
             >
               {/* Ambient glow */}
               <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[400px] h-[200px] rounded-full blur-3xl pointer-events-none" style={{ background: 'rgba(13,148,136,0.08)' }} />
               <div className="relative">
-                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 mb-4 leading-tight">
+                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black !text-slate-900 mb-4 leading-tight">
                   Ready to ace your<br />
                   <span style={{ background: 'linear-gradient(135deg, #0d9488, #059669)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                     next interview?
@@ -4856,10 +5230,10 @@ function Landing({
           {/* Brand info */}
           <div className="space-y-4 md:col-span-2">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-orange-600 shadow-sm">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-teal-600 shadow-sm">
                 <SutraLogo size={14} className="text-white" />
               </div>
-              <span className="font-display font-bold text-sm text-slate-900">Sutra AI</span>
+              <span className="font-display font-bold text-sm !text-slate-900">Sutra AI</span>
             </div>
             <p className="leading-relaxed text-slate-500 font-medium max-w-xs">
               The AI Operating System for Interviews.
@@ -4868,34 +5242,34 @@ function Landing({
 
           {/* Links 1 */}
           <div>
-            <h4 className="font-bold text-slate-800 uppercase tracking-widest text-[10px] mb-4">Product</h4>
+            <h4 className="font-bold !text-slate-900 uppercase tracking-widest text-[10px] mb-4">Product</h4>
             <ul className="space-y-3 font-semibold">
-              <li><a href="#simulator" className="hover:text-blue-600 transition-colors">Live Interview</a></li>
-              <li><a href="#features" className="hover:text-blue-600 transition-colors">Mock Interview</a></li>
-              <li><a href="#features" className="hover:text-blue-600 transition-colors">Resumes</a></li>
-              <li><a href="#features" className="hover:text-blue-600 transition-colors">Knowledge Base</a></li>
+              <li><a href="#simulator" className="hover:text-teal-600 transition-colors">Live Interview</a></li>
+              <li><a href="#features" className="hover:text-teal-600 transition-colors">Mock Interview</a></li>
+              <li><a href="#features" className="hover:text-teal-600 transition-colors">Resumes</a></li>
+              <li><a href="#features" className="hover:text-teal-600 transition-colors">Knowledge Base</a></li>
             </ul>
           </div>
 
           {/* Links 2 */}
           <div>
-            <h4 className="font-bold text-slate-800 uppercase tracking-widest text-[10px] mb-4">Resources</h4>
+            <h4 className="font-bold !text-slate-900 uppercase tracking-widest text-[10px] mb-4">Resources</h4>
             <ul className="space-y-3 font-semibold">
-              <li><a href="#" className="hover:text-blue-600 transition-colors">Blog</a></li>
-              <li><a href="#" className="hover:text-blue-600 transition-colors">Guides</a></li>
-              <li><a href="#" className="hover:text-blue-600 transition-colors">Help Center</a></li>
-              <li><a href="#" className="hover:text-blue-600 transition-colors">Changelog</a></li>
+              <li><a href="#" className="hover:text-teal-600 transition-colors">Blog</a></li>
+              <li><a href="#" className="hover:text-teal-600 transition-colors">Guides</a></li>
+              <li><a href="#" className="hover:text-teal-600 transition-colors">Help Center</a></li>
+              <li><a href="#" className="hover:text-teal-600 transition-colors">Changelog</a></li>
             </ul>
           </div>
 
           {/* Links 3 */}
           <div>
-            <h4 className="font-bold text-slate-800 uppercase tracking-widest text-[10px] mb-4">Company</h4>
+            <h4 className="font-bold !text-slate-900 uppercase tracking-widest text-[10px] mb-4">Company</h4>
             <ul className="space-y-3 font-semibold">
-              <li><a href="#" className="hover:text-blue-600 transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-blue-600 transition-colors">Careers</a></li>
-              <li><a href="#" className="hover:text-blue-600 transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-blue-600 transition-colors">Terms of Service</a></li>
+              <li><a href="#" className="hover:text-teal-600 transition-colors">About Us</a></li>
+              <li><a href="#" className="hover:text-teal-600 transition-colors">Careers</a></li>
+              <li><a href="#" className="hover:text-teal-600 transition-colors">Privacy Policy</a></li>
+              <li><a href="#" className="hover:text-teal-600 transition-colors">Terms of Service</a></li>
             </ul>
           </div>
 
@@ -4937,11 +5311,11 @@ function Sidebar({ active, onNavigate, onLogout, showHelpChatbot }: { active: st
           onClick={() => onNavigate('Dashboard')}
           className="flex items-center gap-3 px-2 hover:opacity-80 transition-all cursor-pointer select-none"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 shadow-[0_4px_12px_rgba(245,158,11,0.3)]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600 shadow-[0_4px_12px_rgba(245,158,11,0.3)]">
             <SutraLogo size={22} className="text-white" />
           </div>
           <div>
-            <div className="text-base font-bold text-slate-900 leading-tight">Sutra <span className="text-orange-500">AI</span></div>
+            <div className="text-base font-bold !text-slate-900 leading-tight">Sutra <span className="text-teal-500">AI</span></div>
             <div className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Interview OS</div>
           </div>
         </div>
@@ -4955,8 +5329,8 @@ function Sidebar({ active, onNavigate, onLogout, showHelpChatbot }: { active: st
                 key={item.label}
                 onClick={() => onNavigate(item.label)}
                 className={`flex w-full items-center gap-3.5 rounded-xl px-3.5 py-3 text-sm font-semibold transition-all cursor-pointer border ${selected
-                  ? 'bg-blue-50 text-blue-600 border-blue-100/50 shadow-sm'
-                  : 'text-slate-600 border-transparent hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-teal-50 text-teal-600 border-teal-100/50 shadow-sm'
+                  : 'text-slate-600 border-transparent hover:bg-slate-50 hover:!text-slate-900'
                   }`}
               >
                 <Icon size={18} className="shrink-0" />
@@ -4970,7 +5344,7 @@ function Sidebar({ active, onNavigate, onLogout, showHelpChatbot }: { active: st
       <div className="border-t border-slate-100 pt-4 w-full relative">
         <div
           onClick={() => setShowProfileMenu(!showProfileMenu)}
-          className="flex items-center gap-3 px-2 py-2.5 w-full cursor-pointer rounded-xl transition-all hover:bg-slate-50 text-slate-500 hover:text-slate-900"
+          className="flex items-center gap-3 px-2 py-2.5 w-full cursor-pointer rounded-xl transition-all hover:bg-slate-50 text-slate-500 hover:!text-slate-900"
         >
           {keys.userPhoto ? (
             <img src={keys.userPhoto} alt="Avatar" className="h-10 w-10 shrink-0 rounded-xl border border-slate-200" />
@@ -4980,7 +5354,7 @@ function Sidebar({ active, onNavigate, onLogout, showHelpChatbot }: { active: st
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-bold text-slate-800 truncate">{keys.userName || 'Interview Candidate'}</div>
+            <div className="text-sm font-bold !text-slate-900 truncate">{keys.userName || 'Interview Candidate'}</div>
             <div className="text-[10px] text-slate-400 truncate">{keys.userEmail || 'Free Plan'}</div>
           </div>
         </div>
@@ -5023,9 +5397,9 @@ function Topbar({
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-[#f8fafc]/75 px-5 py-4 backdrop-blur-2xl lg:px-8 relative z-10">
       <div className="flex items-center justify-between gap-4">
-        <div className="hidden min-w-0 flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-slate-100/50 px-4 py-2.5 text-slate-500 md:flex focus-within:border-blue-500/40 transition-all">
+        <div className="hidden min-w-0 flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-slate-100/50 px-4 py-2.5 text-slate-500 md:flex focus-within:border-teal-500/40 transition-all">
           <Search size={18} className="text-slate-400" />
-          <input className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400 text-slate-800 font-medium" placeholder="Search sessions, resumes, knowledge base, prompts..." />
+          <input className="w-full bg-transparent text-sm outline-none placeholder:!text-slate-400 !text-slate-900 font-medium" placeholder="Search sessions, resumes, knowledge base, prompts..." />
         </div>
         <div className="ml-auto flex items-center gap-3">
           {isSessionActive ? (
@@ -5127,30 +5501,30 @@ function Dashboard({
       title: 'Live Session',
       desc: 'Start a live session — realtime AI answers with transcript and mic capture',
       icon: Mic,
-      color: 'from-violet-500/20 to-violet-600/5 border-violet-500/25 hover:border-violet-400/50',
-      iconColor: 'bg-violet-500/20 text-violet-200',
+      color: 'from-teal-500/20 to-teal-600/5 border-teal-500/25 hover:border-teal-400/50',
+      iconColor: 'bg-teal-500/20 text-teal-200',
       badge: 'Core Feature',
-      badgeClass: 'bg-violet-500/20 text-violet-300',
+      badgeClass: 'bg-teal-500/20 text-teal-300',
       action: onStart,
     },
     {
       title: 'Resume Intelligence',
       desc: 'Upload and activate your resume so the AI answers are fully personalized to your background',
       icon: FileText,
-      color: 'from-emerald-500/20 to-emerald-600/5 border-emerald-500/25 hover:border-emerald-400/50',
-      iconColor: 'bg-emerald-500/20 text-emerald-200',
+      color: 'from-teal-500/20 to-teal-600/5 border-teal-500/25 hover:border-teal-400/50',
+      iconColor: 'bg-teal-500/20 text-teal-200',
       badge: activeResumeName ? '✓ Active' : 'Setup needed',
-      badgeClass: activeResumeName ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300',
+      badgeClass: activeResumeName ? 'bg-teal-500/20 text-teal-300' : 'bg-amber-500/20 text-amber-300',
       action: () => onNavigate('Resume Intelligence'),
     },
     {
       title: 'Knowledge Base',
       desc: 'Add reference docs, build prompt templates, and write AI notes to inject context into every session',
       icon: Brain,
-      color: 'from-indigo-500/20 to-indigo-600/5 border-indigo-500/25 hover:border-indigo-400/50',
-      iconColor: 'bg-indigo-500/20 text-indigo-200',
+      color: 'from-teal-500/20 to-teal-600/5 border-teal-500/25 hover:border-teal-400/50',
+      iconColor: 'bg-teal-500/20 text-teal-200',
       badge: activeDocsCount > 0 ? `${activeDocsCount} docs active` : 'No docs yet',
-      badgeClass: activeDocsCount > 0 ? 'bg-indigo-500/20 text-indigo-300' : 'bg-amber-500/20 text-amber-300',
+      badgeClass: activeDocsCount > 0 ? 'bg-teal-500/20 text-teal-300' : 'bg-amber-500/20 text-amber-300',
       action: () => onNavigate('Knowledge'),
     },
     {
@@ -5193,13 +5567,13 @@ function Dashboard({
           
           {/* Card A: Readiness & Target Info */}
           <div className="glass rounded-2xl border border-white/5 p-6 relative overflow-hidden">
-            <div className="pointer-events-none absolute -top-24 -right-24 h-56 w-56 rounded-full bg-violet-600/10 blur-[90px]" />
+            <div className="pointer-events-none absolute -top-24 -right-24 h-56 w-56 rounded-full bg-teal-600/10 blur-[90px]" />
             <div className="pointer-events-none absolute -bottom-16 -left-16 h-40 w-40 rounded-full bg-cyan-500/10 blur-[80px]" />
             
             <div className="relative flex flex-wrap md:flex-nowrap gap-6 items-center justify-between">
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-2">
-                  <Badge tone="emerald"><span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />Readiness {readinessScore}%</span></Badge>
+                  <Badge tone="teal"><span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-teal-400 animate-pulse" />Readiness {readinessScore}%</span></Badge>
                   <Badge tone="sky">{config.type} · {config.company || 'No target'}</Badge>
                 </div>
                 <div>
@@ -5214,8 +5588,8 @@ function Dashboard({
                   {dynamicContextItems.map((it) => {
                     const Icon = it.icon;
                     return (
-                      <div key={it.title} onClick={it.action} className="flex items-center gap-3 bg-white/[0.02] border border-white/5 rounded-xl p-3 hover:border-violet-500/20 hover:bg-violet-500/5 transition-all cursor-pointer">
-                        <div className={`rounded-lg p-1.5 ${it.ok ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/10' : 'bg-slate-900 text-slate-600 border border-transparent'}`}><Icon size={14} /></div>
+                      <div key={it.title} onClick={it.action} className="flex items-center gap-3 bg-white/[0.02] border border-white/5 rounded-xl p-3 hover:border-teal-500/20 hover:bg-teal-500/5 transition-all cursor-pointer">
+                        <div className={`rounded-lg p-1.5 ${it.ok ? 'bg-teal-500/10 text-teal-400 border border-teal-500/10' : 'bg-slate-900 text-slate-600 border border-transparent'}`}><Icon size={14} /></div>
                         <div className="min-w-0">
                           <div className="text-xs font-bold text-white leading-tight truncate">{it.title}</div>
                           <div className="text-[10px] text-slate-500 font-semibold truncate leading-normal">{it.status}</div>
@@ -5231,13 +5605,13 @@ function Dashboard({
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Readiness</div>
                 <div className="relative flex items-center justify-center h-16 w-16 mb-2">
                   <svg className="absolute inset-0 h-full w-full transform -rotate-90">
-                    <circle cx="32" cy="32" r="28" className="text-slate-800" strokeWidth="4" stroke="currentColor" fill="transparent" />
-                    <circle cx="32" cy="32" r="28" className="text-violet-500 transition-all duration-700" strokeWidth="4" strokeDasharray="175" strokeDashoffset={175 - (175 * readinessScore) / 100} strokeLinecap="round" stroke="currentColor" fill="transparent" />
+                    <circle cx="32" cy="32" r="28" className="!text-slate-900" strokeWidth="4" stroke="currentColor" fill="transparent" />
+                    <circle cx="32" cy="32" r="28" className="text-teal-500 transition-all duration-700" strokeWidth="4" strokeDasharray="175" strokeDashoffset={175 - (175 * readinessScore) / 100} strokeLinecap="round" stroke="currentColor" fill="transparent" />
                   </svg>
                   <span className="text-sm font-extrabold text-white">{readinessScore}%</span>
                 </div>
                 <div className="h-1.5 rounded-full bg-slate-900 overflow-hidden w-20">
-                  <div className="h-full bg-gradient-to-r from-violet-500 via-cyan-400 to-emerald-400 transition-all duration-700" style={{ width: `${readinessScore}%` }} />
+                  <div className="h-full bg-teal-500 transition-all duration-700" style={{ width: `${readinessScore}%` }} />
                 </div>
               </div>
             </div>
@@ -5256,13 +5630,13 @@ function Dashboard({
             {sessionsList.length > 0 ? (
               <div className="space-y-2.5">
                 {sessionsList.slice(0, 3).map((s) => (
-                  <div key={s.id} onClick={() => openDetail(s)} className="flex items-center justify-between rounded-xl bg-white/[0.02] border border-white/5 hover:border-violet-500/20 hover:bg-violet-500/5 px-4 py-3.5 transition-all cursor-pointer group">
+                  <div key={s.id} onClick={() => openDetail(s)} className="flex items-center justify-between rounded-xl bg-white/[0.02] border border-white/5 hover:border-teal-500/20 hover:bg-teal-500/5 px-4 py-3.5 transition-all cursor-pointer group">
                     <div className="flex items-center gap-3.5">
                       <div className="h-8 w-8 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center text-slate-400 group-hover:text-white transition-colors">
                         <PlayCircle size={16} />
                       </div>
                       <div className="text-left">
-                        <div className="text-xs font-bold text-white leading-tight group-hover:text-violet-400 transition-colors">{s.title}</div>
+                        <div className="text-xs font-bold text-white leading-tight group-hover:text-teal-400 transition-colors">{s.title}</div>
                         <div className="text-[10px] text-slate-500 font-semibold mt-0.5 leading-none">{s.description} · {s.createdAt}</div>
                       </div>
                     </div>
@@ -5273,7 +5647,7 @@ function Dashboard({
                   </div>
                 ))}
                 {sessionsList.length > 3 && (
-                  <button onClick={() => onNavigate('Recent Sessions')} className="w-full text-center py-2 text-xs font-bold text-violet-400 hover:text-violet-300 transition-colors flex items-center justify-center gap-1 cursor-pointer">
+                  <button onClick={() => onNavigate('Recent Sessions')} className="w-full text-center py-2 text-xs font-bold text-teal-400 hover:text-teal-300 transition-colors flex items-center justify-center gap-1 cursor-pointer">
                     View all session reports <ArrowRight size={12} />
                   </button>
                 )}
@@ -5285,7 +5659,7 @@ function Dashboard({
                 <p className="text-[10px] text-slate-600 font-medium mt-1 text-center max-w-xs leading-normal">
                   Transcripts and AI scoring metrics will appear here once you run a session prep simulation.
                 </p>
-                <button onClick={onStart} className="mt-4 rounded-lg bg-violet-600/10 border border-violet-500/20 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-violet-300 hover:bg-violet-600/20 transition-all cursor-pointer">
+                <button onClick={onStart} className="mt-4 rounded-lg bg-teal-600/10 border border-teal-500/20 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-teal-300 hover:bg-teal-600/20 transition-all cursor-pointer">
                   Launch Live Assist
                 </button>
               </div>
@@ -5301,18 +5675,18 @@ function Dashboard({
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Navigation Launcher</h3>
             <div className="space-y-2">
               {[
-                { title: 'Live Assist Console', desc: 'Realtime speech to answer logic', icon: Mic, tone: 'violet', screen: 'Live Session' as Screen, trigger: onStart },
-                { title: 'Mock Voice Simulator', desc: 'Pre-defined question trials', icon: UserRound, tone: 'emerald', screen: 'Mock Interview' as Screen },
+                { title: 'Live Assist Console', desc: 'Realtime speech to answer logic', icon: Mic, tone: 'teal', screen: 'Live Session' as Screen, trigger: onStart },
+                { title: 'Mock Voice Simulator', desc: 'Pre-defined question trials', icon: UserRound, tone: 'teal', screen: 'Mock Interview' as Screen },
                 { title: 'Resume Personalizer', desc: 'Custom role matching indexing', icon: FileText, tone: 'sky', screen: 'Resume Intelligence' as Screen },
-                { title: 'Knowledge Base API', desc: 'Import custom prompts & docs', icon: Brain, tone: 'indigo', screen: 'Knowledge' as Screen },
+                { title: 'Knowledge Base API', desc: 'Import custom prompts & docs', icon: Brain, tone: 'teal', screen: 'Knowledge' as Screen },
                 { title: 'Recent Transcripts', desc: 'Logs, summaries, & review notes', icon: PlayCircle, tone: 'amber', screen: 'Recent Sessions' as Screen },
               ].map((launch) => {
                 const Icon = launch.icon;
                 const colors: Record<string, string> = {
-                  violet: 'bg-violet-500/10 text-violet-400 border-violet-500/10 group-hover:bg-violet-500/20 group-hover:text-violet-300',
-                  emerald: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/10 group-hover:bg-emerald-500/20 group-hover:text-emerald-300',
+                  teal: 'bg-teal-500/10 text-teal-400 border-teal-500/10 group-hover:bg-teal-500/20 group-hover:text-teal-300',
+                  teal: 'bg-teal-500/10 text-teal-400 border-teal-500/10 group-hover:bg-teal-500/20 group-hover:text-teal-300',
                   sky: 'bg-sky-500/10 text-sky-400 border-sky-500/10 group-hover:bg-sky-500/20 group-hover:text-sky-300',
-                  indigo: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/10 group-hover:bg-indigo-500/20 group-hover:text-indigo-300',
+                  teal: 'bg-teal-500/10 text-teal-400 border-teal-500/10 group-hover:bg-teal-500/20 group-hover:text-teal-300',
                   amber: 'bg-amber-500/10 text-amber-400 border-amber-500/10 group-hover:bg-amber-500/20 group-hover:text-amber-300'
                 };
                 
@@ -5331,7 +5705,7 @@ function Dashboard({
                     <div className="flex items-center gap-3">
                       <div className={`rounded-lg p-2 border transition-all ${colors[launch.tone]}`}><Icon size={14} /></div>
                       <div className="text-left">
-                        <div className="text-xs font-bold text-white group-hover:text-violet-400 transition-colors leading-tight">{launch.title}</div>
+                        <div className="text-xs font-bold text-white group-hover:text-teal-400 transition-colors leading-tight">{launch.title}</div>
                         <div className="text-[9px] text-slate-500 font-semibold mt-0.5 leading-none">{launch.desc}</div>
                       </div>
                     </div>
@@ -5360,7 +5734,7 @@ function Dashboard({
               </div>
               <div className="bg-white/[0.01] border border-white/5 p-3 rounded-xl col-span-1">
                 <div className="text-[9px] font-bold text-slate-500 uppercase leading-none">Readiness</div>
-                <div className="text-sm font-extrabold text-emerald-400 mt-1 leading-none">{readinessScore}%</div>
+                <div className="text-sm font-extrabold text-teal-400 mt-1 leading-none">{readinessScore}%</div>
               </div>
             </div>
           </div>
@@ -5401,17 +5775,17 @@ function AppChoiceModal({ open, onClose, onContinueWeb }: { open: boolean; onClo
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-6 top-6 rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-all"
+          className="absolute right-6 top-6 rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:!text-slate-900 transition-all"
         >
           <X size={20} />
         </button>
 
         {/* Modal Title */}
         <div className="text-center mb-8">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-md shadow-blue-500/20 mb-4">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-600 text-white shadow-md shadow-teal-500/20 mb-4">
             <MonitorPlay size={28} />
           </div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">Choose Your Experience</h2>
+          <h2 className="text-2xl font-black !text-slate-900 tracking-tight">Choose Your Experience</h2>
           <p className="mt-2 text-sm text-slate-500">Select how you want to run your interview assist session</p>
         </div>
 
@@ -5421,16 +5795,16 @@ function AppChoiceModal({ open, onClose, onContinueWeb }: { open: boolean; onClo
           {/* Card 1: Desktop App */}
           <div 
             onClick={handleOpenDesktop}
-            className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-blue-200 bg-blue-50/50 hover:bg-blue-50/80 p-6 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer hover:shadow-lg"
+            className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-teal-200 bg-teal-50/50 hover:bg-teal-50/80 p-6 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer hover:shadow-lg"
           >
-            <div className="absolute top-4 right-4 rounded-full bg-blue-600 text-white text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wider">
+            <div className="absolute top-4 right-4 rounded-full bg-teal-600 text-white text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wider">
               Recommended
             </div>
             <div>
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 group-hover:scale-110 transition-transform">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-100 text-teal-600 group-hover:scale-110 transition-transform">
                 <Laptop size={24} />
               </div>
-              <h3 className="text-lg font-black text-slate-900">Desktop Application</h3>
+              <h3 className="text-lg font-black !text-slate-900">Desktop Application</h3>
               <p className="mt-2 text-xs text-slate-500 leading-5">
                 Captures system audio, tab sound, and microphone feeds directly from your desktop. Bypasses all browser security constraints.
               </p>
@@ -5438,7 +5812,7 @@ function AppChoiceModal({ open, onClose, onContinueWeb }: { open: boolean; onClo
             <div className="mt-6">
               <button 
                 onClick={(e) => { e.stopPropagation(); handleOpenDesktop(); }}
-                className="w-full rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-3 px-4 shadow-md transition-all flex items-center justify-center gap-1.5"
+                className="w-full rounded-2xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold py-3 px-4 shadow-md transition-all flex items-center justify-center gap-1.5"
               >
                 <span>Open in Desktop</span>
                 <ArrowRight size={14} />
@@ -5455,7 +5829,7 @@ function AppChoiceModal({ open, onClose, onContinueWeb }: { open: boolean; onClo
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 group-hover:scale-110 transition-transform">
                 <Globe size={24} />
               </div>
-              <h3 className="text-lg font-black text-slate-900">Continue in Web</h3>
+              <h3 className="text-lg font-black !text-slate-900">Continue in Web</h3>
               <p className="mt-2 text-xs text-slate-500 leading-5">
                 Run the interview helper right here in this browser tab. Relies on manual browser screen/tab sharing controls.
               </p>
@@ -5818,10 +6192,10 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
           <div>
-            <h2 className="text-base font-black text-slate-900">Start Live Session</h2>
+            <h2 className="text-base font-black !text-slate-900">Start Live Session</h2>
             <p className="text-[11px] text-slate-500 font-semibold">Configure your session, context, and options.</p>
           </div>
-          <button onClick={onClose} className="rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all"><X size={18} /></button>
+          <button onClick={onClose} className="rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:!text-slate-900 transition-all"><X size={18} /></button>
         </div>
 
         {/* Step Indicator */}
@@ -5833,17 +6207,17 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
               return (
                 <React.Fragment key={s}>
                   <div className="flex items-center gap-2">
-                    <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-black transition-all duration-300 ${active ? 'bg-violet-600 text-white ring-4 ring-violet-500/20' :
-                      completed ? 'bg-emerald-500 text-white' : 'bg-white/5 text-slate-500 border border-white/10'
+                    <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-black transition-all duration-300 ${active ? 'bg-teal-600 text-white ring-4 ring-teal-500/20' :
+                      completed ? 'bg-teal-500 text-white' : 'bg-white/5 text-slate-500 border border-white/10'
                       }`}>
                       {completed ? '✓' : s}
                     </div>
-                    <span className={`text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${active ? 'text-violet-400' : completed ? 'text-emerald-400' : 'text-slate-600'
+                    <span className={`text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${active ? 'text-teal-400' : completed ? 'text-teal-400' : 'text-slate-600'
                       }`}>
                       {s === 1 ? 'Job Details' : s === 2 ? 'Context' : 'AI Options'}
                     </span>
                   </div>
-                  {s < 3 && <div className={`h-0.5 flex-1 rounded-full transition-all duration-300 ${step > s ? 'bg-emerald-500' : 'bg-white/5'}`} />}
+                  {s < 3 && <div className={`h-0.5 flex-1 rounded-full transition-all duration-300 ${step > s ? 'bg-teal-500' : 'bg-white/5'}`} />}
                 </React.Fragment>
               );
             })}
@@ -5865,7 +6239,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                         key={s.label}
                         type="button"
                         onClick={() => setC({ ...c, type: s.label as SessionType })}
-                        className={`flex flex-col items-center gap-1.5 rounded-2xl border p-3 text-center transition-all ${selected ? 'border-violet-500/50 bg-violet-500/15 text-violet-200' : 'border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/20 hover:text-white'
+                        className={`flex flex-col items-center gap-1.5 rounded-2xl border p-3 text-center transition-all ${selected ? 'border-teal-300 bg-teal-50 text-teal-700' : 'border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300 hover:!text-slate-900'
                           }`}
                       >
                         <Icon size={18} />
@@ -5885,7 +6259,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                     value={c.company}
                     onChange={e => setC({ ...c, company: e.target.value })}
                     placeholder="e.g. Amazon, Google..."
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-xs text-white outline-none focus:border-violet-500/60 placeholder:text-slate-600 transition-all"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs !text-slate-900 outline-none focus:border-teal-500 placeholder:!text-slate-400 transition-all shadow-sm"
                   />
                 </div>
                 <div>
@@ -5896,7 +6270,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                     value={c.role}
                     onChange={e => setC({ ...c, role: e.target.value })}
                     placeholder="e.g. Senior SDE, Data Engineer..."
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-xs text-white outline-none focus:border-violet-500/60 placeholder:text-slate-600 transition-all"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs !text-slate-900 outline-none focus:border-teal-500 placeholder:!text-slate-400 transition-all shadow-sm"
                   />
                 </div>
               </div>
@@ -5911,7 +6285,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                   onBlur={() => { if (c.selectedResumeId) scoreResume(c.selectedResumeId, c.jd); }}
                   rows={4}
                   placeholder="Paste the JD to personalize AI answers and score your resume match..."
-                  className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-xs text-white outline-none focus:border-violet-500/60 placeholder:text-slate-600 transition-all"
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs !text-slate-900 outline-none focus:border-teal-500 placeholder:!text-slate-400 transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -5927,9 +6301,9 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
 
                 <div className="grid grid-cols-2 gap-3 items-start">
                   {/* Resume */}
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3.5 space-y-2">
-                    <label className="flex items-center gap-1.5 text-[11px] font-bold text-slate-300">
-                      <FileText size={13} className="text-violet-400" /> Resume
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 space-y-2">
+                    <label className="flex items-center gap-1.5 text-[11px] font-bold text-slate-600">
+                      <FileText size={13} className="text-teal-500" /> Resume
                     </label>
                     <CustomSelect
                       value={c.selectedResumeId}
@@ -5937,25 +6311,26 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                       options={resumeOptions}
                       placeholder="-- Select Resume --"
                       icon={FileText}
+                      theme="light"
                     />
                     {/* Resume JD Score */}
                     {c.selectedResumeId && (
                       <div className="mt-1">
                         {scoringResume ? (
                           <div className="flex items-center gap-2 text-[10px] text-slate-400">
-                            <div className="h-3 w-3 animate-spin rounded-full border border-violet-500 border-t-transparent" />
+                            <div className="h-3 w-3 animate-spin rounded-full border border-teal-500 border-t-transparent" />
                             Scoring resume vs JD...
                           </div>
                         ) : resumeScore !== null ? (
                           <div className="space-y-1">
                             <div className="flex items-center justify-between text-[10px]">
                               <span className="text-slate-400 font-semibold">Resume × JD Match</span>
-                              <span className={`font-black ${resumeScore >= 80 ? 'text-emerald-400' : resumeScore >= 60 ? 'text-amber-400' : 'text-red-400'
+                              <span className={`font-black ${resumeScore >= 80 ? 'text-teal-400' : resumeScore >= 60 ? 'text-amber-400' : 'text-red-400'
                                 }`}>{resumeScore}%</span>
                             </div>
                             <div className="h-1.5 w-full rounded-full bg-slate-800">
                               <div
-                                className={`h-1.5 rounded-full transition-all ${resumeScore >= 80 ? 'bg-emerald-500' : resumeScore >= 60 ? 'bg-amber-500' : 'bg-red-500'
+                                className={`h-1.5 rounded-full transition-all ${resumeScore >= 80 ? 'bg-teal-500' : resumeScore >= 60 ? 'bg-amber-500' : 'bg-red-500'
                                   }`}
                                 style={{ width: `${resumeScore}%` }}
                               />
@@ -5967,7 +6342,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                                   const resume = resumes.find(r => r.id === c.selectedResumeId);
                                   scoreResume(c.selectedResumeId, c.jd, resume?.parsed_content);
                                 }}
-                                className="text-[9px] text-violet-400 hover:text-violet-300 transition-all cursor-pointer mt-1"
+                                className="text-[9px] text-teal-400 hover:text-teal-300 transition-all cursor-pointer mt-1"
                               >
                                 🔄 Recalculate Score
                               </button>
@@ -5984,7 +6359,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                                 const resume = resumes.find(r => r.id === c.selectedResumeId);
                                 scoreResume(c.selectedResumeId, c.jd, resume?.parsed_content);
                               }}
-                              className="text-[9px] text-violet-400 hover:text-violet-300 underline cursor-pointer mt-1 block"
+                              className="text-[9px] text-teal-400 hover:text-teal-300 underline cursor-pointer mt-1 block"
                             >
                               Retry Scoring
                             </button>
@@ -5996,7 +6371,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                               const resume = resumes.find(r => r.id === c.selectedResumeId);
                               scoreResume(c.selectedResumeId, c.jd, resume?.parsed_content);
                             }}
-                            className="text-[10px] text-violet-400 hover:text-violet-300 underline cursor-pointer"
+                            className="text-[10px] text-teal-400 hover:text-teal-300 underline cursor-pointer"
                           >Score resume vs JD</button>
                         )}
                       </div>
@@ -6004,39 +6379,39 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                   </div>
 
                   {/* Add Button & Popover */}
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3.5 space-y-3 flex flex-col justify-center items-center min-h-[96px]">
-                    <label className="text-[11px] font-bold text-slate-400">Additional Context</label>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 space-y-3 flex flex-col justify-center items-center min-h-[96px]">
+                    <label className="text-[11px] font-bold text-slate-500">Additional Context</label>
                     <div className="relative inline-block w-full text-center">
                       <button
                         type="button"
                         onClick={() => setShowAddMenu(!showAddMenu)}
-                        className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-bold text-slate-300 hover:border-violet-500/30 hover:bg-violet-500/5 transition-all select-none cursor-pointer"
+                        className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600 hover:border-teal-300 hover:bg-teal-50 transition-all select-none cursor-pointer"
                       >
-                        <Plus size={14} className="text-violet-400" /> Add Context Source
+                        <Plus size={14} className="text-teal-500" /> Add Context Source
                       </button>
 
                       {showAddMenu && (
-                        <div className="absolute left-1/2 -translate-x-1/2 mt-1.5 z-20 w-48 rounded-xl border border-white/10 bg-slate-900 p-1.5 shadow-xl space-y-0.5 animate-fadeIn">
+                        <div className="absolute left-1/2 -translate-x-1/2 mt-1.5 z-20 w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl space-y-0.5 animate-fadeIn">
                           <button
                             type="button"
                             onClick={() => { setShowAddMenu(false); setOpenDocModal(true); }}
-                            className="w-full flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs font-semibold text-slate-300 hover:bg-white/5 hover:text-white transition-all cursor-pointer"
+                            className="w-full flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
                           >
                             <Brain size={12} className="text-cyan-400" /> Reference Doc
                           </button>
                           <button
                             type="button"
                             onClick={() => { setShowAddMenu(false); setOpenPromptModal(true); }}
-                            className="w-full flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs font-semibold text-slate-300 hover:bg-white/5 hover:text-white transition-all cursor-pointer"
+                            className="w-full flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
                           >
-                            <NotebookPen size={12} className="text-amber-400" /> Custom System Prompt
+                            <NotebookPen size={12} className="text-amber-500" /> Custom System Prompt
                           </button>
                           <button
                             type="button"
                             onClick={() => { setShowAddMenu(false); setOpenSessionModal(true); }}
-                            className="w-full flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs font-semibold text-slate-300 hover:bg-white/5 hover:text-white transition-all cursor-pointer"
+                            className="w-full flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
                           >
-                            <PlayCircle size={12} className="text-emerald-400" /> Previous Session
+                            <PlayCircle size={12} className="text-teal-500" /> Previous Session
                           </button>
                         </div>
                       )}
@@ -6052,20 +6427,20 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
 
                 {/* Display Selected Context Items below Resume */}
                 {(c.selectedDocId || c.selectedPromptId || c.selectedSessionId) && (
-                  <div className="mt-4 space-y-2 border-t border-white/5 pt-3 animate-fadeIn">
+                  <div className="mt-4 space-y-2 border-t border-slate-200 pt-3 animate-fadeIn">
                     <p className="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-1">Active Context Sources</p>
 
                     {c.selectedDocId && (() => {
                       const docItem = docs.find(d => d.id === c.selectedDocId);
                       return (
-                        <div className="flex items-center justify-between rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-3 py-2 text-xs">
-                          <div className="flex items-center gap-2 text-cyan-200">
+                        <div className="flex items-center justify-between rounded-xl border border-cyan-200 bg-cyan-50/50 px-3 py-2 text-xs">
+                          <div className="flex items-center gap-2 text-cyan-700">
                             <Brain size={13} />
                             <span className="font-semibold truncate max-w-[200px]">{docItem?.name || "Selected Reference Doc"}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <button type="button" onClick={() => setOpenDocModal(true)} className="text-[10px] text-cyan-400 hover:underline cursor-pointer">Edit</button>
-                            <button type="button" onClick={() => setC(prev => ({ ...prev, selectedDocId: '' }))} className="text-slate-500 hover:text-red-400 cursor-pointer"><X size={12} /></button>
+                            <button type="button" onClick={() => setOpenDocModal(true)} className="text-[10px] text-cyan-600 hover:underline cursor-pointer">Edit</button>
+                            <button type="button" onClick={() => setC(prev => ({ ...prev, selectedDocId: '' }))} className="text-slate-400 hover:text-red-500 cursor-pointer"><X size={12} /></button>
                           </div>
                         </div>
                       );
@@ -6074,14 +6449,14 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                     {c.selectedPromptId && (() => {
                       const promptItem = prompts.find(p => p.id === c.selectedPromptId);
                       return (
-                        <div className="flex items-center justify-between rounded-xl border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs">
-                          <div className="flex items-center gap-2 text-amber-200">
+                        <div className="flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50/50 px-3 py-2 text-xs">
+                          <div className="flex items-center gap-2 text-amber-700">
                             <NotebookPen size={13} />
                             <span className="font-semibold truncate max-w-[200px]">{promptItem?.title || "Custom Prompt"}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <button type="button" onClick={() => setOpenPromptModal(true)} className="text-[10px] text-amber-400 hover:underline cursor-pointer">Edit</button>
-                            <button type="button" onClick={() => setC(prev => ({ ...prev, selectedPromptId: '' }))} className="text-slate-500 hover:text-red-400 cursor-pointer"><X size={12} /></button>
+                            <button type="button" onClick={() => setOpenPromptModal(true)} className="text-[10px] text-amber-600 hover:underline cursor-pointer">Edit</button>
+                            <button type="button" onClick={() => setC(prev => ({ ...prev, selectedPromptId: '' }))} className="text-slate-400 hover:text-red-500 cursor-pointer"><X size={12} /></button>
                           </div>
                         </div>
                       );
@@ -6090,14 +6465,14 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                     {c.selectedSessionId && (() => {
                       const sessionItem = sessions.find(s => s.id === c.selectedSessionId);
                       return (
-                        <div className="flex items-center justify-between rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs">
-                          <div className="flex items-center gap-2 text-emerald-200">
+                        <div className="flex items-center justify-between rounded-xl border border-teal-200 bg-teal-50/50 px-3 py-2 text-xs">
+                          <div className="flex items-center gap-2 text-teal-700">
                             <PlayCircle size={13} />
                             <span className="font-semibold truncate max-w-[200px]">{sessionItem?.title || `${sessionItem?.type || "Past"} Session`}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <button type="button" onClick={() => setOpenSessionModal(true)} className="text-[10px] text-emerald-400 hover:underline cursor-pointer">Edit</button>
-                            <button type="button" onClick={() => setC(prev => ({ ...prev, selectedSessionId: '' }))} className="text-slate-500 hover:text-red-400 cursor-pointer"><X size={12} /></button>
+                            <button type="button" onClick={() => setOpenSessionModal(true)} className="text-[10px] text-teal-600 hover:underline cursor-pointer">Edit</button>
+                            <button type="button" onClick={() => setC(prev => ({ ...prev, selectedSessionId: '' }))} className="text-slate-400 hover:text-red-500 cursor-pointer"><X size={12} /></button>
                           </div>
                         </div>
                       );
@@ -6121,21 +6496,22 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                   options={modelOptions}
                   placeholder="-- Select Model --"
                   icon={Cpu}
+                  theme="light"
                 />
               </div>
 
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Session Options</p>
                 <div className="grid grid-cols-2 gap-3">
-                  <label className={`flex items-center justify-between gap-3 rounded-xl border p-3.5 cursor-pointer transition-all ${autoAnswer ? 'border-violet-500/40 bg-violet-500/10' : 'border-white/10 bg-white/[0.02]'
+                  <label className={`flex items-center justify-between gap-3 rounded-xl border p-3.5 cursor-pointer transition-all ${autoAnswer ? 'border-teal-300 bg-teal-50' : 'border-slate-200 bg-slate-50'
                     }`}>
                     <div>
-                      <div className="text-xs font-bold text-white">Auto Answer</div>
+                      <div className="text-xs font-bold !text-slate-900">Auto Answer</div>
                       <div className="text-[10px] text-slate-500 mt-0.5">AI answers automatically when question detected</div>
                     </div>
                     <div
                       onClick={() => setAutoAnswer(!autoAnswer)}
-                      className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${autoAnswer ? 'bg-violet-600' : 'bg-slate-700'
+                      className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${autoAnswer ? 'bg-teal-600' : 'bg-slate-700'
                         }`}
                     >
                       <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${autoAnswer ? 'translate-x-4' : 'translate-x-0.5'
@@ -6143,15 +6519,15 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                     </div>
                   </label>
 
-                  <label className={`flex items-center justify-between gap-3 rounded-xl border p-3.5 cursor-pointer transition-all ${saveTranscript ? 'border-emerald-500/40 bg-emerald-500/10' : 'border-white/10 bg-white/[0.02]'
+                  <label className={`flex items-center justify-between gap-3 rounded-xl border p-3.5 cursor-pointer transition-all ${saveTranscript ? 'border-teal-300 bg-teal-50' : 'border-slate-200 bg-slate-50'
                     }`}>
                     <div>
-                      <div className="text-xs font-bold text-white">Save Transcript</div>
+                      <div className="text-xs font-bold !text-slate-900">Save Transcript</div>
                       <div className="text-[10px] text-slate-500 mt-0.5">Store full Q&A transcript after session ends</div>
                     </div>
                     <div
                       onClick={() => setSaveTranscript(!saveTranscript)}
-                      className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${saveTranscript ? 'bg-emerald-600' : 'bg-slate-700'
+                      className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${saveTranscript ? 'bg-teal-600' : 'bg-slate-700'
                         }`}
                     >
                       <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${saveTranscript ? 'translate-x-4' : 'translate-x-0.5'
@@ -6165,7 +6541,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
 
           {/* Error */}
           {error && (
-            <div className="flex items-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-xs text-red-400">
+            <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-600">
               <AlertCircle size={14} /> {error}
             </div>
           )}
@@ -6206,10 +6582,10 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+              <h3 className="text-sm font-bold !text-slate-900 flex items-center gap-1.5">
                 <Brain size={15} className="text-cyan-600" /> Select Reference Document
               </h3>
-              <button type="button" onClick={() => setOpenDocModal(false)} className="text-slate-500 hover:text-slate-900 cursor-pointer"><X size={16} /></button>
+              <button type="button" onClick={() => setOpenDocModal(false)} className="text-slate-500 hover:!text-slate-900 cursor-pointer"><X size={16} /></button>
             </div>
             <div className="space-y-3">
               <CustomSelect
@@ -6241,10 +6617,10 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+              <h3 className="text-sm font-bold !text-slate-900 flex items-center gap-1.5">
                 <NotebookPen size={15} className="text-amber-600" /> Custom System Prompt
               </h3>
-              <button type="button" onClick={() => setOpenPromptModal(false)} className="text-slate-500 hover:text-slate-900 cursor-pointer"><X size={16} /></button>
+              <button type="button" onClick={() => setOpenPromptModal(false)} className="text-slate-500 hover:!text-slate-900 cursor-pointer"><X size={16} /></button>
             </div>
             <div className="space-y-3">
               <CustomSelect
@@ -6274,10 +6650,10 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                <PlayCircle size={15} className="text-emerald-600" /> Select Previous Session
+              <h3 className="text-sm font-bold !text-slate-900 flex items-center gap-1.5">
+                <PlayCircle size={15} className="text-teal-600" /> Select Previous Session
               </h3>
-              <button type="button" onClick={() => setOpenSessionModal(false)} className="text-slate-500 hover:text-slate-900 cursor-pointer"><X size={16} /></button>
+              <button type="button" onClick={() => setOpenSessionModal(false)} className="text-slate-500 hover:!text-slate-900 cursor-pointer"><X size={16} /></button>
             </div>
             <div className="space-y-3">
               <CustomSelect
@@ -6367,7 +6743,7 @@ function RecentSessionsTable({
     <div className="overflow-x-auto">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="border-b border-white/10 text-xs font-bold uppercase tracking-wider text-slate-500">
+          <tr className="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500">
             <th className="pb-3 pr-4">Title</th>
             <th className="pb-3 pr-4">Description</th>
             <th className="pb-3 pr-4">Mode</th>
@@ -6377,7 +6753,7 @@ function RecentSessionsTable({
             <th className="pb-3 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/5 text-sm text-slate-300">
+        <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
           {sessionsList.length === 0 ? (
             <tr>
               <td colSpan={7} className="py-8 text-center text-slate-500 text-xs">No recent sessions found.</td>
@@ -6387,35 +6763,35 @@ function RecentSessionsTable({
               const ModeIcon = getIconForType(s.type);
               const isEditing = editingId === s.id;
               return (
-                <tr key={s.id} className="hover:bg-white/[0.01]">
-                  <td className="py-3.5 pr-4 font-bold text-white max-w-[120px] truncate">
+                <tr key={s.id} className="hover:bg-slate-50">
+                  <td className="py-3.5 pr-4 font-bold text-slate-900 max-w-[120px] truncate">
                     {isEditing ? (
                       <input
                         type="text"
                         value={editTitle}
                         onChange={e => setEditTitle(e.target.value)}
-                        className="w-full text-xs rounded-lg border border-violet-500/30 bg-slate-950 px-2 py-1 outline-none text-white focus:border-violet-500"
+                        className="w-full text-xs rounded-lg border border-slate-200 bg-white px-2 py-1 outline-none text-slate-900 focus:border-teal-500"
                       />
                     ) : s.title}
                   </td>
-                  <td className="py-3.5 pr-4 text-xs text-slate-400 max-w-[160px] truncate" title={s.description}>
+                  <td className="py-3.5 pr-4 text-xs text-slate-500 max-w-[160px] truncate" title={s.description}>
                     {isEditing ? (
                       <input
                         type="text"
                         value={editDesc}
                         onChange={e => setEditDesc(e.target.value)}
-                        className="w-full text-xs rounded-lg border border-violet-500/30 bg-slate-950 px-2 py-1 outline-none text-white focus:border-violet-500"
+                        className="w-full text-xs rounded-lg border border-slate-200 bg-white px-2 py-1 outline-none text-slate-900 focus:border-teal-500"
                       />
                     ) : s.description}
                   </td>
                   <td className="py-3.5 pr-4">
-                    <span className="inline-flex items-center gap-1 text-xs bg-slate-800 px-2 py-1 rounded-xl">
-                      <ModeIcon size={10} className="text-violet-300" />
+                    <span className="inline-flex items-center gap-1 text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded-xl font-medium border border-slate-200">
+                      <ModeIcon size={10} className="text-teal-600" />
                       {s.type}
                     </span>
                   </td>
                   <td className="py-3.5 pr-4 text-xs">
-                    <Badge tone="violet">{s.duration || s.endsIn || '0:00'}</Badge>
+                    <Badge tone="teal">{s.duration || s.endsIn || '0:00'}</Badge>
                   </td>
                   <td className="py-3.5 pr-4 text-xs font-bold pl-3">
                     {s.aiUsage}
@@ -6428,14 +6804,14 @@ function RecentSessionsTable({
                       <div className="flex justify-end gap-1.5">
                         <button
                           onClick={() => saveEdit(s.id)}
-                          className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 transition-all"
+                          className="p-1.5 rounded-lg bg-teal-50 text-teal-600 hover:bg-teal-600 hover:text-white border border-teal-100 transition-all"
                           title="Save changes"
                         >
                           <CheckCircle2 size={13} />
                         </button>
                         <button
                           onClick={cancelEdit}
-                          className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-white/5 transition-all"
+                          className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-800 hover:text-white border border-slate-200 transition-all"
                           title="Cancel editing"
                         >
                           <X size={13} />
@@ -6445,21 +6821,21 @@ function RecentSessionsTable({
                       <div className="flex justify-end gap-1.5">
                         <button
                           onClick={() => openDetail(s)}
-                          className="p-1.5 rounded-lg bg-violet-600/20 text-violet-300 hover:bg-violet-600 hover:text-white border border-violet-500/20 transition-all"
+                          className="p-1.5 rounded-lg bg-teal-50 text-teal-600 hover:bg-teal-600 hover:text-white border border-teal-100 transition-all"
                           title="View details & transcript"
                         >
                           <Library size={13} />
                         </button>
                         <button
                           onClick={() => startEdit(s)}
-                          className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-white/5 transition-all"
+                          className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-800 hover:text-white border border-slate-200 transition-all"
                           title="Edit details"
                         >
                           <NotebookPen size={13} />
                         </button>
                         <button
                           onClick={() => deleteSession(s.id)}
-                          className="p-1.5 rounded-lg bg-rose-500/10 text-rose-300 hover:bg-rose-500 hover:text-white border border-rose-500/20 transition-all"
+                          className="p-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-100 transition-all"
                           title="Delete session"
                         >
                           <X size={13} />
@@ -6836,56 +7212,53 @@ function MockInterview({
 
   if (isSessionActive) {
     return (
-      <div className="flex-1 min-h-0 flex overflow-hidden bg-[#070a1a] text-slate-100 animate-fadeIn" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
+      <div className="flex-1 min-h-0 flex overflow-hidden bg-[#0e1015] text-slate-100 animate-fadeIn" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
         {/* Left Panel: Webcam + Mic */}
-        <div className="flex flex-col border-r border-slate-800 bg-[#070a1a]" style={{ width: '42%', minWidth: '300px' }}>
+        <div className="flex flex-col border-r border-slate-800/50 bg-[#0e1015]" style={{ width: '42%', minWidth: '300px' }}>
           {/* Webcam player */}
-          <div className="shrink-0 border-b border-slate-800 bg-black relative aspect-video overflow-hidden flex flex-col items-center justify-center">
+          <div className="shrink-0 relative bg-[#8f8f8f] aspect-video flex flex-col items-center justify-center overflow-hidden border-b border-[#0e1015]">
             <video
               ref={videoRef}
-              className="w-full h-full object-cover bg-black"
+              className="w-full h-full object-cover bg-[#8f8f8f]"
               muted
               playsInline
               autoPlay
             />
             {/* Live Indicator overlay */}
-            <div className="absolute top-3 left-3 bg-red-600/90 text-[10px] font-bold text-white px-2 py-0.5 rounded-full flex items-center gap-1.5 shadow-glow animate-pulse">
-              <span className="h-1.5 w-1.5 rounded-full bg-white" /> REC
+            <div className="absolute top-3 left-3 bg-rose-500/90 text-[10px] font-bold text-white px-2 py-0.5 rounded-md flex items-center gap-1.5 shadow-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" /> REC
             </div>
             {!webcamStream && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 p-4 text-center text-xs text-slate-500">
-                <Camera size={24} className="mb-2 text-slate-600" />
-                No webcam feed. Please allow camera permissions.
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#9e9e9e]">
+                <SettingsIcon size={140} className="text-[#c1c1c1]" />
               </div>
             )}
           </div>
 
           {/* Left Panel Header / Mic control */}
-          <div className="flex items-center justify-between border-b border-slate-800 bg-[#070a1a] px-4 py-3 shrink-0">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col flex-1 bg-slate-50 p-4 relative border-r border-slate-200">
+            <div className="flex items-center gap-3">
               <button
                 onClick={mic.active ? mic.stop : startMic}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold border transition-all ${mic.active
-                  ? 'bg-violet-600 text-white border-violet-600 shadow-[0_0_15px_rgba(124,58,237,0.35)]'
-                  : 'bg-slate-900 text-slate-300 border-slate-700 hover:border-violet-500 hover:text-violet-400 hover:bg-slate-800'
+                className={`flex items-center gap-2 rounded border border-slate-200 px-3 py-1.5 text-xs font-semibold transition-all ${mic.active
+                  ? 'bg-teal-600 text-white shadow-[0_0_15px_rgba(124,58,237,0.35)]'
+                  : 'bg-white text-slate-700 hover:bg-slate-100'
                   }`}
               >
-                {mic.active ? <MicOff size={13} /> : <Mic size={13} />}
+                {mic.active ? <MicOff size={14} /> : <Mic size={14} />}
                 {mic.active ? 'Mic Off' : 'Mic On'}
               </button>
               <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                 {mic.statusMsg}
               </span>
             </div>
-          </div>
 
-          {/* Transcription progress box */}
-          <div className="flex-1 min-h-0 overflow-y-auto p-4 bg-[#050712]/40 flex flex-col justify-end">
-            <div className="border border-white/5 bg-slate-950/40 rounded-2xl p-4">
-              <div className="text-[10px] font-bold text-violet-400 uppercase tracking-wide mb-2 flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-violet-400 animate-ping" /> Live Speech Transcription
+            {/* Transcription progress box */}
+            <div className="mt-auto border border-slate-200 bg-white rounded-xl p-4 shadow-sm">
+              <div className="text-[10px] font-bold text-teal-600 uppercase tracking-wide mb-2 flex items-center gap-1">
+                LIVE SPEECH TRANSCRIPTION
               </div>
-              <p className="text-xs text-slate-300 leading-5 italic">
+              <p className="text-xs text-slate-600 leading-5 italic">
                 {mic.active
                   ? (userAnswer ? "Listening to mic... Answer text area on the right will update in real-time." : "Start speaking. Your words will appear in the answer box on the right.")
                   : "Microphone is muted. Turn it on to answer by speaking, or type directly into the text box."}
@@ -6895,24 +7268,26 @@ function MockInterview({
         </div>
 
         {/* Right Panel: AI Question, Answer Input, Feedback */}
-        <div className="flex flex-col flex-1 min-w-0 bg-[#070a1a]">
+        <div className="flex flex-col flex-1 min-w-0 bg-white">
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-slate-800 bg-[#070a1a] px-5 py-3 shrink-0">
+          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 shrink-0 bg-white">
             <div>
-              <div className="flex items-center gap-2">
-                <Badge tone="violet">{interviewType}</Badge>
-                <h1 className="text-base font-black text-white">{company} Mock Session</h1>
+              <div className="flex items-center gap-3">
+                <span className="inline-flex items-center rounded-full bg-slate-900 px-2.5 py-0.5 text-[11px] font-bold text-white">
+                  {interviewType}
+                </span>
+                <h1 className="text-lg font-black text-slate-900">{company} Mock Session</h1>
               </div>
-              <p className="text-[10px] text-slate-500 font-medium mt-0.5">{role}</p>
+              <p className="text-[11px] text-slate-500 font-medium mt-1">{role}</p>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-200">
-                <Timer size={12} className="text-slate-500" />
+              <div className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-700 shadow-sm">
+                <Timer size={14} className="text-slate-400" />
                 <span className="font-semibold">{formatTime(sessionTime)}</span>
               </div>
               <button
                 onClick={endAndSaveSession}
-                className="rounded-lg bg-rose-600 hover:bg-rose-500 px-4 py-1.5 text-xs font-bold text-white transition-all shadow-glow"
+                className="rounded-md bg-rose-600 hover:bg-rose-500 px-4 py-1.5 text-xs font-bold text-white transition-all shadow-sm"
               >
                 End & Save
               </button>
@@ -6920,34 +7295,34 @@ function MockInterview({
           </div>
 
           {/* Body */}
-          <div className="flex-1 min-h-0 overflow-y-auto p-5 space-y-5 bg-[#050712]/40">
+          <div className="flex-1 min-h-0 overflow-y-auto p-6 space-y-6 bg-white">
             {/* Question card */}
-            <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-r from-violet-950/20 to-indigo-950/20 p-5 shadow-[0_4px_25px_rgba(99,102,241,0.08)] relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-1 h-full bg-violet-500" />
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-violet-400">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-teal-600 rounded-l-xl" />
+              <div className="flex items-center justify-between mb-3 ml-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-teal-600">
                   Question {sessionQuestions.length + 1}
                 </span>
-                <span className="text-[10px] text-slate-500">Active</span>
+                <span className="text-[11px] font-medium text-slate-500">Active</span>
               </div>
-              <p className="text-sm font-semibold leading-7 text-slate-200">{currentQuestion}</p>
+              <p className="text-sm font-medium leading-relaxed text-slate-900 ml-2">{currentQuestion}</p>
             </div>
 
             {/* Answer textarea */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400">Your Response</label>
+            <div className="space-y-3">
+              <label className="text-xs font-bold text-slate-500">Your Response</label>
               <textarea
                 value={userAnswer}
                 onChange={handleUserAnswerChange}
                 rows={5}
                 placeholder="Type your response here or speak into the mic..."
-                className="w-full resize-none rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-white outline-none focus:border-violet-500 placeholder:text-slate-600 transition-all"
+                className="w-full resize-none rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-900 outline-none focus:border-teal-500 placeholder:text-slate-400 transition-all shadow-sm"
               />
               <div className="flex gap-3 justify-end">
                 <button
                   onClick={generateFeedback}
                   disabled={isGenerating || !userAnswer.trim()}
-                  className="rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-2.5 text-xs font-bold text-white hover:from-violet-500 hover:to-indigo-500 disabled:opacity-40 transition-all flex items-center gap-1.5 shadow-glow"
+                  className="rounded-lg bg-teal-600 hover:bg-teal-500 px-5 py-2.5 text-xs font-bold text-white disabled:opacity-40 transition-all flex items-center gap-1.5 shadow-sm"
                 >
                   {isGenerating ? (
                     <>
@@ -6959,7 +7334,7 @@ function MockInterview({
                     </>
                   ) : (
                     <>
-                      <Send size={12} />
+                      <Send size={13} />
                       Submit Answer
                     </>
                   )}
@@ -6970,13 +7345,13 @@ function MockInterview({
             {/* AI Feedback output for previous answer */}
             {(feedback || suggestedAnswer) && (
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/5 p-4">
-                  <div className="text-[10px] font-black uppercase tracking-wide text-emerald-400">AI Feedback (Last Question)</div>
-                  <p className="mt-2.5 whitespace-pre-wrap text-xs leading-6 text-slate-200">{feedback}</p>
+                <div className="rounded-2xl border border-teal-200 bg-teal-50/50 p-4">
+                  <div className="text-[10px] font-black uppercase tracking-wide text-teal-600">AI Feedback (Last Question)</div>
+                  <p className="mt-2.5 whitespace-pre-wrap text-xs leading-6 text-slate-700">{feedback}</p>
                 </div>
-                <div className="rounded-2xl border border-sky-500/15 bg-sky-500/5 p-4">
-                  <div className="text-[10px] font-black uppercase tracking-wide text-sky-400">Suggested Response</div>
-                  <p className="mt-2.5 whitespace-pre-wrap text-xs leading-6 text-slate-200">{suggestedAnswer}</p>
+                <div className="rounded-2xl border border-sky-200 bg-sky-50/50 p-4">
+                  <div className="text-[10px] font-black uppercase tracking-wide text-sky-600">Suggested Response</div>
+                  <p className="mt-2.5 whitespace-pre-wrap text-xs leading-6 text-slate-700">{suggestedAnswer}</p>
                 </div>
               </div>
             )}
@@ -6984,23 +7359,23 @@ function MockInterview({
             {/* Session QA History Log */}
             {sessionQuestions.length > 0 && (
               <div className="space-y-3 pt-2">
-                <h3 className="text-xs font-bold text-slate-400">Session Transcript ({sessionQuestions.length})</h3>
+                <h3 className="text-xs font-bold text-slate-500">Session Transcript ({sessionQuestions.length})</h3>
                 <div className="space-y-3">
                   {sessionQuestions.slice().reverse().map((qa, idx) => (
-                    <div key={idx} className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-xs space-y-2">
-                      <div className="font-bold text-violet-400">Q: {qa.question}</div>
-                      <div className="text-slate-300 pl-2 border-l border-white/10">A: {qa.answer}</div>
+                    <div key={idx} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs space-y-2">
+                      <div className="font-bold text-teal-600">Q: {qa.question}</div>
+                      <div className="text-slate-700 pl-2 border-l border-slate-200">A: {qa.answer}</div>
                       <details className="mt-2 group">
-                        <summary className="text-[10px] text-slate-500 font-bold cursor-pointer hover:text-slate-300 select-none outline-none">
+                        <summary className="text-[10px] text-slate-500 font-bold cursor-pointer hover:text-slate-700 select-none outline-none">
                           View Feedback & Suggestion
                         </summary>
-                        <div className="mt-2 grid gap-3 md:grid-cols-2 pt-2 border-t border-white/5">
-                          <div className="bg-emerald-500/5 p-3 rounded-xl text-[11px] leading-5 text-slate-300">
-                            <span className="font-bold text-emerald-400 block mb-1">Feedback</span>
+                        <div className="mt-2 grid gap-3 md:grid-cols-2 pt-2 border-t border-slate-100">
+                          <div className="bg-teal-50 p-3 rounded-xl text-[11px] leading-5 text-slate-700 border border-teal-100">
+                            <span className="font-bold text-teal-600 block mb-1">Feedback</span>
                             {qa.feedback}
                           </div>
-                          <div className="bg-sky-500/5 p-3 rounded-xl text-[11px] leading-5 text-slate-300">
-                            <span className="font-bold text-sky-400 block mb-1">Suggested</span>
+                          <div className="bg-sky-50 p-3 rounded-xl text-[11px] leading-5 text-slate-700 border border-sky-100">
+                            <span className="font-bold text-sky-600 block mb-1">Suggested</span>
                             {qa.suggested}
                           </div>
                         </div>
@@ -7024,7 +7399,7 @@ function MockInterview({
       <div className="flex justify-end mb-6 -mt-4">
         <button
           onClick={() => setShowSetup(true)}
-          className="rounded-xl bg-violet-600 hover:bg-violet-500 px-4 py-2.5 text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-glow"
+          className="rounded-xl bg-teal-600 hover:bg-teal-500 px-4 py-2.5 text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-glow"
         >
           <Plus size={14} />
           Start Interview
@@ -7035,13 +7410,13 @@ function MockInterview({
       {showSetup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md p-4 animate-fadeIn">
           <div className="w-full max-w-xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-2xl relative overflow-hidden">
-            <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-blue-100/50 blur-3xl pointer-events-none" />
+            <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-teal-100/50 blur-3xl pointer-events-none" />
 
             <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
-              <h2 className="text-lg font-black text-slate-900">Setup Mock Interview</h2>
+              <h2 className="text-lg font-black !text-slate-900">Setup Mock Interview</h2>
               <button
                 onClick={() => setShowSetup(false)}
-                className="rounded-full p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-all"
+                className="rounded-full p-1.5 hover:bg-slate-100 text-slate-500 hover:!text-slate-900 transition-all"
               >
                 <X size={18} />
               </button>
@@ -7055,7 +7430,7 @@ function MockInterview({
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
                     placeholder="e.g. Amazon, Google"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 transition-all placeholder:text-slate-400"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-xs !text-slate-900 outline-none focus:border-teal-500 transition-all placeholder:!text-slate-400"
                   />
                 </div>
                 <div>
@@ -7064,7 +7439,7 @@ function MockInterview({
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
                     placeholder="e.g. Senior Software Engineer"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 transition-all placeholder:text-slate-400"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-xs !text-slate-900 outline-none focus:border-teal-500 transition-all placeholder:!text-slate-400"
                   />
                 </div>
               </div>
@@ -7074,7 +7449,7 @@ function MockInterview({
                 <select
                   value={interviewType}
                   onChange={(e) => setInterviewType(e.target.value as any)}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 cursor-pointer transition-all"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs !text-slate-900 outline-none focus:border-teal-500 cursor-pointer transition-all"
                 >
                   <option>Mixed</option>
                   <option>Behavioral</option>
@@ -7093,7 +7468,7 @@ function MockInterview({
                   onChange={(e) => setJd(e.target.value)}
                   rows={4}
                   placeholder="Paste Job Description to personalize interview questions..."
-                  className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 transition-all placeholder:text-slate-400"
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-xs !text-slate-900 outline-none focus:border-teal-500 transition-all placeholder:!text-slate-400"
                 />
               </div>
             </div>
@@ -7107,7 +7482,7 @@ function MockInterview({
               </button>
               <button
                 onClick={startMockInterview}
-                className="flex-1 rounded-xl bg-blue-600 py-3 text-xs font-black text-white hover:bg-blue-500 shadow-md transition-all"
+                className="flex-1 rounded-xl bg-teal-600 py-3 text-xs font-black text-white hover:bg-teal-500 shadow-md transition-all"
               >
                 Start Mock Interview
               </button>
@@ -7119,7 +7494,7 @@ function MockInterview({
       {/* ── Mock History Dashboard ── */}
       {sessions.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center border border-white/5 bg-slate-900/20 rounded-[2rem] p-8 max-w-xl mx-auto">
-          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-500/10 text-violet-300 border border-violet-500/20 shadow-glow">
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-500/10 text-teal-300 border border-teal-500/20 shadow-glow">
             <UserRound size={28} />
           </div>
           <h2 className="text-lg font-black text-white">No Mock Interviews Yet</h2>
@@ -7128,7 +7503,7 @@ function MockInterview({
           </p>
           <button
             onClick={() => setShowSetup(true)}
-            className="mt-6 rounded-xl bg-violet-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-violet-500 transition-all shadow-glow"
+            className="mt-6 rounded-xl bg-teal-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-teal-500 transition-all shadow-glow"
           >
             Start Your First Mock Interview
           </button>
@@ -7136,12 +7511,12 @@ function MockInterview({
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {sessions.map((s) => (
-            <div key={s.id} className="rounded-[2rem] border border-white/10 bg-slate-900/40 p-5 hover:border-violet-500/30 transition-all flex flex-col justify-between group relative overflow-hidden">
-              <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-violet-600/5 blur-2xl pointer-events-none" />
+            <div key={s.id} className="rounded-[2rem] border border-white/10 bg-slate-900/40 p-5 hover:border-teal-500/30 transition-all flex flex-col justify-between group relative overflow-hidden">
+              <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-teal-600/5 blur-2xl pointer-events-none" />
 
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <Badge tone="violet">{s.type}</Badge>
+                  <Badge tone="teal">{s.type}</Badge>
                   <span className="text-[10px] text-slate-500 font-semibold">{s.date}</span>
                 </div>
 
@@ -7207,12 +7582,12 @@ function MockInterview({
                 {viewingSession.history && viewingSession.history.length > 0 ? (
                   viewingSession.history.map((qa: any, idx: number) => (
                     <div key={idx} className="rounded-2xl border border-white/5 bg-white/[0.015] p-4 text-xs space-y-2">
-                      <div className="font-bold text-violet-400">Q{idx + 1}: {qa.question}</div>
+                      <div className="font-bold text-teal-400">Q{idx + 1}: {qa.question}</div>
                       <div className="text-slate-300 pl-2 border-l border-white/10">A: {qa.answer}</div>
 
                       <div className="grid gap-3 md:grid-cols-2 pt-2 mt-2 border-t border-white/5">
-                        <div className="bg-emerald-500/5 p-3 rounded-xl leading-5 text-slate-300">
-                          <span className="font-bold text-emerald-400 block mb-1">AI Feedback</span>
+                        <div className="bg-teal-500/5 p-3 rounded-xl leading-5 text-slate-300">
+                          <span className="font-bold text-teal-400 block mb-1">AI Feedback</span>
                           {qa.feedback}
                         </div>
                         <div className="bg-sky-500/5 p-3 rounded-xl leading-5 text-slate-300">
@@ -7261,8 +7636,8 @@ function RecentSessionsPage({
     <Page title="Recent Sessions" subtitle="View details, edit info, delete, or review transcripts of your past live sessions.">
       <Card className="w-full">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white">Recent Live Sessions</h2>
-          <Badge tone="violet">{sessionsList.length} total</Badge>
+          <h2 className="text-xl font-bold text-slate-900">Recent Live Sessions</h2>
+          <Badge tone="teal">{sessionsList.length} total</Badge>
         </div>
 
         <RecentSessionsTable
@@ -7894,48 +8269,48 @@ function LiveSession({
   };
 
   return (
-    <div className="flex-1 min-h-0 flex overflow-hidden bg-[#070a1a] text-slate-100 animate-fadeIn" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
+    <div className="flex-1 min-h-0 flex overflow-hidden bg-white text-slate-900 animate-fadeIn" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
 
       {/* ── Screen share / system audio authorization request modal ── */}
       {!sysAudio.stream && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
-          <div className="w-full max-w-lg rounded-[2rem] border border-white/10 bg-[#0a0d24] p-8 shadow-soft text-center relative overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-4">
+          <div className="w-full max-w-lg rounded-[2rem] border border-slate-200 bg-white p-8 shadow-2xl text-center relative overflow-hidden">
             {/* Visual background glow */}
-            <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-violet-600/20 blur-3xl pointer-events-none" />
+            <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-teal-600/10 blur-3xl pointer-events-none" />
             <div className="absolute -bottom-24 -right-24 h-48 w-48 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
 
-            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-glow">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-600 text-white shadow-glow">
               <ScreenShare size={30} />
             </div>
 
-            <h3 className="text-xl font-black text-white">Share Tab or Window to Connect</h3>
-            <p className="mt-2.5 text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+            <h3 className="text-xl font-black text-slate-900">Share Tab or Window to Connect</h3>
+            <p className="mt-2.5 text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
               To capture the interviewer's audio and process live questions, Sutra AI requires capturing a browser tab or an application window. Sharing the entire screen is not supported.
             </p>
 
             {/* Instruction Steps */}
-            <div className="my-6 text-left bg-white/[0.02] border border-white/5 rounded-2xl p-5 space-y-3.5">
+            <div className="my-6 text-left bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3.5">
               <div className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-[10px] font-black text-violet-300">1</span>
-                <p className="text-xs text-slate-300 leading-normal">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-100 text-[10px] font-black text-teal-600">1</span>
+                <p className="text-xs text-slate-700 leading-normal">
                   Click the <strong>Accept &amp; Connect</strong> button below.
                 </p>
               </div>
               <div className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-[10px] font-black text-violet-300">2</span>
-                <p className="text-xs text-slate-300 leading-normal">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-100 text-[10px] font-black text-teal-600">2</span>
+                <p className="text-xs text-slate-700 leading-normal">
                   In the browser picker, switch to the <strong>Chrome Tab</strong>/<strong>Edge Tab</strong> or <strong>Window</strong> panel.
                 </p>
               </div>
               <div className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-500/20 text-[10px] font-black text-violet-300">3</span>
-                <p className="text-xs text-slate-300 leading-normal">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-100 text-[10px] font-black text-teal-600">3</span>
+                <p className="text-xs text-slate-700 leading-normal">
                   Select the tab or window where your video call is running (Google Meet, Teams, etc.).
                 </p>
               </div>
               <div className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-500/20 text-[10px] font-black text-rose-300">!</span>
-                <p className="text-xs text-slate-300 leading-normal">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-100 text-[10px] font-black text-rose-600">!</span>
+                <p className="text-xs text-slate-700 leading-normal">
                   <strong>CRITICAL:</strong> If sharing a browser tab, you must check the <strong>Share tab audio</strong> (or "Share audio") box at the bottom-left of the picker window.
                 </p>
               </div>
@@ -7943,8 +8318,8 @@ function LiveSession({
 
             {/* Error / Loading Feedback */}
             {sysAudio.status === 'requesting' && (
-              <div className="mb-6 flex items-center justify-center gap-2 rounded-xl border border-violet-500/20 bg-violet-500/5 p-3 text-xs text-violet-300">
-                <svg className="animate-spin h-4 w-4 text-violet-400" viewBox="0 0 24 24" fill="none">
+              <div className="mb-6 flex items-center justify-center gap-2 rounded-xl border border-teal-500/20 bg-teal-500/5 p-3 text-xs text-teal-600">
+                <svg className="animate-spin h-4 w-4 text-teal-500" viewBox="0 0 24 24" fill="none">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
@@ -7973,7 +8348,7 @@ function LiveSession({
               <button
                 onClick={startSystemAudio}
                 disabled={sysAudio.status === 'requesting'}
-                className="flex-1 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 py-3 text-sm font-black text-white hover:from-violet-500 hover:to-indigo-500 shadow-glow disabled:opacity-50 transition-all"
+                className="flex-1 rounded-xl bg-teal-600 py-3 text-sm font-black text-white hover:bg-teal-500 shadow-glow disabled:opacity-50 transition-all"
               >
                 Accept &amp; Connect
               </button>
@@ -7983,9 +8358,9 @@ function LiveSession({
       )}
 
       {/* ── LEFT PANEL: Live Captions ── */}
-      <div className="flex flex-col border-r border-slate-800 bg-[#070a1a]" style={{ width: '42%', minWidth: '300px' }}>
+      <div className="flex flex-col border-r border-slate-200 bg-slate-50" style={{ width: '42%', minWidth: '300px' }}>
         {sysAudio.stream && (
-          <div className="shrink-0 border-b border-slate-800 bg-black relative group/preview aspect-video overflow-hidden flex flex-col">
+          <div className="shrink-0 border-b border-slate-200 bg-black relative group/preview aspect-video overflow-hidden flex flex-col">
             <video
               id="screen-share-preview-video"
               ref={videoRef}
@@ -8036,19 +8411,19 @@ function LiveSession({
         )}
 
         {!sysAudio.stream && (
-          <div className="shrink-0 border-b border-slate-800 bg-slate-950/60 p-5 flex flex-col items-center justify-center gap-3 text-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+          <div className="shrink-0 border-b border-slate-200 bg-slate-50 p-5 flex flex-col items-center justify-center gap-3 text-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-teal-600 border border-teal-100">
               <ScreenShare size={18} />
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-200">Connect Interview Audio & Screen</p>
+              <p className="text-xs font-semibold text-slate-700">Connect Interview Audio & Screen</p>
               <p className="mt-1 text-[11px] text-slate-500 max-w-xs leading-normal">
                 Share a Chrome Tab with the audio checkbox checked to stream the interviewer's voice and capture live screenshots.
               </p>
             </div>
             <button
               onClick={startSystemAudio}
-              className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition-all shadow-glow"
+              className="flex items-center gap-1.5 rounded-lg bg-teal-600 px-4 py-2 text-xs font-bold text-white hover:bg-teal-500 transition-all shadow-glow"
             >
               <ScreenShare size={12} />
               Share Screen & Audio
@@ -8057,10 +8432,10 @@ function LiveSession({
         )}
 
         {/* Left Header */}
-        <div className="flex items-center gap-2 border-b border-slate-800 bg-[#070a1a] px-4 py-3 shrink-0">
+        <div className="flex items-center gap-2 border-b border-slate-200 bg-white px-4 py-3 shrink-0">
           <button
             onClick={() => { setTr([]); setAiQuestion(''); stream.start(''); }}
-            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold border border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-600 hover:text-white transition-all"
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900 transition-all"
           >
             <X size={14} />
             Clear
@@ -8070,8 +8445,8 @@ function LiveSession({
             <button
               onClick={mic.active ? mic.stop : startMic}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold border transition-all ${mic.active
-                ? 'bg-violet-600 text-white border-violet-600 shadow-[0_0_15px_rgba(124,58,237,0.35)]'
-                : 'bg-slate-900 text-slate-300 border-slate-700 hover:border-violet-500 hover:text-violet-400 hover:bg-slate-800'
+                ? 'bg-teal-600 text-white border-teal-600 shadow-[0_0_15px_rgba(124,58,237,0.35)]'
+                : 'bg-white text-slate-700 border-slate-200 hover:border-teal-500 hover:text-teal-600 hover:bg-slate-50'
                 }`}
             >
               <MonitorSpeaker size={13} />
@@ -8080,24 +8455,24 @@ function LiveSession({
             <select
               value={language}
               onChange={e => setLanguage(e.target.value)}
-              className="rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5 text-sm text-slate-200 outline-none cursor-pointer hover:border-slate-600"
+              className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 outline-none cursor-pointer hover:border-slate-300"
             >
               {['English', 'Hindi', 'Telugu', 'Spanish', 'French'].map(l => (
-                <option key={l} className="bg-slate-900 text-slate-200">{l}</option>
+                <option key={l} className="bg-white text-slate-900">{l}</option>
               ))}
             </select>
           </div>
         </div>
 
         {/* Transcript Area */}
-        <div className="flex-1 min-h-0 overflow-y-auto p-4 bg-[#050712]/40 space-y-3">
+        <div className="flex-1 min-h-0 overflow-y-auto p-4 bg-slate-50 space-y-3">
           {tr.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-10 animate-fadeIn">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 shadow-glow relative">
-                <div className="absolute inset-0 rounded-2xl border border-indigo-500/30 animate-ping opacity-60" />
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 border border-teal-100 shadow-sm relative">
+                <div className="absolute inset-0 rounded-2xl border border-teal-200 animate-ping opacity-60" />
                 <Mic size={24} />
               </div>
-              <p className="text-sm font-semibold text-slate-300">Waiting for interviewer audio...</p>
+              <p className="text-sm font-semibold text-slate-700">Waiting for interviewer audio...</p>
               <p className="mt-1.5 text-xs text-slate-500 leading-relaxed max-w-[240px]">Real-time transcription will begin automatically as soon as the interviewer speaks.</p>
             </div>
           ) : (
@@ -8113,16 +8488,16 @@ function LiveSession({
                     {t.text.trim() && t.isFinal && (
                       <button
                         onClick={() => handleAskAI(t)}
-                        className="opacity-0 group-hover:opacity-100 flex items-center gap-1 rounded-md bg-indigo-600 px-2 py-0.5 text-[10px] font-bold text-white hover:bg-indigo-500 transition-all"
+                        className="opacity-0 group-hover:opacity-100 flex items-center gap-1 rounded-md bg-teal-600 px-2 py-0.5 text-[10px] font-bold text-white hover:bg-teal-500 transition-all"
                       >
                         <Sparkles size={8} /> Ask AI
                       </button>
                     )}
                   </div>
                   <p className={`text-sm leading-6 rounded-xl px-3 py-2 border ${t.speaker === 'Interviewer'
-                    ? 'bg-slate-900/80 border-slate-800 text-slate-100 shadow-sm'
-                    : 'bg-indigo-950/40 border-indigo-900/60 text-slate-100'
-                    } ${!t.isFinal ? 'italic text-slate-300/80 border-indigo-500/25 bg-indigo-500/5' : ''}`}>
+                    ? 'bg-white border-slate-200 text-slate-800 shadow-sm'
+                    : 'bg-teal-50 border-teal-100 text-teal-900'
+                    } ${!t.isFinal ? 'italic text-slate-500 border-teal-200 bg-teal-50/50' : ''}`}>
                     {t.text || <span className="text-slate-500 italic animate-pulse">Listening...</span>}
                   </p>
                   {t.screenshot && <img src={t.screenshot} alt="capture" className="mt-2 max-h-32 rounded-lg border border-slate-800 object-cover w-full" />}
@@ -8138,7 +8513,7 @@ function LiveSession({
             <button
               onClick={() => handleAskAI(tr[tr.length - 1])}
               disabled={tr.length === 0 || !tr[tr.length - 1].text.trim() || stream.busy}
-              className="ml-auto flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-700 disabled:opacity-40 transition-all"
+              className="ml-auto flex items-center gap-1.5 rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-teal-700 disabled:opacity-40 transition-all"
             >
               <Sparkles size={11} /> Ask AI
             </button>
@@ -8147,41 +8522,41 @@ function LiveSession({
       </div>
 
       {/* ── RIGHT PANEL: AI Answer ── */}
-      <div className="flex flex-col flex-1 min-w-0 bg-[#070a1a]">
+      <div className="flex flex-col flex-1 min-w-0 bg-white">
 
         {/* Right Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 bg-[#070a1a] px-5 py-3 shrink-0">
+        <div className="flex items-center justify-between border-b border-slate-200 bg-white px-5 py-3 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400 shadow-sm">
-              <Brain size={16} className="text-white" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-600 shadow-sm">
+              <SutraLogo size={16} className="text-white" />
             </div>
-            <span className="text-base font-black text-slate-100">Sutra AI</span>
+            <span className="text-base font-black text-slate-900">Sutra AI</span>
           </div>
 
           {/* Active Context Badges */}
           <div className="hidden lg:flex items-center gap-2 text-[10px]">
             {activeResumeName && (
-              <span className="inline-flex items-center gap-1 rounded bg-violet-500/10 border border-violet-500/20 px-2 py-0.5 text-violet-300 font-bold max-w-[150px] truncate" title={activeResumeName}>
+              <span className="inline-flex items-center gap-1 rounded bg-teal-50 border border-teal-100 px-2 py-0.5 text-teal-600 font-bold max-w-[150px] truncate" title={activeResumeName}>
                 <FileText size={10} /> {activeResumeName}
               </span>
             )}
             {activeDocName && (
-              <span className="inline-flex items-center gap-1 rounded bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 text-cyan-300 font-bold max-w-[150px] truncate" title={activeDocName}>
+              <span className="inline-flex items-center gap-1 rounded bg-cyan-50 border border-cyan-100 px-2 py-0.5 text-cyan-600 font-bold max-w-[150px] truncate" title={activeDocName}>
                 <Brain size={10} /> {activeDocName}
               </span>
             )}
             {activePromptTitle && (
-              <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-emerald-300 font-bold max-w-[150px] truncate" title={activePromptTitle}>
+              <span className="inline-flex items-center gap-1 rounded bg-teal-50 border border-teal-100 px-2 py-0.5 text-teal-600 font-bold max-w-[150px] truncate" title={activePromptTitle}>
                 <Sparkles size={10} /> {activePromptTitle}
               </span>
             )}
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-1.5">
-              <Timer size={13} className="text-gray-500" />
-              <span className="text-sm font-semibold text-slate-200">{formatTime(sessionTime)}</span>
-              <span className="text-xs font-bold bg-violet-500/10 border border-violet-500/20 text-violet-300 px-1.5 py-0.5 rounded ml-1">Pro</span>
+            <div className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5">
+              <Timer size={13} className="text-slate-400" />
+              <span className="text-sm font-semibold text-slate-600">{formatTime(sessionTime)}</span>
+              <span className="text-xs font-bold bg-teal-50 border border-teal-100 text-teal-600 px-1.5 py-0.5 rounded ml-1">Pro</span>
             </div>
             {qaHistory.length > 0 && (
               <button
@@ -8189,7 +8564,7 @@ function LiveSession({
                   if (!window.confirm('Are you sure you want to clear the live Q&A history?')) return;
                   setQaHistory([]);
                 }}
-                className="flex items-center gap-1 rounded-lg border border-rose-500/20 bg-rose-500/10 px-2.5 py-1.5 text-xs font-bold text-rose-300 hover:bg-rose-500 hover:text-white transition-all"
+                className="flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-600 hover:text-white transition-all"
                 title="Clear Q&A"
               >
                 <X size={12} /> Clear Q&A
@@ -8197,14 +8572,14 @@ function LiveSession({
             )}
             <button
               onClick={captureAndAnalyze}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-1.5 text-sm font-semibold text-slate-300 hover:border-slate-700 hover:bg-slate-800 transition-all"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-600 hover:border-slate-300 hover:bg-slate-50 transition-all shadow-sm"
               title="Take screenshot"
             >
               <Camera size={13} />
             </button>
             <button
               onClick={handleExitClick}
-              className="rounded-lg bg-rose-500 px-4 py-1.5 text-sm font-bold text-white hover:bg-rose-600 transition-all"
+              className="rounded-lg bg-rose-500 px-4 py-1.5 text-sm font-bold text-white hover:bg-rose-600 transition-all shadow-sm"
             >
               Exit
             </button>
@@ -8212,42 +8587,42 @@ function LiveSession({
         </div>
 
         {/* AI Chat Area */}
-        <div className="flex-1 min-h-0 overflow-y-auto p-5 bg-[#050712]/40">
+        <div className="flex-1 min-h-0 overflow-y-auto p-5 bg-white">
           {qaHistory.length === 0 && !stream.text ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 border border-orange-500/20 shadow-[0_4px_12px_rgba(245,158,11,0.2)]">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-600 border border-teal-500/20 shadow-[0_4px_12px_rgba(245,158,11,0.2)]">
                 <SutraLogo size={26} className="text-white" />
               </div>
-              <p className="text-sm font-semibold text-slate-400">No messages yet.</p>
+              <p className="text-sm font-semibold text-slate-700">No messages yet.</p>
               <p className="text-xs text-slate-500 mt-1">Click "Answer" to start!</p>
             </div>
           ) : (
             <div className="space-y-6 max-w-2xl mx-auto">
               {qaHistory.map((qa, i) => (
                 <div key={i} className="space-y-3">
-                  <div className="rounded-2xl border border-indigo-500/20 bg-[#0d1230]/80 p-4 shadow-[0_4px_20px_rgba(99,102,241,0.08)] backdrop-blur-sm relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-indigo-500 to-violet-500" />
+                  <div className="rounded-2xl border border-teal-100 bg-white p-4 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1.5 h-full bg-teal-600" />
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded border border-teal-100">
                         Question #{i + 1}
                       </span>
                       {qa.responseTime && (
-                        <span className="text-[10px] font-bold text-violet-300/90 bg-violet-500/15 px-2 py-0.5 rounded border border-violet-500/20 shadow-[0_0_8px_rgba(139,92,246,0.15)] flex items-center gap-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full bg-violet-400 animate-pulse" />
+                        <span className="text-[10px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded border border-teal-100 flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse" />
                           TTFT: {qa.responseTime}s
                         </span>
                       )}
                     </div>
-                    <p className="text-sm font-medium leading-6 text-slate-200 pl-1.5">{qa.question}</p>
+                    <p className="text-sm font-medium leading-6 text-slate-900 pl-1.5">{qa.question}</p>
                   </div>
-                  <div className="rounded-2xl border border-violet-500/20 bg-violet-950/10 p-5 shadow-[0_8px_30px_rgba(124,58,237,0.06)] backdrop-blur-sm">
+                  <div className="rounded-2xl border border-teal-100 bg-teal-50/50 p-5 shadow-sm">
                     <div className="mb-4 flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-violet-400 bg-violet-500/10 px-2.5 py-0.5 rounded border border-violet-500/20">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-100 px-2.5 py-0.5 rounded border border-teal-200">
                         AI Answer
                       </span>
                       <button
                         onClick={() => navigator.clipboard.writeText(qa.answer)}
-                        className="rounded-md border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-[10px] font-bold text-slate-300 hover:border-violet-600 hover:text-violet-400 hover:bg-slate-800 transition-all flex items-center gap-1 cursor-pointer"
+                        className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-bold text-slate-600 hover:border-teal-300 hover:text-teal-600 hover:bg-teal-50 transition-all flex items-center gap-1 cursor-pointer shadow-sm"
                       >
                         <Copy size={10} />
                         Copy Answer
@@ -8262,29 +8637,29 @@ function LiveSession({
 
               {stream.busy && stream.text && !qaHistory.some(x => x.answer === stream.text) && (
                 <div className="space-y-3">
-                  <div className="rounded-2xl border border-indigo-500/20 bg-[#0d1230]/80 p-4 shadow-[0_4px_20px_rgba(99,102,241,0.08)] backdrop-blur-sm relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-indigo-500 to-violet-500" />
+                  <div className="rounded-2xl border border-teal-100 bg-white p-4 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1.5 h-full bg-teal-600" />
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded border border-teal-100">
                         Current Question
                       </span>
                     </div>
-                    <p className="text-sm font-medium leading-6 text-slate-200 pl-1.5">{aiQuestion || latestQuestion}</p>
+                    <p className="text-sm font-medium leading-6 text-slate-900 pl-1.5">{aiQuestion || latestQuestion}</p>
                   </div>
-                  <div className="rounded-2xl border border-violet-500/20 bg-violet-950/10 p-5 shadow-[0_8px_30px_rgba(124,58,237,0.06)] backdrop-blur-sm">
+                  <div className="rounded-2xl border border-teal-100 bg-teal-50/50 p-5 shadow-sm">
                     <div className="mb-4 flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-violet-400 bg-violet-500/10 px-2.5 py-0.5 rounded border border-violet-500/20">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-100 px-2.5 py-0.5 rounded border border-teal-200">
                           AI Answer
                         </span>
-                        <span className="text-[10px] font-bold text-cyan-400 bg-cyan-950/40 px-2.5 py-0.5 rounded border border-cyan-900/40 animate-pulse">
+                        <span className="text-[10px] font-bold text-cyan-600 bg-cyan-100 px-2.5 py-0.5 rounded border border-cyan-200 animate-pulse">
                           Generating
                         </span>
                       </div>
                     </div>
                     <div className="pl-1">
                       <FormattedAnswer text={stream.text} />
-                      <span className="animate-pulse text-violet-400 ml-1 text-sm">▍</span>
+                      <span className="animate-pulse text-teal-400 ml-1 text-sm">▍</span>
                     </div>
                   </div>
                 </div>
@@ -8295,18 +8670,18 @@ function LiveSession({
         </div>
 
         {/* Bottom: Manual input + Screenshot + Answer button */}
-        <div className="shrink-0 border-t border-slate-800 bg-[#070a1a]">
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800/40">
+        <div className="shrink-0 border-t border-slate-200 bg-slate-50">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100">
             <input
               value={manualMessage}
               onChange={e => setManualMessage(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAnswerClick(); } }}
               placeholder="Type a manual message..."
-              className="flex-1 min-w-0 rounded-lg border border-slate-800 bg-slate-900/60 px-4 py-2.5 text-sm text-slate-200 outline-none placeholder:text-slate-500 focus:border-indigo-500 focus:bg-slate-900 transition-all"
+              className="flex-1 min-w-0 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-teal-500 focus:bg-white transition-all shadow-sm"
             />
             <button
               onClick={captureAndAnalyze}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2.5 text-sm font-semibold text-slate-300 hover:border-slate-700 hover:bg-slate-800 transition-all shrink-0"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-600 hover:border-slate-300 hover:bg-slate-50 transition-all shrink-0 shadow-sm"
             >
               <Camera size={16} />
               <span className="text-xs">Screenshot</span>
@@ -8317,9 +8692,9 @@ function LiveSession({
             <button
               onClick={handleAnswerClick}
               disabled={stream.busy}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 py-3.5 text-sm font-bold text-white hover:from-violet-500 hover:to-indigo-500 shadow-glow disabled:opacity-50 transition-all"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-teal-600 py-3.5 text-sm font-bold text-white hover:bg-teal-500 shadow-glow disabled:opacity-50 transition-all"
             >
-              <Sparkles size={16} className="text-violet-400" />
+              <Sparkles size={16} className="text-teal-400" />
               {stream.busy ? 'Generating Answer...' : 'Answer'}
             </button>
           </div>
@@ -8520,8 +8895,8 @@ function ResumeIntelligence() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={`flex h-48 flex-col items-center justify-center rounded-3xl border-2 border-dashed transition-all ${dragging
-              ? 'border-violet-500 bg-violet-500/10 scale-[0.99]'
-              : 'border-white/10 bg-white/[0.02] hover:border-violet-400/30 hover:bg-violet-500/5'
+              ? 'border-teal-500 bg-teal-500/10 scale-[0.99]'
+              : 'border-white/10 bg-white/[0.02] hover:border-teal-400/30 hover:bg-teal-500/5'
               } text-center relative`}
           >
             <input
@@ -8531,7 +8906,7 @@ function ResumeIntelligence() {
               onChange={handleFileChange}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
-            <Upload size={36} className={`mb-3 ${dragging ? 'text-violet-400 animate-bounce' : 'text-slate-500'}`} />
+            <Upload size={36} className={`mb-3 ${dragging ? 'text-teal-400 animate-bounce' : 'text-slate-500'}`} />
             <h3 className="text-base font-black text-white">Drag & Drop Resumes Here</h3>
             <p className="mt-1 text-xs text-slate-500">Supports PDF, DOCX, TXT up to 10MB (or click to browse)</p>
           </div>
@@ -8549,12 +8924,12 @@ function ResumeIntelligence() {
                   <div
                     key={r.id}
                     className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${r.active
-                      ? 'border-emerald-500/30 bg-emerald-500/5'
+                      ? 'border-teal-500/30 bg-teal-500/5'
                       : 'border-white/5 bg-white/[0.01] hover:bg-white/[0.03]'
                       }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`p-2.5 rounded-xl ${r.active ? 'bg-emerald-500/10 text-emerald-300' : 'bg-slate-800 text-slate-400'}`}>
+                      <div className={`p-2.5 rounded-xl ${r.active ? 'bg-teal-500/10 text-teal-300' : 'bg-slate-800 text-slate-400'}`}>
                         <FileText size={20} />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -8566,7 +8941,7 @@ function ResumeIntelligence() {
                       <button
                         onClick={() => toggleActive(r.id)}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${r.active
-                          ? 'bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_8px_rgba(16,185,129,0.1)]'
+                          ? 'bg-teal-600/20 text-teal-300 border border-teal-500/40 shadow-[0_0_8px_rgba(16,185,129,0.1)]'
                           : 'bg-slate-800 text-slate-400 hover:text-white border border-slate-700 hover:border-slate-600'
                           }`}
                       >
@@ -8609,7 +8984,7 @@ function ResumeIntelligence() {
                       onClick={() => setPreviewTab(tab.id)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                         previewTab === tab.id
-                          ? 'bg-violet-600/20 text-violet-300 border border-violet-500/30'
+                          ? 'bg-teal-600/20 text-teal-300 border border-teal-500/30'
                           : 'bg-white/5 text-slate-400 hover:text-white border border-transparent'
                       }`}
                     >
@@ -8640,7 +9015,7 @@ function ResumeIntelligence() {
                         else text = activeResume.parsed_content;
                         navigator.clipboard.writeText(text || '');
                       }}
-                      className="text-[10px] text-violet-400 hover:text-violet-300 font-bold bg-white/5 px-2 py-0.5 rounded transition-all cursor-pointer"
+                      className="text-[10px] text-teal-400 hover:text-teal-300 font-bold bg-white/5 px-2 py-0.5 rounded transition-all cursor-pointer"
                     >
                       Copy Content
                     </button>
@@ -8683,7 +9058,7 @@ function CompanyIntelligence() {
 function ScreenshotLab() {
   return <Page title="Screenshot Lab" subtitle="Upload interview screenshots and extract questions, code, SQL, or diagrams.">
     <section className="grid gap-6 xl:grid-cols-2">
-      <Card><div className="flex h-96 flex-col items-center justify-center rounded-3xl border border-dashed border-violet-400/30 bg-violet-500/8 text-center"><ImageIcon size={48} className="text-violet-300" /><h2 className="mt-5 text-xl font-black">Drop Screenshot Here</h2><p className="mt-2 max-w-sm text-sm text-slate-400">Supports coding platforms, system design diagrams, SQL tables, and browser interview prompts.</p><Button className="mt-5">Upload Screenshot</Button></div></Card>
+      <Card><div className="flex h-96 flex-col items-center justify-center rounded-3xl border border-dashed border-teal-400/30 bg-teal-500/8 text-center"><ImageIcon size={48} className="text-teal-300" /><h2 className="mt-5 text-xl font-black">Drop Screenshot Here</h2><p className="mt-2 max-w-sm text-sm text-slate-400">Supports coding platforms, system design diagrams, SQL tables, and browser interview prompts.</p><Button className="mt-5">Upload Screenshot</Button></div></Card>
       <Card><h2 className="text-xl font-black">Detected Output Preview</h2><div className="mt-5 space-y-4"><Output k="Question Type" v="System Design" /><Output k="Detected Question" v="Design a realtime notification service." /><Output k="Difficulty" v="Senior" /><div className="rounded-3xl bg-slate-950/70 p-5 text-sm leading-7 text-slate-300">Recommended answer will appear here after image processing.</div></div></Card>
     </section>
   </Page>;
@@ -8996,7 +9371,7 @@ function Knowledge() {
         <button
           onClick={() => setTab('docs')}
           className={`flex-1 py-3 text-sm font-black transition-all flex items-center justify-center gap-2 ${tab === 'docs'
-            ? 'border-b-2 border-violet-500 text-violet-300 bg-violet-500/5'
+            ? 'border-b-2 border-teal-500 text-teal-300 bg-teal-500/5'
             : 'text-slate-500 hover:text-slate-300'
             }`}
         >
@@ -9005,7 +9380,7 @@ function Knowledge() {
         <button
           onClick={() => setTab('prompts')}
           className={`flex-1 py-3 text-sm font-black transition-all flex items-center justify-center gap-2 ${tab === 'prompts'
-            ? 'border-b-2 border-violet-500 text-violet-300 bg-violet-500/5'
+            ? 'border-b-2 border-teal-500 text-teal-300 bg-teal-500/5'
             : 'text-slate-500 hover:text-slate-300'
             }`}
         >
@@ -9021,8 +9396,8 @@ function Knowledge() {
               onDragLeave={handleDocDragLeave}
               onDrop={handleDocDrop}
               className={`flex h-48 flex-col items-center justify-center rounded-3xl border-2 border-dashed transition-all ${docDragging
-                ? 'border-violet-500 bg-violet-500/10 scale-[0.99]'
-                : 'border-white/10 bg-white/[0.02] hover:border-violet-400/30 hover:bg-violet-500/5'
+                ? 'border-teal-500 bg-teal-500/10 scale-[0.99]'
+                : 'border-white/10 bg-white/[0.02] hover:border-teal-400/30 hover:bg-teal-500/5'
                 } text-center relative`}
             >
               <input
@@ -9031,7 +9406,7 @@ function Knowledge() {
                 onChange={handleDocFileChange}
                 className="absolute inset-0 opacity-0 cursor-pointer"
               />
-              <Upload size={36} className={`mb-3 ${docDragging ? 'text-violet-400 animate-bounce' : 'text-slate-500'}`} />
+              <Upload size={36} className={`mb-3 ${docDragging ? 'text-teal-400 animate-bounce' : 'text-slate-500'}`} />
               <h3 className="text-base font-black text-white">Drag & Drop Documents Here</h3>
               <p className="mt-1 text-xs text-slate-500">Supports PDF, DOCX, TXT, MD up to 15MB (or click to browse)</p>
             </div>
@@ -9051,14 +9426,14 @@ function Knowledge() {
                       onClick={() => setSelectedDocId(d.id)}
                       className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer ${
                         selectedDocId === d.id
-                          ? 'border-violet-500 bg-violet-500/10'
+                          ? 'border-teal-500 bg-teal-500/10'
                           : d.active
-                            ? 'border-violet-500/30 bg-violet-500/5'
+                            ? 'border-teal-500/30 bg-teal-500/5'
                             : 'border-white/5 bg-white/[0.01] hover:bg-white/[0.03]'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`p-2.5 rounded-xl ${d.active ? 'bg-violet-500/15 text-violet-300' : 'bg-slate-800 text-slate-400'}`}>
+                        <div className={`p-2.5 rounded-xl ${d.active ? 'bg-teal-500/15 text-teal-300' : 'bg-slate-800 text-slate-400'}`}>
                           <FileText size={20} />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -9072,7 +9447,7 @@ function Knowledge() {
                             type="checkbox"
                             checked={d.active}
                             onChange={() => toggleDocActive(d.id)}
-                            className="h-4 w-4 accent-violet-600 rounded cursor-pointer"
+                            className="h-4 w-4 accent-teal-600 rounded cursor-pointer"
                           />
                           <span className="text-xs text-slate-400 font-medium">Use Context</span>
                         </label>
@@ -9120,10 +9495,10 @@ function Knowledge() {
               })()}
 
               <p className="text-xs text-slate-400 leading-5 mb-5">Active documents are parsed and converted into semantic vector embeddings. During live sessions, relevant snippets are injected directly into the prompt.</p>
-              <div className="rounded-3xl border border-emerald-400/15 bg-emerald-500/8 p-5 mb-6">
+              <div className="rounded-3xl border border-teal-400/15 bg-teal-500/8 p-5 mb-6">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-black text-sm">Embedding Status</span>
-                  <Badge tone="emerald">Synced</Badge>
+                  <Badge tone="teal">Synced</Badge>
                 </div>
                 <div className="text-xs text-slate-400">All active document vectors are built and fully available.</div>
               </div>
@@ -9140,7 +9515,7 @@ function Knowledge() {
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-400">LLM Context Utilization</span>
-                  <Badge tone="violet">Optimal (4.2k tokens)</Badge>
+                  <Badge tone="teal">Optimal (4.2k tokens)</Badge>
                 </div>
               </div>
             </div>
@@ -9160,8 +9535,8 @@ function Knowledge() {
                 onDragLeave={handlePromptDragLeave}
                 onDrop={handlePromptDrop}
                 className={`flex h-64 flex-col items-center justify-center rounded-3xl border-2 border-dashed transition-all ${promptDragging
-                  ? 'border-violet-500 bg-violet-500/10 scale-[0.99]'
-                  : 'border-white/10 bg-white/[0.02] hover:border-violet-400/30 hover:bg-violet-500/5'
+                  ? 'border-teal-500 bg-teal-500/10 scale-[0.99]'
+                  : 'border-white/10 bg-white/[0.02] hover:border-teal-400/30 hover:bg-teal-500/5'
                   } text-center p-4 relative`}
               >
                 <input
@@ -9171,7 +9546,7 @@ function Knowledge() {
                   onChange={handlePromptFileChange}
                   className="absolute inset-0 opacity-0 cursor-pointer"
                 />
-                <Upload size={32} className={`mb-3 ${promptDragging ? 'text-violet-400 animate-bounce' : 'text-slate-500'}`} />
+                <Upload size={32} className={`mb-3 ${promptDragging ? 'text-teal-400 animate-bounce' : 'text-slate-500'}`} />
                 <h3 className="text-sm font-black text-white">Drag & Drop Prompt Files</h3>
                 <p className="mt-1 text-xs text-slate-500 max-w-[150px] mx-auto">Drop template files (.txt, .md) to import them instantly (or click to browse)</p>
               </div>
@@ -9185,7 +9560,7 @@ function Knowledge() {
                       placeholder="Template Title (e.g. Behavioral STAR)"
                       value={promptTitleInput}
                       onChange={e => setPromptTitleInput(e.target.value)}
-                      className="w-full text-xs rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 outline-none focus:border-violet-500/50 text-white placeholder:text-slate-600"
+                      className="w-full text-xs rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 outline-none focus:border-teal-500/50 text-white placeholder:text-slate-600"
                     />
                   </div>
                   <div>
@@ -9194,14 +9569,14 @@ function Knowledge() {
                       rows={4}
                       value={promptContentInput}
                       onChange={e => setPromptContentInput(e.target.value)}
-                      className="w-full text-xs resize-none rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 outline-none focus:border-violet-500/50 text-white placeholder:text-slate-600"
+                      className="w-full text-xs resize-none rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 outline-none focus:border-teal-500/50 text-white placeholder:text-slate-600"
                     />
                   </div>
                 </div>
                 <button
                   onClick={addPromptManually}
                   disabled={!promptTitleInput.trim() || !promptContentInput.trim()}
-                  className="mt-3 w-full rounded-xl bg-violet-600 py-2.5 text-xs font-black hover:bg-violet-500 disabled:opacity-40 transition-all text-white"
+                  className="mt-3 w-full rounded-xl bg-teal-600 py-2.5 text-xs font-black hover:bg-teal-500 disabled:opacity-40 transition-all text-white"
                 >
                   Add Template
                 </button>
@@ -9221,13 +9596,13 @@ function Knowledge() {
                     <div
                       key={p.id}
                       className={`p-4 rounded-2xl border transition-all ${p.active
-                        ? 'border-violet-500/30 bg-violet-500/5'
+                        ? 'border-teal-500/30 bg-teal-500/5'
                         : 'border-white/5 bg-white/[0.01] hover:bg-white/[0.03]'
                         }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <div className={`p-2.5 rounded-xl ${p.active ? 'bg-violet-500/15 text-violet-300' : 'bg-slate-800 text-slate-400'}`}>
+                          <div className={`p-2.5 rounded-xl ${p.active ? 'bg-teal-500/15 text-teal-300' : 'bg-slate-800 text-slate-400'}`}>
                             <Library size={18} />
                           </div>
                           <div>
@@ -9241,7 +9616,7 @@ function Knowledge() {
                               type="checkbox"
                               checked={p.active}
                               onChange={() => togglePromptActive(p.id)}
-                              className="h-4 w-4 accent-violet-600 rounded cursor-pointer"
+                              className="h-4 w-4 accent-teal-600 rounded cursor-pointer"
                             />
                             <span className="text-xs text-slate-400 font-medium">Inject</span>
                           </label>
@@ -9266,17 +9641,17 @@ function Knowledge() {
             <div>
               <h3 className="text-lg font-black mb-3">AI Behavior Engine</h3>
               <p className="text-xs text-slate-400 leading-5 mb-5">By injecting structured answer templates, you override the default LLM system prompt. The model will format answers to explicitly match your guidelines.</p>
-              <div className="rounded-3xl border border-violet-400/15 bg-violet-500/8 p-5 mb-6">
+              <div className="rounded-3xl border border-teal-400/15 bg-teal-500/8 p-5 mb-6">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-black text-sm">Active Templates</span>
-                  <span className="font-bold text-violet-300">{prompts.filter(p => p.active).length} Injected</span>
+                  <span className="font-bold text-teal-300">{prompts.filter(p => p.active).length} Injected</span>
                 </div>
                 <div className="text-xs text-slate-400">These will combine in the system instruction buffer during live streaming.</div>
               </div>
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-400">Response Tone Preference</span>
-                  <Badge tone="emerald">Structured & Analytical</Badge>
+                  <Badge tone="teal">Structured & Analytical</Badge>
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-400">Total Tokens Consumed</span>
@@ -9299,8 +9674,8 @@ function Analytics() {
     <Page title="Analytics & Insights" subtitle="Track your progression, latency trends, and AI context score.">
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[
-          ['Overall Score', '88%', 'High confidence (+3% vs last week)', 'emerald'],
-          ['Sessions Practiced', '14 rounds', '5 system design, 9 coding', 'violet'],
+          ['Overall Score', '88%', 'High confidence (+3% vs last week)', 'teal'],
+          ['Sessions Practiced', '14 rounds', '5 system design, 9 coding', 'teal'],
           ['Avg AI Response Time', '1.1 seconds', 'Streaming mode (Fast)', 'sky'],
           ['Context Index Health', '94% Score', 'Full active sync coverage', 'amber']
         ].map(([title, value, description, tone]) => (
@@ -9312,8 +9687,8 @@ function Analytics() {
               </div>
               <p className="mt-4 text-xs text-slate-400">{description}</p>
             </div>
-            <div className={`absolute -right-6 -bottom-6 h-20 w-20 rounded-full opacity-10 blur-xl ${tone === 'emerald' ? 'bg-emerald-500' :
-              tone === 'violet' ? 'bg-violet-500' :
+            <div className={`absolute -right-6 -bottom-6 h-20 w-20 rounded-full opacity-10 blur-xl ${tone === 'teal' ? 'bg-teal-500' :
+              tone === 'teal' ? 'bg-teal-500' :
                 tone === 'sky' ? 'bg-sky-500' : 'bg-amber-500'
               }`} />
           </Card>
@@ -9324,7 +9699,7 @@ function Analytics() {
         <Card>
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-black text-white">Score Progression (Last 6 Sessions)</h3>
-            <Badge tone="violet">Interactive Engaged</Badge>
+            <Badge tone="teal">Interactive Engaged</Badge>
           </div>
 
           <div className="relative w-full h-60 bg-slate-950/60 rounded-2xl p-4 border border-white/5 flex items-center justify-center">
@@ -9407,8 +9782,8 @@ function Analytics() {
       </section>
 
       <section className="mt-6 grid gap-6 md:grid-cols-2">
-        <Card className="border-l-4 border-emerald-500">
-          <h4 className="text-sm font-black text-emerald-300 uppercase tracking-wide flex items-center gap-1.5">
+        <Card className="border-l-4 border-teal-500">
+          <h4 className="text-sm font-black text-teal-300 uppercase tracking-wide flex items-center gap-1.5">
             <CheckCircle2 size={14} /> Strong Areas
           </h4>
           <ul className="mt-3 space-y-2.5 text-xs text-slate-300 leading-5">
@@ -9544,8 +9919,8 @@ function Billing() {
         <button
           onClick={() => setBillingTab('periods')}
           className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${billingTab === 'periods'
-            ? 'bg-violet-600 text-white shadow-sm'
-            : 'text-slate-500 hover:text-slate-800'
+            ? 'bg-teal-600 text-white shadow-sm'
+            : 'text-slate-500 hover:!text-slate-900'
             }`}
         >
           <SlidersHorizontal size={14} /> Subscription Periods
@@ -9553,8 +9928,8 @@ function Billing() {
         <button
           onClick={() => setBillingTab('credits')}
           className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${billingTab === 'credits'
-            ? 'bg-violet-600 text-white shadow-sm'
-            : 'text-slate-500 hover:text-slate-800'
+            ? 'bg-teal-600 text-white shadow-sm'
+            : 'text-slate-500 hover:!text-slate-900'
             }`}
         >
           <Zap size={14} /> Session Credits
@@ -9568,13 +9943,13 @@ function Billing() {
             <Card
               key={plan.title}
               className={`relative overflow-hidden flex flex-col justify-between h-full border transition-all ${plan.popular
-                ? 'border-violet-500/40 bg-violet-500/10 shadow-sm'
+                ? 'border-teal-500/40 bg-teal-500/10 shadow-sm'
                 : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
                 }`}
             >
               {plan.badge && (
                 <div className="absolute top-4 right-4">
-                  <Badge tone={plan.popular ? 'violet' : 'emerald'}>{plan.badge}</Badge>
+                  <Badge tone={plan.popular ? 'teal' : 'teal'}>{plan.badge}</Badge>
                 </div>
               )}
               <div className="space-y-4">
@@ -9585,7 +9960,7 @@ function Billing() {
                     <span className="text-sm text-slate-500 line-through">{plan.originalPrice}</span>
                   )}
                   {plan.discount && (
-                    <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">
+                    <span className="text-[10px] text-teal-400 font-bold bg-teal-500/10 px-2 py-0.5 rounded-lg border border-teal-500/20">
                       {plan.discount}
                     </span>
                   )}
@@ -9610,13 +9985,13 @@ function Billing() {
             <Card
               key={plan.title}
               className={`relative overflow-hidden flex flex-col justify-between h-full border transition-all ${plan.popular
-                ? 'border-violet-500/40 bg-violet-500/10 shadow-sm'
+                ? 'border-teal-500/40 bg-teal-500/10 shadow-sm'
                 : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
                 }`}
             >
               {plan.badge && (
                 <div className="absolute top-4 right-4">
-                  <Badge tone={plan.popular ? 'violet' : 'emerald'}>{plan.badge}</Badge>
+                  <Badge tone={plan.popular ? 'teal' : 'teal'}>{plan.badge}</Badge>
                 </div>
               )}
               <div className="space-y-4">
@@ -9630,7 +10005,7 @@ function Billing() {
                     <span className="text-xs text-slate-500">/{plan.period}</span>
                   )}
                   {plan.discount && (
-                    <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">
+                    <span className="text-[10px] text-teal-400 font-bold bg-teal-500/10 px-2 py-0.5 rounded-lg border border-teal-500/20">
                       {plan.discount}
                     </span>
                   )}
@@ -9658,12 +10033,12 @@ function SessionSummary({ onHome, onReplay }: { onHome: () => void; onReplay: ()
   return <Page title="Interview Summary" subtitle="Review strengths, gaps, and learning plan.">
     <div className="mb-6 flex gap-2"><Button variant="secondary" onClick={onReplay}>Replay Session</Button><Button onClick={onHome}>Back Home</Button></div>
     <section className="grid gap-4 md:grid-cols-4">{[['Questions', '12'], ['Strong', '8'], ['Improve', '3'], ['Score', '86%']].map(([a, b]) => <Card key={a}><p className="text-sm text-slate-400">{a}</p><div className="mt-4 text-3xl font-black">{b}</div></Card>)}</section>
-    <section className="mt-6 grid gap-6 xl:grid-cols-2"><Card><h2 className="text-xl font-black">Strengths</h2><div className="mt-4 flex flex-wrap gap-2">{['Clear structure', 'Good caching explanation', 'Strong API design'].map((x) => <Badge key={x} tone="emerald">{x}</Badge>)}</div></Card><Card><h2 className="text-xl font-black">Improve Next</h2><div className="mt-4 space-y-4"><Plan label="Database sharding" value={58} /><Plan label="Failure handling" value={64} /><Plan label="Capacity estimation" value={42} /></div></Card></section>
+    <section className="mt-6 grid gap-6 xl:grid-cols-2"><Card><h2 className="text-xl font-black">Strengths</h2><div className="mt-4 flex flex-wrap gap-2">{['Clear structure', 'Good caching explanation', 'Strong API design'].map((x) => <Badge key={x} tone="teal">{x}</Badge>)}</div></Card><Card><h2 className="text-xl font-black">Improve Next</h2><div className="mt-4 space-y-4"><Plan label="Database sharding" value={58} /><Plan label="Failure handling" value={64} /><Plan label="Capacity estimation" value={42} /></div></Card></section>
   </Page>;
 }
 
 function Page({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
-  return <main className="px-5 py-7 lg:px-8 flex-1 overflow-y-auto min-h-0"><div className="mb-8"><p className="text-sm font-semibold text-violet-300">Sutra AI</p><h1 className="mt-2 text-4xl font-black text-white">{title}</h1><p className="mt-2 text-slate-400">{subtitle}</p></div>{children}</main>;
+  return <main className="px-5 py-7 lg:px-8 flex-1 overflow-y-auto min-h-0"><div className="mb-8"><p className="text-sm font-semibold text-teal-300">Sutra AI</p><h1 className="mt-2 text-4xl font-black text-white">{title}</h1><p className="mt-2 text-slate-400">{subtitle}</p></div>{children}</main>;
 }
 
 function useStream() {
@@ -9734,15 +10109,15 @@ function Plan({ label, value }: { label: string; value: number }) {
 }
 
 function Output({ k, v }: { k: string; v: string }) {
-  return <div className="flex justify-between rounded-2xl bg-slate-50 border border-slate-200/60 p-4 text-sm"><span className="text-slate-500">{k}</span><span className="font-bold text-slate-900">{v}</span></div>;
+  return <div className="flex justify-between rounded-2xl bg-slate-50 border border-slate-200/60 p-4 text-sm"><span className="text-slate-500">{k}</span><span className="font-bold !text-slate-900">{v}</span></div>;
 }
 
 function MiniMetric({ label, value }: { label: string; value: string }) {
-  return <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><div className="text-2xl font-black text-slate-900">{value}</div><div className="mt-1 text-xs text-slate-500 font-semibold">{label}</div></div>;
+  return <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><div className="text-2xl font-black !text-slate-900">{value}</div><div className="mt-1 text-xs text-slate-500 font-semibold">{label}</div></div>;
 }
 
 function PreviewCard({ title, text }: { title: string; text: string }) {
-  return <div className="rounded-2xl bg-slate-50 border border-slate-200/60 p-4"><div className="text-xs font-black uppercase tracking-wide text-blue-600">{title}</div><p className="mt-2 text-sm leading-6 text-slate-600 font-medium">{text}</p></div>;
+  return <div className="rounded-2xl bg-slate-50 border border-slate-200/60 p-4"><div className="text-xs font-black uppercase tracking-wide text-teal-600">{title}</div><p className="mt-2 text-sm leading-6 text-slate-600 font-medium">{text}</p></div>;
 }
 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
@@ -9750,28 +10125,28 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
 }
 
 const toneMap = {
-  violet: 'bg-blue-50 text-blue-600 ring-blue-100/50',
-  emerald: 'bg-emerald-50 text-emerald-600 ring-emerald-100/50',
+  teal: 'bg-teal-50 text-teal-600 ring-teal-100/50',
+  teal: 'bg-teal-50 text-teal-600 ring-teal-100/50',
   amber: 'bg-amber-50 text-amber-600 ring-amber-100/50',
   sky: 'bg-sky-50 text-sky-600 ring-sky-100/50',
   rose: 'bg-rose-50 text-rose-600 ring-rose-100/50',
 };
 
-function Badge({ children, tone = 'violet' }: { children: React.ReactNode; tone?: keyof typeof toneMap }) {
+function Badge({ children, tone = 'teal' }: { children: React.ReactNode; tone?: keyof typeof toneMap }) {
   return <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${toneMap[tone]}`}>{children}</span>;
 }
 
 function Button({ children, onClick, variant = 'primary', className = '' }: { children: React.ReactNode; onClick?: () => void; variant?: 'primary' | 'secondary' | 'danger'; className?: string }) {
   const styles = {
-    primary: 'btn-gradient text-white shadow-lg shadow-blue-600/10',
-    secondary: 'btn-glass text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900',
+    primary: 'btn-gradient text-white shadow-lg shadow-teal-600/10',
+    secondary: 'btn-glass text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 hover:!text-slate-900',
     danger: 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-lg shadow-red-600/10 hover:from-red-500 hover:to-rose-500'
   };
   return <button onClick={onClick} className={`rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300 active:translate-y-0 cursor-pointer ${styles[variant]} ${className}`}>{children}</button>;
 }
 
 function Progress({ value }: { value: number }) {
-  return <div className="h-2 rounded-full bg-slate-100"><div className="h-2 rounded-full bg-gradient-to-r from-blue-600 to-cyan-400" style={{ width: `${value}%` }} /></div>;
+  return <div className="h-2 rounded-full bg-slate-100"><div className="h-2 rounded-full bg-teal-600" style={{ width: `${value}%` }} /></div>;
 }
 
 // getMockAnswerForQuestion removed — only real API responses are used
@@ -9881,9 +10256,9 @@ function renderHighlightedCode(code: string, lang: string = 'code') {
       if (comment) {
         tokens.push(<span key={keyIdx++} className="text-slate-500 italic">{comment}</span>);
       } else if (stringToken) {
-        tokens.push(<span key={keyIdx++} className="text-emerald-400 font-medium">{stringToken}</span>);
+        tokens.push(<span key={keyIdx++} className="text-teal-400 font-medium">{stringToken}</span>);
       } else if (keyword) {
-        tokens.push(<span key={keyIdx++} className="text-violet-400 font-bold">{keyword}</span>);
+        tokens.push(<span key={keyIdx++} className="text-teal-400 font-bold">{keyword}</span>);
       } else if (numberToken) {
         tokens.push(<span key={keyIdx++} className="text-amber-400">{numberToken}</span>);
       } else if (funcName) {
@@ -9894,7 +10269,7 @@ function renderHighlightedCode(code: string, lang: string = 'code') {
         tokens.push(<span key={keyIdx++} className="text-pink-400 font-medium">{operator}</span>);
       } else if (identifier) {
         if (identifier === 'self' || identifier === 'None' || identifier === 'true' || identifier === 'false' || identifier === 'null') {
-          tokens.push(<span key={keyIdx++} className="text-indigo-400 font-semibold">{identifier}</span>);
+          tokens.push(<span key={keyIdx++} className="text-teal-400 font-semibold">{identifier}</span>);
         } else {
           tokens.push(identifier);
         }
@@ -9919,13 +10294,13 @@ function FormattedAnswer({ text }: { text: string }) {
       {segments.map((segment, index) => {
         if (segment.type === 'code') {
           return (
-            <div key={index} className="my-4 overflow-hidden rounded-xl border border-violet-500/30 bg-[#05060f] shadow-lg font-mono text-xs ring-1 ring-violet-500/10">
-              <div className="flex items-center justify-between bg-violet-950/20 px-4 py-2 border-b border-violet-500/20">
-                <span className="text-[10px] uppercase tracking-wider text-violet-300 font-extrabold">{segment.lang || 'code'}</span>
+            <div key={index} className="my-4 overflow-hidden rounded-xl border border-teal-500/30 bg-[#05060f] shadow-lg font-mono text-xs ring-1 ring-teal-500/10">
+              <div className="flex items-center justify-between bg-teal-950/20 px-4 py-2 border-b border-teal-500/20">
+                <span className="text-[10px] uppercase tracking-wider text-teal-300 font-extrabold">{segment.lang || 'code'}</span>
                 <button
                   type="button"
                   onClick={() => navigator.clipboard.writeText(segment.content.trim())}
-                  className="rounded-md border border-violet-500/20 bg-violet-950/40 px-2 py-1 text-[10px] font-bold text-violet-300 hover:border-violet-500 hover:text-white hover:bg-violet-900 transition-all cursor-pointer"
+                  className="rounded-md border border-teal-500/20 bg-teal-950/40 px-2 py-1 text-[10px] font-bold text-teal-300 hover:border-teal-500 hover:text-white hover:bg-teal-900 transition-all cursor-pointer"
                 >
                   Copy
                 </button>
@@ -9956,7 +10331,7 @@ function FormattedAnswer({ text }: { text: string }) {
                   const content = isBullet ? trimmed.replace(/^[-*]\s+/, '') : trimmed.replace(/^\d+\.\s+/, '');
                   return (
                     <div key={lIdx} className="flex items-start gap-2.5 pl-1 my-1 animate-fadeIn" style={{ paddingLeft: `${indentCount * 8}px` }}>
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 shadow-[0_0_8px_rgba(139,92,246,0.5)]" />
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-600 shadow-[0_0_8px_rgba(139,92,246,0.5)]" />
                       <p className="text-slate-300 whitespace-pre-wrap">
                         {renderBoldText(content)}
                       </p>
@@ -9970,7 +10345,7 @@ function FormattedAnswer({ text }: { text: string }) {
                   const content = trimmed.replace(/^#+\s+/, '');
                   const sizeClass = level === 1 ? 'text-xl' : level === 2 ? 'text-lg' : 'text-base';
                   return (
-                    <h4 key={lIdx} className={`${sizeClass} font-black text-slate-900 mt-4 mb-2 tracking-tight`}>
+                    <h4 key={lIdx} className={`${sizeClass} font-black !text-slate-900 mt-4 mb-2 tracking-tight`}>
                       {renderBoldText(content)}
                     </h4>
                   );
@@ -9996,7 +10371,7 @@ function renderBoldText(text: string) {
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
       return (
-        <strong key={i} className="font-bold text-slate-900">
+        <strong key={i} className="font-bold !text-slate-900">
           {part.slice(2, -2)}
         </strong>
       );
