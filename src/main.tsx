@@ -513,7 +513,7 @@ function CustomSelect({
         className={`w-full flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-sm outline-none transition-all cursor-pointer shadow-sm focus:border-teal-500/50 ${
           isLight 
             ? 'bg-white border-slate-200 !text-slate-900 hover:bg-slate-50'
-            : 'bg-[#0f1123]/95 border-white/10 text-slate-200 hover:bg-[#0f1123]'
+            : 'bg-[#0f1123]/95 border-slate-200 text-slate-200 hover:bg-[#0f1123]'
         }`}
       >
         <span className="flex items-center gap-2 truncate">
@@ -531,7 +531,7 @@ function CustomSelect({
         <div className={`absolute left-0 mt-1.5 z-40 w-full rounded-xl border p-1.5 shadow-2xl max-h-60 overflow-y-auto animate-fadeIn ${
           isLight 
             ? 'bg-white border-slate-200 shadow-xl'
-            : 'bg-[#0c0d1e]/98 border-white/10 backdrop-blur-md'
+            : 'bg-[#0c0d1e]/98 border-slate-200 backdrop-blur-md'
         }`}>
           {options.length === 0 ? (
             <div className={`px-3 py-2 text-xs italic ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>No options available</div>
@@ -548,11 +548,11 @@ function CustomSelect({
               } else if (isAddBtn) {
                 btnClass = isLight
                   ? 'text-teal-600 hover:bg-teal-50 border-t border-slate-100 mt-1 pt-2'
-                  : 'text-cyan-300 hover:bg-cyan-500/10 border-t border-white/5 mt-1 pt-2';
+                  : 'text-cyan-300 hover:bg-cyan-500/10 border-t border-slate-200 mt-1 pt-2';
               } else {
                 btnClass = isLight
                   ? 'text-slate-700 hover:bg-slate-100'
-                  : 'text-slate-300 hover:bg-white/5 hover:text-white';
+                  : 'text-slate-700 hover:bg-white/5 hover:text-white';
               }
 
               return (
@@ -2461,7 +2461,7 @@ function App() {
         {screen === 'Live Session' && !isSessionActive && (
           <Page title="Live Session" subtitle="Prepare and customize your live interview settings.">
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-teal-500/10 text-teal-300 border border-teal-500/20 shadow-glow animate-pulse">
+              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-teal-500/10 text-teal-700 border border-teal-500/20 shadow-glow animate-pulse">
                 <Mic size={36} />
               </div>
               <h2 className="text-2xl font-black text-white">Setup Your Live Session</h2>
@@ -2488,9 +2488,9 @@ function App() {
 
       {detailSession && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md">
-          <div className="max-h-[94vh] w-full max-w-2xl overflow-y-auto rounded-[2rem] border border-white/10 bg-slate-950 p-6 shadow-soft flex flex-col justify-between">
+          <div className="max-h-[94vh] w-full max-w-2xl overflow-y-auto rounded-[2rem] border border-slate-200 bg-white p-6 shadow-soft flex flex-col justify-between">
             <div>
-              <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
+              <div className="mb-4 flex items-center justify-between border-b border-slate-200 pb-4">
                 <div className="flex items-center gap-2">
                   <h2 className="text-xl font-black text-white">Transcript</h2>
                   <button
@@ -2513,13 +2513,13 @@ function App() {
                 </button>
               </div>
 
-              <div className="flex items-center justify-between border-b border-white/5 mb-4 shrink-0">
+              <div className="flex items-center justify-between border-b border-slate-200 mb-4 shrink-0">
                 <div className="flex gap-2">
                   <button
                     onClick={() => setModalTab('transcript')}
                     className={`py-2 px-3 text-xs font-bold transition-all relative ${modalTab === 'transcript'
-                      ? 'border-b-2 border-teal-500 text-teal-300'
-                      : 'text-slate-500 hover:text-slate-300'
+                      ? 'border-b-2 border-teal-500 text-teal-700'
+                      : 'text-slate-500 hover:text-slate-700'
                       }`}
                   >
                     Transcript & Q&A
@@ -2527,8 +2527,8 @@ function App() {
                   <button
                     onClick={() => setModalTab('notes')}
                     className={`py-2 px-3 text-xs font-bold transition-all relative ${modalTab === 'notes'
-                      ? 'border-b-2 border-teal-500 text-teal-300'
-                      : 'text-slate-500 hover:text-slate-300'
+                      ? 'border-b-2 border-teal-500 text-teal-700'
+                      : 'text-slate-500 hover:text-slate-700'
                       }`}
                   >
                     Session Summary
@@ -2537,7 +2537,7 @@ function App() {
 
                 <button
                   onClick={() => handleDownloadTranscript(detailSession)}
-                  className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-black text-slate-200 hover:bg-white/[0.08] transition-all"
+                  className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-black text-slate-200 hover:bg-slate-50 transition-all"
                 >
                   <Upload size={12} className="rotate-180" />
                   Download
@@ -2554,7 +2554,7 @@ function App() {
                         {detailSession.transcript.map((item: any) => (
                           <div key={item.id} className="space-y-1.5">
                             <div className="flex justify-between items-center text-[10px] text-slate-500 px-1">
-                              <span className="font-bold text-teal-400">
+                              <span className="font-bold text-teal-600">
                                 {item.speaker === 'Interviewer' ? 'Question' : 'Your Answer'}
                               </span>
                               <span>{item.time}</span>
@@ -2562,12 +2562,12 @@ function App() {
 
                             <div className={`p-4 rounded-2xl border relative ${item.speaker === 'Interviewer'
                               ? 'border-teal-500/20 bg-teal-500/5'
-                              : 'border-white/5 bg-slate-900'
+                              : 'border-slate-200 bg-slate-50'
                               }`}>
                               <p className="text-xs leading-5 text-slate-200 whitespace-pre-wrap">{item.text}</p>
                               <button
                                 onClick={() => navigator.clipboard.writeText(item.text)}
-                                className="absolute top-2 right-2 opacity-0 hover:opacity-100 p-1 rounded bg-white/[0.05] text-slate-400 hover:text-white transition-all"
+                                className="absolute top-2 right-2 opacity-0 hover:opacity-100 p-1 rounded bg-slate-50 text-slate-400 hover:text-white transition-all"
                                 title="Copy text"
                               >
                                 <Copy size={10} />
@@ -2580,12 +2580,12 @@ function App() {
                           <>
                             <div className="flex items-center gap-2 pt-2">
                               <div className="h-px flex-1 bg-teal-500/20" />
-                              <span className="text-[10px] font-black text-teal-400 uppercase tracking-widest">AI Q&A Answers</span>
+                              <span className="text-[10px] font-black text-teal-600 uppercase tracking-widest">AI Q&A Answers</span>
                               <div className="h-px flex-1 bg-teal-500/20" />
                             </div>
                             {detailSession.qas.map((n: any) => (
                               <div key={n.id} className="p-4 rounded-2xl border border-teal-500/10 bg-teal-950/10">
-                                <div className="text-xs font-bold text-teal-300 mb-1">{n.title}</div>
+                                <div className="text-xs font-bold text-teal-700 mb-1">{n.title}</div>
                                 <p className="text-xs text-slate-400 mt-1 leading-5">{n.text}</p>
                               </div>
                             ))}
@@ -2599,7 +2599,7 @@ function App() {
                 {modalTab === 'notes' && (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-black text-teal-300 uppercase tracking-wide">Session Summary</h4>
+                      <h4 className="text-xs font-black text-teal-700 uppercase tracking-wide">Session Summary</h4>
                       {detailSession.notes?.length > 0 && (
                         <button
                           onClick={() => {
@@ -2618,7 +2618,7 @@ function App() {
                       <div className="text-center text-slate-600 text-xs py-12">No session summary yet. Summary is auto-generated when you end the session.</div>
                     ) : (
                       detailSession.notes?.map((n: any) => (
-                        <div key={n.id} className="p-4 rounded-2xl border border-white/5 bg-white/[0.01]">
+                        <div key={n.id} className="p-4 rounded-2xl border border-slate-200 bg-slate-50">
                           <div className="text-xs font-bold text-white">{n.title}</div>
                           <p className="text-xs text-slate-400 mt-1.5 leading-5">{n.text}</p>
                         </div>
@@ -2641,24 +2641,24 @@ function App() {
             className="fixed inset-0 left-64 bg-black/60 backdrop-blur-md z-[90] animate-fadeIn cursor-pointer"
           />
           {/* Chatbot Window next to Nav */}
-          <div className="fixed inset-y-6 left-[17rem] w-96 z-[100] flex flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/90 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-fadeIn">
+          <div className="fixed inset-y-6 left-[17rem] w-96 z-[100] flex flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-fadeIn">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 bg-white/[0.02]">
+            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 bg-slate-50">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/10 text-teal-300">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/10 text-teal-700">
                   <SutraLogo size={18} />
                 </div>
                 <div>
-                  <h4 className="text-sm font-black text-white">Sutra AI Support AI</h4>
+                  <h4 className="text-sm font-black text-slate-900">Sutra AI Support AI</h4>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse" />
-                    <span className="text-[10px] text-slate-400 font-medium">Online Help Agent</span>
+                    <span className="text-[10px] text-slate-500 font-medium">Online Help Agent</span>
                   </div>
                 </div>
               </div>
               <button
                 onClick={() => setShowHelpChatbot(false)}
-                className="rounded-xl p-1.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all"
+                className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition-all"
               >
                 <X size={16} />
               </button>
@@ -2671,16 +2671,16 @@ function App() {
                   <div
                     className={`rounded-2xl px-4 py-2.5 text-xs leading-5 ${msg.sender === 'user'
                       ? 'bg-teal-600 text-white rounded-tr-none'
-                      : 'bg-white/[0.04] text-slate-200 border border-white/5 rounded-tl-none whitespace-pre-line'
+                      : 'bg-slate-50 text-slate-700 border border-slate-200 rounded-tl-none whitespace-pre-line'
                       }`}
                   >
-                    {msg.text}
+                    {renderBoldText(msg.text)}
                   </div>
                   <span className="text-[9px] text-slate-500 mt-1 px-1">{msg.time}</span>
                 </div>
               ))}
               {isBotTyping && (
-                <div className="flex items-center gap-1 bg-white/[0.04] border border-white/5 rounded-2xl rounded-tl-none px-4 py-3 w-16 mr-auto">
+                <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-2xl rounded-tl-none px-4 py-3 w-16 mr-auto">
                   <span className="h-1.5 w-1.5 bg-slate-400 rounded-full animate-bounce" />
                   <span className="h-1.5 w-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:0.2s]" />
                   <span className="h-1.5 w-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:0.4s]" />
@@ -2691,7 +2691,7 @@ function App() {
 
             {/* Suggestions */}
             {!isBotTyping && (
-              <div className="px-5 py-3 flex flex-col gap-3 border-t border-white/5 bg-slate-950/40">
+              <div className="px-5 py-3 flex flex-col gap-3 border-t border-slate-200 bg-white">
                 <div>
                   <p className="text-[9px] text-slate-500 font-bold px-1 uppercase tracking-wider mb-1.5">Explore Features</p>
                   <div className="flex flex-wrap gap-1.5">
@@ -2705,7 +2705,7 @@ function App() {
                       <button
                         key={label}
                         onClick={() => sendQuickQuestion(query)}
-                        className="rounded-xl border border-white/5 bg-white/[0.02] hover:bg-teal-500/10 hover:border-teal-500/30 px-2.5 py-1.5 text-[9px] text-slate-300 font-medium transition-all text-left"
+                        className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-500/10 hover:border-teal-500/30 px-2.5 py-1.5 text-[9px] text-slate-700 font-medium transition-all text-left"
                       >
                         {label}
                       </button>
@@ -2723,7 +2723,7 @@ function App() {
                       <button
                         key={label}
                         onClick={() => sendQuickQuestion(query)}
-                        className="rounded-xl border border-white/5 bg-white/[0.02] hover:bg-teal-500/10 hover:border-teal-500/30 px-2.5 py-1.5 text-[9px] text-slate-300 font-medium transition-all text-left"
+                        className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-500/10 hover:border-teal-500/30 px-2.5 py-1.5 text-[9px] text-slate-700 font-medium transition-all text-left"
                       >
                         {label}
                       </button>
@@ -2734,14 +2734,14 @@ function App() {
             )}
 
             {/* Input Area */}
-            <div className="flex gap-2 border-t border-white/10 px-5 py-3.5 bg-slate-950">
+            <div className="flex gap-2 border-t border-slate-200 px-5 py-3.5 bg-white">
               <input
                 type="text"
                 placeholder="Ask a question about Sutra AI..."
                 value={helpInput}
                 onChange={e => setHelpInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleHelpMessageSend()}
-                className="flex-1 rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2 text-xs outline-none focus:border-teal-500/50 text-white placeholder:text-slate-600"
+                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs outline-none focus:border-teal-500/50 text-slate-900 placeholder:text-slate-500"
               />
               <button
                 onClick={handleHelpMessageSend}
@@ -2946,7 +2946,7 @@ const MockIDE = ({ scenario }: { scenario: 'system' | 'sql' | 'react' }) => {
           </div>
 
           {/* Actual Code */}
-          <div className="text-[10px] sm:text-[11px] leading-relaxed space-y-1 text-slate-300">
+          <div className="text-[10px] sm:text-[11px] leading-relaxed space-y-1 text-slate-700">
             {scenario === 'system' && (
               <>
                 <div><span className="text-[#ff7b72]">import</span> &#123; messageQueue &#125; <span className="text-[#ff7b72]">from</span> <span className="text-[#a5d6ff]">'./broker'</span>;</div>
@@ -3800,7 +3800,7 @@ function Landing({
 
                 {/* View Mode Toggle Controls */}
                 <div className="absolute top-4 inset-x-0 flex justify-center z-30">
-                  <div className="bg-slate-900/80 backdrop-blur-md p-1 rounded-lg border border-slate-700 flex gap-1 shadow-lg">
+                  <div className="bg-slate-50 backdrop-blur-md p-1 rounded-lg border border-slate-700 flex gap-1 shadow-lg">
                     <button 
                       onClick={() => setLiveViewMode('hud')}
                       className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all ${liveViewMode === 'hud' ? 'bg-teal-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
@@ -3817,22 +3817,22 @@ function Landing({
                 </div>
 
                 {/* Quick Scenario Toggles at the bottom inside the slider mode */}
-                <div className="absolute bottom-0 inset-x-0 bg-slate-900 border-t border-slate-800 px-4 py-2 flex items-center justify-center gap-2 z-20 shrink-0">
+                <div className="absolute bottom-0 inset-x-0 bg-slate-50 border-t border-slate-800 px-4 py-2 flex items-center justify-center gap-2 z-20 shrink-0">
                   <button 
                     onClick={() => setActiveScenario('system')}
-                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'system' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-800'}`}
+                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'system' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-100'}`}
                   >
                     System Design
                   </button>
                   <button 
                     onClick={() => setActiveScenario('sql')}
-                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'sql' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-800'}`}
+                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'sql' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-100'}`}
                   >
                     Database Tuning
                   </button>
                   <button 
                     onClick={() => setActiveScenario('react')}
-                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'react' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-800'}`}
+                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${activeScenario === 'react' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-100'}`}
                   >
                     React 19 Reconciler
                   </button>
@@ -3852,18 +3852,18 @@ function Landing({
           transition={{ duration: 0.6, type: "spring", bounce: 0.3 }}
           className="relative z-10 mx-auto w-full max-w-7xl px-6 py-4">
           
-          <div className="bg-slate-900 border border-slate-700/60 rounded-2xl p-6 md:p-10 flex flex-col gap-8 shadow-[0_8px_40px_rgba(0,0,0,0.3)]">
+          <div className="bg-slate-50 border border-slate-700/60 rounded-2xl p-6 md:p-10 flex flex-col gap-8 shadow-[0_8px_40px_rgba(0,0,0,0.3)]">
             
             {/* Top Row: Copy + Badges */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
               <div className="flex-1">
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-teal-500/10 border border-teal-500/20 px-3 py-1 text-xs font-bold text-teal-400 mb-4">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-teal-500/10 border border-teal-500/20 px-3 py-1 text-xs font-bold text-teal-600 mb-4">
                   <ShieldCheck size={14} />
                   100% Invisible to Screen Share
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
                   They see your screen. <br className="hidden sm:block" />
-                  <span className="text-teal-400">They never see Sutra AI.</span>
+                  <span className="text-teal-600">They never see Sutra AI.</span>
                 </h2>
                 <p className="text-sm text-slate-400 max-w-lg leading-relaxed">
                   Our click-through overlay sits invisibly above any video platform. You type in your IDE, maintain eye contact, and the AI speaks to you silently — no tab-switch alerts, no extension permissions, no traces.
@@ -3878,10 +3878,10 @@ function Landing({
                   <motion.div 
                     whileHover={{ scale: 1.05 }}
                     key={text} 
-                    className="flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-800/50 px-3.5 py-1.5 cursor-default shadow-sm backdrop-blur-sm"
+                    className="flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-100 px-3.5 py-1.5 cursor-default shadow-sm backdrop-blur-sm"
                   >
-                    <Icon size={12} className="text-teal-400 shrink-0" />
-                    <span className="text-[11px] font-bold text-slate-300 tracking-wide">{text}</span>
+                    <Icon size={12} className="text-teal-600 shrink-0" />
+                    <span className="text-[11px] font-bold text-slate-700 tracking-wide">{text}</span>
                   </motion.div>
                 ))}
               </div>
@@ -3892,9 +3892,9 @@ function Landing({
               {(['listening', 'thinking', 'response'] as const).map((phase, idx) => {
                 const labels = ['1. Listening', '2. Processing', '3. Responding'];
                 const colors = {
-                  listening: { active: 'bg-teal-500', text: 'text-teal-400', ring: 'ring-teal-500/40' },
+                  listening: { active: 'bg-teal-500', text: 'text-teal-600', ring: 'ring-teal-500/40' },
                   thinking:  { active: 'bg-yellow-400', text: 'text-yellow-400', ring: 'ring-yellow-400/40' },
-                  response:  { active: 'bg-teal-500', text: 'text-teal-400', ring: 'ring-teal-500/40' },
+                  response:  { active: 'bg-teal-500', text: 'text-teal-600', ring: 'ring-teal-500/40' },
                 };
                 const isActive = stealthPhase === phase;
                 const isDone = (stealthPhase === 'thinking' && idx === 0) || (stealthPhase === 'response' && idx < 2);
@@ -3906,11 +3906,11 @@ function Landing({
                         animate={isActive ? { scale: [1, 1.15, 1] } : { scale: 1 }}
                         transition={{ repeat: isActive ? Infinity : 0, duration: 1.2, ease: 'easeInOut' }}
                         className={`h-6 w-6 rounded-full flex items-center justify-center text-[9px] font-black transition-all duration-500
-                          ${isActive ? `${c.active} ring-4 ${c.ring} shadow-lg text-white` : isDone ? 'bg-teal-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+                          ${isActive ? `${c.active} ring-4 ${c.ring} shadow-lg text-white` : isDone ? 'bg-teal-600 text-white' : 'bg-slate-700 text-slate-700'}`}
                       >
                         {isDone ? '✓' : idx + 1}
                       </motion.div>
-                      <span className={`text-[9px] font-bold tracking-wide transition-colors duration-500 ${isActive ? c.text : isDone ? 'text-teal-400' : 'text-slate-400'}`}>
+                      <span className={`text-[9px] font-bold tracking-wide transition-colors duration-500 ${isActive ? c.text : isDone ? 'text-teal-600' : 'text-slate-400'}`}>
                         {labels[idx]}
                       </span>
                     </div>
@@ -3933,7 +3933,7 @@ function Landing({
 
               {/* LEFT: What YOU See */}
               <motion.div
-                className="relative bg-slate-800 border border-teal-500/30 rounded-xl p-4 overflow-hidden"
+                className="relative bg-slate-100 border border-teal-500/30 rounded-xl p-4 overflow-hidden"
                 animate={{ borderColor: stealthPhase === 'response' ? 'rgba(16,185,129,0.4)' : 'rgba(16,185,129,0.1)' }}
                 transition={{ duration: 0.5 }}
               >
@@ -3946,7 +3946,7 @@ function Landing({
 
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-teal-400">👤 You</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-teal-600">👤 You</span>
                     <span className="text-[9px] text-slate-400">— your private view</span>
                   </div>
                   <motion.span
@@ -3961,7 +3961,7 @@ function Landing({
                   </motion.span>
                 </div>
 
-                <div className="bg-slate-900 rounded-lg p-3 border border-slate-700/60 min-h-[180px] relative overflow-hidden">
+                <div className="bg-slate-50 rounded-lg p-3 border border-slate-700/60 min-h-[180px] relative overflow-hidden">
                   {/* Scan line animation */}
                   <AnimatePresence>
                     {stealthPhase === 'thinking' && (
@@ -3980,7 +3980,7 @@ function Landing({
                     <div className="flex h-5 w-5 items-center justify-center rounded-md bg-teal-600">
                       <SutraLogo size={10} className="text-white" />
                     </div>
-                    <span className="text-[10px] font-bold text-slate-300">Sutra AI Overlay</span>
+                    <span className="text-[10px] font-bold text-slate-700">Sutra AI Overlay</span>
                     <motion.span
                       className="ml-auto h-1.5 w-1.5 rounded-full"
                       animate={{ backgroundColor: stealthPhase === 'listening' ? '#60a5fa' : stealthPhase === 'thinking' ? '#facc15' : '#10b981' }}
@@ -3998,7 +3998,7 @@ function Landing({
                           ))}
                         </div>
                         <div className="text-center">
-                          <span className="text-[10px] text-teal-300 font-semibold block">Detecting interview question...</span>
+                          <span className="text-[10px] text-teal-700 font-semibold block">Detecting interview question...</span>
                           <span className="text-[8px] text-slate-400 mt-0.5 block">Transcribing audio in real-time</span>
                         </div>
                       </motion.div>
@@ -4021,16 +4021,16 @@ function Landing({
                     {stealthPhase === 'response' && (
                       <motion.div key="response" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="space-y-2">
                         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="bg-teal-900/40 border border-teal-500/30 rounded-md px-2.5 py-2">
-                          <span className="text-[8px] font-black text-teal-400 uppercase tracking-widest block mb-1">💬 SAY FIRST</span>
+                          <span className="text-[8px] font-black text-teal-600 uppercase tracking-widest block mb-1">💬 SAY FIRST</span>
                           <p className="text-[10px] text-slate-200 italic leading-snug">&ldquo;That&rsquo;s similar to a bottleneck we solved last quarter...&rdquo;</p>
                         </motion.div>
                         <div className="space-y-1.5 px-0.5">
-                          <span className="text-[8px] font-black text-teal-400 uppercase tracking-widest block">Key Points</span>
+                          <span className="text-[8px] font-black text-teal-600 uppercase tracking-widest block">Key Points</span>
                           {['Use async workers + message queue', 'Cache at CDN edge layer', 'Auto-scale horizontally'].map((b, i) => (
                             visibleBullets > i && (
                               <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="flex items-center gap-1.5">
-                                <span className="h-3.5 w-3.5 rounded-full bg-teal-500/20 border border-teal-500/40 text-[7px] flex items-center justify-center text-teal-400 font-black shrink-0">{i + 1}</span>
-                                <span className="text-[10px] text-slate-300 font-medium">{b}</span>
+                                <span className="h-3.5 w-3.5 rounded-full bg-teal-500/20 border border-teal-500/40 text-[7px] flex items-center justify-center text-teal-600 font-black shrink-0">{i + 1}</span>
+                                <span className="text-[10px] text-slate-700 font-medium">{b}</span>
                               </motion.div>
                             )
                           ))}
@@ -4045,24 +4045,24 @@ function Landing({
               <div className="hidden md:flex flex-col items-center justify-center gap-2 px-2 min-w-[44px]">
                 <div className="flex-1 w-px bg-gradient-to-b from-transparent via-teal-500/30 to-transparent" />
                 <motion.div
-                  className="h-8 w-8 rounded-full bg-slate-900 border border-teal-500/40 flex items-center justify-center shadow-[0_0_16px_rgba(16,185,129,0.2)]"
+                  className="h-8 w-8 rounded-full bg-slate-50 border border-teal-500/40 flex items-center justify-center shadow-[0_0_16px_rgba(16,185,129,0.2)]"
                   animate={{ boxShadow: ['0 0 8px rgba(16,185,129,0.15)', '0 0 20px rgba(16,185,129,0.35)', '0 0 8px rgba(16,185,129,0.15)'] }}
                   transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
                 >
-                  <ShieldCheck size={14} className="text-teal-400" />
+                  <ShieldCheck size={14} className="text-teal-600" />
                 </motion.div>
-                <span className="text-[7px] font-black uppercase tracking-widest text-teal-400 text-center leading-tight">Invisible<br/>Barrier</span>
+                <span className="text-[7px] font-black uppercase tracking-widest text-teal-600 text-center leading-tight">Invisible<br/>Barrier</span>
                 <div className="flex-1 w-px bg-gradient-to-b from-transparent via-teal-500/30 to-transparent" />
               </div>
 
               {/* RIGHT: What Interviewer Sees */}
-              <div className="relative bg-slate-800 border border-slate-700 rounded-xl p-4 overflow-hidden">
+              <div className="relative bg-slate-100 border border-slate-700 rounded-xl p-4 overflow-hidden">
                 {/* Subtle scanline texture to imply "recording" */}
                 <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,1) 2px, rgba(255,255,255,1) 4px)' }} />
 
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">🎥 Interviewer</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-700">🎥 Interviewer</span>
                     <span className="text-[9px] text-slate-400">— their screen share view</span>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -4075,7 +4075,7 @@ function Landing({
                   </div>
                 </div>
 
-                <div className="bg-slate-900 rounded-lg p-3 border border-slate-700/60 min-h-[180px] relative">
+                <div className="bg-slate-50 rounded-lg p-3 border border-slate-700/60 min-h-[180px] relative">
                   <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-800">
                     <div className="flex gap-1">
                       <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
@@ -4096,11 +4096,11 @@ function Landing({
                   {/* Fake IDE code lines */}
                   <div className="space-y-2 font-mono">
                     {[
-                      { w: 'w-full',  color: 'bg-slate-800' },
-                      { w: 'w-3/4',  color: 'bg-slate-800' },
+                      { w: 'w-full',  color: 'bg-slate-100' },
+                      { w: 'w-3/4',  color: 'bg-slate-100' },
                       { w: 'w-5/6',  color: 'bg-teal-900/50' },
-                      { w: 'w-4/5',  color: 'bg-slate-800' },
-                      { w: 'w-2/3',  color: 'bg-slate-800' },
+                      { w: 'w-4/5',  color: 'bg-slate-100' },
+                      { w: 'w-2/3',  color: 'bg-slate-100' },
                     ].map((line, i) => (
                       <div key={i} className="flex gap-2 items-center">
                         <span className="text-[8px] text-slate-500 w-3 shrink-0">{i + 1}</span>
@@ -4115,14 +4115,14 @@ function Landing({
                     animate={{ opacity: [0.6, 1, 0.6] }}
                     transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
                   >
-                    <CheckCircle2 size={10} className="text-teal-400 shrink-0" />
+                    <CheckCircle2 size={10} className="text-teal-600 shrink-0" />
                     <span className="text-[9px] text-slate-400">No overlay visible — clean screen share</span>
                   </motion.div>
 
                   {/* Big "hidden" label overlay */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <motion.div
-                      className="bg-slate-900/80 border border-slate-700/60 rounded-lg px-3 py-2 flex items-center gap-2 backdrop-blur-sm"
+                      className="bg-slate-50 border border-slate-700/60 rounded-lg px-3 py-2 flex items-center gap-2 backdrop-blur-sm"
                       animate={{ opacity: [0.55, 0.8, 0.55] }}
                       transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
                     >
@@ -4137,9 +4137,9 @@ function Landing({
             {/* ── How It Works — 3-step mini timeline ── */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-700">
               {[
-                { step: '01', icon: Mic, title: 'Audio Captured', desc: "Sutra silently listens to the interviewer's voice via your mic.", color: 'text-teal-400', bg: 'bg-teal-500/10 border-teal-500/30' },
+                { step: '01', icon: Mic, title: 'Audio Captured', desc: "Sutra silently listens to the interviewer's voice via your mic.", color: 'text-teal-600', bg: 'bg-teal-500/10 border-teal-500/30' },
                 { step: '02', icon: Brain, title: 'AI Generates Answer', desc: 'Your profile + context shapes a tailored talking point in <2s.', color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/30' },
-                { step: '03', icon: EyeOff, title: 'Zero Screen Exposure', desc: 'The overlay is click-through — never captured by any screen share tool.', color: 'text-teal-400', bg: 'bg-teal-500/10 border-teal-500/30' },
+                { step: '03', icon: EyeOff, title: 'Zero Screen Exposure', desc: 'The overlay is click-through — never captured by any screen share tool.', color: 'text-teal-600', bg: 'bg-teal-500/10 border-teal-500/30' },
               ].map(({ step, icon: Icon, title, desc, color, bg }, i) => (
                 <motion.div
                   key={step}
@@ -4157,7 +4157,7 @@ function Landing({
                       <span className={`text-[8px] font-black uppercase tracking-widest ${color}`}>{step}</span>
                       <span className="text-[10px] font-bold text-white">{title}</span>
                     </div>
-                    <p className="text-[9px] text-slate-300 leading-relaxed">{desc}</p>
+                    <p className="text-[9px] text-slate-700 leading-relaxed">{desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -4268,7 +4268,7 @@ function Landing({
           <div className="relative max-w-3xl mx-auto">
             <div className="absolute -inset-3 rounded-[2rem] bg-teal-600 opacity-[0.12] blur-2xl" />
 
-            <div className="relative rounded-3xl bg-slate-950 border border-slate-800 p-2.5 shadow-[0_25px_60px_rgba(15,23,42,0.35)] overflow-hidden aspect-video group">
+            <div className="relative rounded-3xl bg-white border border-slate-800 p-2.5 shadow-[0_25px_60px_rgba(15,23,42,0.35)] overflow-hidden aspect-video group">
               <video 
                 ref={videoRef}
                 key={appVideoUrl}
@@ -4282,7 +4282,7 @@ function Landing({
               {!isVideoPlaying && (
                 <button
                   onClick={handlePlayClick}
-                  className="absolute inset-2.5 flex items-center justify-center rounded-2xl bg-slate-950/20 hover:bg-slate-950/30 transition-colors duration-300 cursor-pointer"
+                  className="absolute inset-2.5 flex items-center justify-center rounded-2xl bg-white hover:bg-white transition-colors duration-300 cursor-pointer"
                   aria-label="Play video"
                 >
                   <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-xl transition-transform duration-300 group-hover:scale-110">
@@ -4323,7 +4323,7 @@ function Landing({
               return (
                 <div
                   key={`${short.videoId}-${idx}`}
-                  className="group relative w-full aspect-[9/16] bg-slate-900 rounded-2xl overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.1)] ring-1 ring-slate-200 hover:ring-2 hover:ring-teal-400/60 hover:shadow-[0_20px_40px_rgba(13,148,136,0.2)] transition-all duration-300 transform hover:-translate-y-2"
+                  className="group relative w-full aspect-[9/16] bg-slate-50 rounded-2xl overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.1)] ring-1 ring-slate-200 hover:ring-2 hover:ring-teal-400/60 hover:shadow-[0_20px_40px_rgba(13,148,136,0.2)] transition-all duration-300 transform hover:-translate-y-2"
                 >
                   {isPlaying ? (
                     <iframe
@@ -4358,7 +4358,7 @@ function Landing({
                       <div className="absolute bottom-0 left-0 right-0 p-4 text-left">
                         <p className="text-white font-bold text-sm leading-tight">{short.name}</p>
                         <p className="text-white/70 text-[11px] font-semibold mt-0.5">{short.role}</p>
-                        <p className="text-teal-300 text-[10px] font-bold mt-1.5 flex items-center gap-1">
+                        <p className="text-teal-700 text-[10px] font-bold mt-1.5 flex items-center gap-1">
                           <CheckCircle2 size={11} /> {short.outcome}
                         </p>
                       </div>
@@ -4752,41 +4752,42 @@ function Landing({
             </p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto text-left">
-            {reviews.map((r, i) => (
-              <motion.div
-                key={r.id || i}
-                whileHover={{ y: -6, scale: 1.02 }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:shadow-xl hover:border-teal-200 transition-all duration-300 flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <img src={r.avatar} alt={r.name} className="h-10 w-10 rounded-full object-cover border border-slate-100 shadow-sm" />
-                      <div>
-                        <h4 className="font-display text-sm font-bold !text-slate-900 leading-tight">{r.name}</h4>
-                        <span className="text-[10px] font-semibold text-slate-500">{r.role} at {r.company}</span>
+          <div className="relative w-full max-w-full overflow-hidden py-4 -mx-6 px-6 sm:mx-0 sm:px-0">
+            <div className="animate-marquee flex gap-6 w-max">
+              {[...reviews, ...reviews, ...reviews, ...reviews].map((r, i) => (
+                <div
+                  key={`${r.id || 'r'}-${i}`}
+                  className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:shadow-xl hover:border-teal-200 transition-all duration-300 flex flex-col justify-between w-[350px] shrink-0 text-left"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <img src={r.avatar} alt={r.name} className="h-10 w-10 rounded-full object-cover border border-slate-100 shadow-sm" />
+                        <div>
+                          <h4 className="font-display text-sm font-bold !text-slate-900 leading-tight">{r.name}</h4>
+                          <span className="text-[10px] font-semibold text-slate-500">{r.role} at {r.company}</span>
+                        </div>
                       </div>
+                      <span className="text-xs bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-teal-600 font-bold shrink-0">Verified</span>
                     </div>
-                    <span className="text-xs bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-teal-600 font-bold shrink-0">Verified</span>
-                  </div>
 
-                  <div className="flex text-yellow-400 text-xs mb-3">
-                    {Array.from({ length: r.rating }).map((_, idx) => (
-                      <span key={idx}>★</span>
-                    ))}
-                  </div>
+                    <div className="flex text-yellow-400 text-xs mb-3">
+                      {Array.from({ length: r.rating }).map((_, idx) => (
+                        <span key={idx}>★</span>
+                      ))}
+                    </div>
 
-                  <p className="text-xs text-slate-600 leading-relaxed font-medium italic">
-                    &ldquo;{r.comment}&rdquo;
-                  </p>
+                    <p className="text-xs text-slate-600 leading-relaxed font-medium italic whitespace-normal">
+                      &ldquo;{r.comment}&rdquo;
+                    </p>
+                  </div>
                 </div>
-              </motion.div>
-            ))}
+              ))}
+            </div>
+            
+            {/* Gradient overlays for smooth fading at the edges */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-white to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-white to-transparent" />
           </div>
         </motion.section>
 
@@ -5112,7 +5113,7 @@ function Landing({
                                   </div>
                                 ) : (
                                   <div className="inline-flex items-center justify-center h-5 w-5 rounded-full mx-auto bg-slate-50 border border-slate-200">
-                                    <span className="text-slate-300 text-xs font-black">—</span>
+                                    <span className="text-slate-700 text-xs font-black">—</span>
                                   </div>
                                 )
                               ) : (
@@ -5504,7 +5505,7 @@ function Dashboard({
       color: 'from-teal-500/20 to-teal-600/5 border-teal-500/25 hover:border-teal-400/50',
       iconColor: 'bg-teal-500/20 text-teal-200',
       badge: 'Core Feature',
-      badgeClass: 'bg-teal-500/20 text-teal-300',
+      badgeClass: 'bg-teal-500/20 text-teal-700',
       action: onStart,
     },
     {
@@ -5514,7 +5515,7 @@ function Dashboard({
       color: 'from-teal-500/20 to-teal-600/5 border-teal-500/25 hover:border-teal-400/50',
       iconColor: 'bg-teal-500/20 text-teal-200',
       badge: activeResumeName ? '✓ Active' : 'Setup needed',
-      badgeClass: activeResumeName ? 'bg-teal-500/20 text-teal-300' : 'bg-amber-500/20 text-amber-300',
+      badgeClass: activeResumeName ? 'bg-teal-500/20 text-teal-700' : 'bg-amber-500/20 text-amber-300',
       action: () => onNavigate('Resume Intelligence'),
     },
     {
@@ -5524,7 +5525,7 @@ function Dashboard({
       color: 'from-teal-500/20 to-teal-600/5 border-teal-500/25 hover:border-teal-400/50',
       iconColor: 'bg-teal-500/20 text-teal-200',
       badge: activeDocsCount > 0 ? `${activeDocsCount} docs active` : 'No docs yet',
-      badgeClass: activeDocsCount > 0 ? 'bg-teal-500/20 text-teal-300' : 'bg-amber-500/20 text-amber-300',
+      badgeClass: activeDocsCount > 0 ? 'bg-teal-500/20 text-teal-700' : 'bg-amber-500/20 text-amber-300',
       action: () => onNavigate('Knowledge'),
     },
     {
@@ -5543,7 +5544,7 @@ function Dashboard({
     <main className="px-6 py-8 flex-1 overflow-y-auto space-y-6 relative z-10 text-left">
       
       {/* ── Welcome Header ── */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/5 pb-5">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-white font-display">
             Interview Workspace
@@ -5553,7 +5554,7 @@ function Dashboard({
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={() => onNavigate('Resume Intelligence')} className="btn-glass inline-flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-300 cursor-pointer">
+          <button onClick={() => onNavigate('Resume Intelligence')} className="btn-glass inline-flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 cursor-pointer">
             <Plus size={14} /> Add Resume
           </button>
         </div>
@@ -5566,7 +5567,7 @@ function Dashboard({
         <div className="lg:col-span-8 space-y-6">
           
           {/* Card A: Readiness & Target Info */}
-          <div className="glass rounded-2xl border border-white/5 p-6 relative overflow-hidden">
+          <div className="glass rounded-2xl border border-slate-200 p-6 relative overflow-hidden">
             <div className="pointer-events-none absolute -top-24 -right-24 h-56 w-56 rounded-full bg-teal-600/10 blur-[90px]" />
             <div className="pointer-events-none absolute -bottom-16 -left-16 h-40 w-40 rounded-full bg-cyan-500/10 blur-[80px]" />
             
@@ -5588,8 +5589,8 @@ function Dashboard({
                   {dynamicContextItems.map((it) => {
                     const Icon = it.icon;
                     return (
-                      <div key={it.title} onClick={it.action} className="flex items-center gap-3 bg-white/[0.02] border border-white/5 rounded-xl p-3 hover:border-teal-500/20 hover:bg-teal-500/5 transition-all cursor-pointer">
-                        <div className={`rounded-lg p-1.5 ${it.ok ? 'bg-teal-500/10 text-teal-400 border border-teal-500/10' : 'bg-slate-900 text-slate-600 border border-transparent'}`}><Icon size={14} /></div>
+                      <div key={it.title} onClick={it.action} className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl p-3 hover:border-teal-500/20 hover:bg-teal-500/5 transition-all cursor-pointer">
+                        <div className={`rounded-lg p-1.5 ${it.ok ? 'bg-teal-500/10 text-teal-600 border border-teal-500/10' : 'bg-slate-50 text-slate-600 border border-transparent'}`}><Icon size={14} /></div>
                         <div className="min-w-0">
                           <div className="text-xs font-bold text-white leading-tight truncate">{it.title}</div>
                           <div className="text-[10px] text-slate-500 font-semibold truncate leading-normal">{it.status}</div>
@@ -5601,7 +5602,7 @@ function Dashboard({
               </div>
 
               {/* Score Circular Dial */}
-              <div className="shrink-0 flex flex-col items-center justify-center p-4 border border-white/5 rounded-2xl bg-[#0a0b15]/40 backdrop-blur-md min-w-[130px]">
+              <div className="shrink-0 flex flex-col items-center justify-center p-4 border border-slate-200 rounded-2xl bg-[#0a0b15]/40 backdrop-blur-md min-w-[130px]">
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Readiness</div>
                 <div className="relative flex items-center justify-center h-16 w-16 mb-2">
                   <svg className="absolute inset-0 h-full w-full transform -rotate-90">
@@ -5610,7 +5611,7 @@ function Dashboard({
                   </svg>
                   <span className="text-sm font-extrabold text-white">{readinessScore}%</span>
                 </div>
-                <div className="h-1.5 rounded-full bg-slate-900 overflow-hidden w-20">
+                <div className="h-1.5 rounded-full bg-slate-50 overflow-hidden w-20">
                   <div className="h-full bg-teal-500 transition-all duration-700" style={{ width: `${readinessScore}%` }} />
                 </div>
               </div>
@@ -5618,10 +5619,10 @@ function Dashboard({
           </div>
 
           {/* Card B: Recent Sessions Logs */}
-          <div className="glass rounded-2xl border border-white/5 p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-white/5 pb-3">
+          <div className="glass rounded-2xl border border-slate-200 p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div>
-                <h3 className="text-sm font-bold text-slate-300 font-display">Recent Practice Runs</h3>
+                <h3 className="text-sm font-bold text-slate-700 font-display">Recent Practice Runs</h3>
                 <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Logs of your verbal transcripts and AI-generated answer summaries.</p>
               </div>
               <Badge tone="sky">{sessionsList.length} total</Badge>
@@ -5630,36 +5631,36 @@ function Dashboard({
             {sessionsList.length > 0 ? (
               <div className="space-y-2.5">
                 {sessionsList.slice(0, 3).map((s) => (
-                  <div key={s.id} onClick={() => openDetail(s)} className="flex items-center justify-between rounded-xl bg-white/[0.02] border border-white/5 hover:border-teal-500/20 hover:bg-teal-500/5 px-4 py-3.5 transition-all cursor-pointer group">
+                  <div key={s.id} onClick={() => openDetail(s)} className="flex items-center justify-between rounded-xl bg-slate-50 border border-slate-200 hover:border-teal-500/20 hover:bg-teal-500/5 px-4 py-3.5 transition-all cursor-pointer group">
                     <div className="flex items-center gap-3.5">
-                      <div className="h-8 w-8 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center text-slate-400 group-hover:text-white transition-colors">
+                      <div className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-white transition-colors">
                         <PlayCircle size={16} />
                       </div>
                       <div className="text-left">
-                        <div className="text-xs font-bold text-white leading-tight group-hover:text-teal-400 transition-colors">{s.title}</div>
+                        <div className="text-xs font-bold text-white leading-tight group-hover:text-teal-600 transition-colors">{s.title}</div>
                         <div className="text-[10px] text-slate-500 font-semibold mt-0.5 leading-none">{s.description} · {s.createdAt}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white/[0.04] text-slate-400 border border-white/5 uppercase">{s.type}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-50 text-slate-400 border border-slate-200 uppercase">{s.type}</span>
                       <ChevronRight size={14} className="text-slate-600 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                     </div>
                   </div>
                 ))}
                 {sessionsList.length > 3 && (
-                  <button onClick={() => onNavigate('Recent Sessions')} className="w-full text-center py-2 text-xs font-bold text-teal-400 hover:text-teal-300 transition-colors flex items-center justify-center gap-1 cursor-pointer">
+                  <button onClick={() => onNavigate('Recent Sessions')} className="w-full text-center py-2 text-xs font-bold text-teal-600 hover:text-teal-700 transition-colors flex items-center justify-center gap-1 cursor-pointer">
                     View all session reports <ArrowRight size={12} />
                   </button>
                 )}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-10 border border-dashed border-white/10 rounded-xl bg-white/[0.01]">
+              <div className="flex flex-col items-center justify-center py-10 border border-dashed border-slate-200 rounded-xl bg-slate-50">
                 <PlayCircle size={32} className="text-slate-600 mb-2.5" />
                 <div className="text-xs font-bold text-slate-400">No sessions recorded yet</div>
                 <p className="text-[10px] text-slate-600 font-medium mt-1 text-center max-w-xs leading-normal">
                   Transcripts and AI scoring metrics will appear here once you run a session prep simulation.
                 </p>
-                <button onClick={onStart} className="mt-4 rounded-lg bg-teal-600/10 border border-teal-500/20 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-teal-300 hover:bg-teal-600/20 transition-all cursor-pointer">
+                <button onClick={onStart} className="mt-4 rounded-lg bg-teal-600/10 border border-teal-500/20 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-teal-700 hover:bg-teal-600/20 transition-all cursor-pointer">
                   Launch Live Assist
                 </button>
               </div>
@@ -5671,23 +5672,18 @@ function Dashboard({
         <div className="lg:col-span-4 space-y-6">
           
           {/* Card C: Quick Launch Center */}
-          <div className="glass rounded-2xl border border-white/5 p-6 space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Navigation Launcher</h3>
-            <div className="space-y-2">
+          <div className="glass rounded-2xl border border-slate-200 p-6 space-y-4">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Quick Actions</h3>
+            <div className="grid grid-cols-2 gap-3">
               {[
-                { title: 'Live Assist Console', desc: 'Realtime speech to answer logic', icon: Mic, tone: 'teal', screen: 'Live Session' as Screen, trigger: onStart },
-                { title: 'Mock Voice Simulator', desc: 'Pre-defined question trials', icon: UserRound, tone: 'teal', screen: 'Mock Interview' as Screen },
-                { title: 'Resume Personalizer', desc: 'Custom role matching indexing', icon: FileText, tone: 'sky', screen: 'Resume Intelligence' as Screen },
-                { title: 'Knowledge Base API', desc: 'Import custom prompts & docs', icon: Brain, tone: 'teal', screen: 'Knowledge' as Screen },
-                { title: 'Recent Transcripts', desc: 'Logs, summaries, & review notes', icon: PlayCircle, tone: 'amber', screen: 'Recent Sessions' as Screen },
+                { title: 'Live Assist', desc: 'Realtime answer logic', icon: Mic, tone: 'teal', screen: 'Live Session' as Screen, trigger: onStart },
+                { title: 'Mock Voice', desc: 'Pre-defined question trials', icon: UserRound, tone: 'teal', screen: 'Mock Interview' as Screen },
+                { title: 'Resumes', desc: 'Custom role matching', icon: FileText, tone: 'teal', screen: 'Resume Intelligence' as Screen },
+                { title: 'Knowledge', desc: 'Import custom prompts', icon: Brain, tone: 'teal', screen: 'Knowledge' as Screen },
               ].map((launch) => {
                 const Icon = launch.icon;
                 const colors: Record<string, string> = {
-                  teal: 'bg-teal-500/10 text-teal-400 border-teal-500/10 group-hover:bg-teal-500/20 group-hover:text-teal-300',
-                  teal: 'bg-teal-500/10 text-teal-400 border-teal-500/10 group-hover:bg-teal-500/20 group-hover:text-teal-300',
-                  sky: 'bg-sky-500/10 text-sky-400 border-sky-500/10 group-hover:bg-sky-500/20 group-hover:text-sky-300',
-                  teal: 'bg-teal-500/10 text-teal-400 border-teal-500/10 group-hover:bg-teal-500/20 group-hover:text-teal-300',
-                  amber: 'bg-amber-500/10 text-amber-400 border-amber-500/10 group-hover:bg-amber-500/20 group-hover:text-amber-300'
+                  teal: 'bg-teal-50 text-teal-600 border-teal-100 group-hover:bg-teal-100',
                 };
                 
                 return (
@@ -5700,16 +5696,13 @@ function Dashboard({
                         onNavigate(launch.screen);
                       }
                     }}
-                    className="w-full flex items-center justify-between rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 hover:bg-white/[0.04] p-3 transition-all cursor-pointer group"
+                    className="flex flex-col items-start justify-between rounded-xl bg-slate-50 border border-slate-200 hover:border-teal-200 hover:shadow-sm p-4 transition-all cursor-pointer group text-left"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`rounded-lg p-2 border transition-all ${colors[launch.tone]}`}><Icon size={14} /></div>
-                      <div className="text-left">
-                        <div className="text-xs font-bold text-white group-hover:text-teal-400 transition-colors leading-tight">{launch.title}</div>
-                        <div className="text-[9px] text-slate-500 font-semibold mt-0.5 leading-none">{launch.desc}</div>
-                      </div>
+                    <div className={`rounded-lg p-2 border transition-all mb-3 ${colors[launch.tone]}`}><Icon size={16} /></div>
+                    <div>
+                      <div className="text-[11px] font-bold text-slate-900 group-hover:text-teal-700 transition-colors leading-tight">{launch.title}</div>
+                      <div className="text-[9px] text-slate-500 font-semibold mt-1 leading-tight">{launch.desc}</div>
                     </div>
-                    <ChevronRight size={14} className="text-slate-600 group-hover:text-white transition-colors" />
                   </button>
                 );
               })}
@@ -5717,24 +5710,24 @@ function Dashboard({
           </div>
 
           {/* Quick Stats Summary Widget */}
-          <div className="glass rounded-2xl border border-white/5 p-6 space-y-4">
+          <div className="glass rounded-2xl border border-slate-200 p-6 space-y-4">
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Platform Stats</h3>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/[0.01] border border-white/5 p-3 rounded-xl">
+              <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                 <div className="text-[9px] font-bold text-slate-500 uppercase leading-none">Total Runs</div>
-                <div className="text-lg font-extrabold text-white mt-1 leading-none">{sessionsList.length}</div>
+                <div className="text-lg font-extrabold text-slate-900 mt-1 leading-none">{sessionsList.length}</div>
               </div>
-              <div className="bg-white/[0.01] border border-white/5 p-3 rounded-xl">
+              <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                 <div className="text-[9px] font-bold text-slate-500 uppercase leading-none">Resumes</div>
-                <div className="text-lg font-extrabold text-white mt-1 leading-none">{activeResumeName ? '1' : '0'}</div>
+                <div className="text-lg font-extrabold text-slate-900 mt-1 leading-none">{activeResumeName ? '1' : '0'}</div>
               </div>
-              <div className="bg-white/[0.01] border border-white/5 p-3 rounded-xl">
+              <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                 <div className="text-[9px] font-bold text-slate-500 uppercase leading-none">Prompt Docs</div>
-                <div className="text-lg font-extrabold text-white mt-1 leading-none">{activeDocsCount}</div>
+                <div className="text-lg font-extrabold text-slate-900 mt-1 leading-none">{activeDocsCount}</div>
               </div>
-              <div className="bg-white/[0.01] border border-white/5 p-3 rounded-xl col-span-1">
+              <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl col-span-1">
                 <div className="text-[9px] font-bold text-slate-500 uppercase leading-none">Readiness</div>
-                <div className="text-sm font-extrabold text-teal-400 mt-1 leading-none">{readinessScore}%</div>
+                <div className="text-sm font-extrabold text-teal-600 mt-1 leading-none">{readinessScore}%</div>
               </div>
             </div>
           </div>
@@ -5769,7 +5762,7 @@ function AppChoiceModal({ open, onClose, onContinueWeb }: { open: boolean; onClo
   };
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-100 backdrop-blur-md animate-fadeIn">
       <div className="relative w-full max-w-2xl overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.1)] md:p-10">
         
         {/* Close Button */}
@@ -6187,7 +6180,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
 
   const selectedResume = resumes.find(r => r.id === c.selectedResumeId);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-100 p-4 backdrop-blur-md">
       <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.06)]">
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
@@ -6200,7 +6193,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
 
         {/* Step Indicator */}
         <div className="px-6 pt-5">
-          <div className="flex items-center justify-between gap-2 rounded-2xl bg-white/[0.02] border border-white/5 px-4 py-3.5">
+          <div className="flex items-center justify-between gap-2 rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3.5">
             {[1, 2, 3].map(s => {
               const active = step === s;
               const completed = step > s;
@@ -6208,11 +6201,11 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                 <React.Fragment key={s}>
                   <div className="flex items-center gap-2">
                     <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-black transition-all duration-300 ${active ? 'bg-teal-600 text-white ring-4 ring-teal-500/20' :
-                      completed ? 'bg-teal-500 text-white' : 'bg-white/5 text-slate-500 border border-white/10'
+                      completed ? 'bg-teal-500 text-white' : 'bg-white/5 text-slate-500 border border-slate-200'
                       }`}>
                       {completed ? '✓' : s}
                     </div>
-                    <span className={`text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${active ? 'text-teal-400' : completed ? 'text-teal-400' : 'text-slate-600'
+                    <span className={`text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${active ? 'text-teal-600' : completed ? 'text-teal-600' : 'text-slate-600'
                       }`}>
                       {s === 1 ? 'Job Details' : s === 2 ? 'Context' : 'AI Options'}
                     </span>
@@ -6325,10 +6318,10 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                           <div className="space-y-1">
                             <div className="flex items-center justify-between text-[10px]">
                               <span className="text-slate-400 font-semibold">Resume × JD Match</span>
-                              <span className={`font-black ${resumeScore >= 80 ? 'text-teal-400' : resumeScore >= 60 ? 'text-amber-400' : 'text-red-400'
+                              <span className={`font-black ${resumeScore >= 80 ? 'text-teal-600' : resumeScore >= 60 ? 'text-amber-400' : 'text-red-400'
                                 }`}>{resumeScore}%</span>
                             </div>
-                            <div className="h-1.5 w-full rounded-full bg-slate-800">
+                            <div className="h-1.5 w-full rounded-full bg-slate-100">
                               <div
                                 className={`h-1.5 rounded-full transition-all ${resumeScore >= 80 ? 'bg-teal-500' : resumeScore >= 60 ? 'bg-amber-500' : 'bg-red-500'
                                   }`}
@@ -6342,7 +6335,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                                   const resume = resumes.find(r => r.id === c.selectedResumeId);
                                   scoreResume(c.selectedResumeId, c.jd, resume?.parsed_content);
                                 }}
-                                className="text-[9px] text-teal-400 hover:text-teal-300 transition-all cursor-pointer mt-1"
+                                className="text-[9px] text-teal-600 hover:text-teal-700 transition-all cursor-pointer mt-1"
                               >
                                 🔄 Recalculate Score
                               </button>
@@ -6359,7 +6352,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                                 const resume = resumes.find(r => r.id === c.selectedResumeId);
                                 scoreResume(c.selectedResumeId, c.jd, resume?.parsed_content);
                               }}
-                              className="text-[9px] text-teal-400 hover:text-teal-300 underline cursor-pointer mt-1 block"
+                              className="text-[9px] text-teal-600 hover:text-teal-700 underline cursor-pointer mt-1 block"
                             >
                               Retry Scoring
                             </button>
@@ -6371,7 +6364,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
                               const resume = resumes.find(r => r.id === c.selectedResumeId);
                               scoreResume(c.selectedResumeId, c.jd, resume?.parsed_content);
                             }}
-                            className="text-[10px] text-teal-400 hover:text-teal-300 underline cursor-pointer"
+                            className="text-[10px] text-teal-600 hover:text-teal-700 underline cursor-pointer"
                           >Score resume vs JD</button>
                         )}
                       </div>
@@ -6579,7 +6572,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
 
       {/* Popup modals for context items */}
       {openDocModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-fadeIn">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-100 p-4 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold !text-slate-900 flex items-center gap-1.5">
@@ -6614,7 +6607,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
       )}
 
       {openPromptModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-fadeIn">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-100 p-4 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold !text-slate-900 flex items-center gap-1.5">
@@ -6647,7 +6640,7 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
       )}
 
       {openSessionModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-fadeIn">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-100 p-4 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold !text-slate-900 flex items-center gap-1.5">
@@ -6811,7 +6804,7 @@ function RecentSessionsTable({
                         </button>
                         <button
                           onClick={cancelEdit}
-                          className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-800 hover:text-white border border-slate-200 transition-all"
+                          className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-100 hover:text-white border border-slate-200 transition-all"
                           title="Cancel editing"
                         >
                           <X size={13} />
@@ -6828,7 +6821,7 @@ function RecentSessionsTable({
                         </button>
                         <button
                           onClick={() => startEdit(s)}
-                          className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-800 hover:text-white border border-slate-200 transition-all"
+                          className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-100 hover:text-white border border-slate-200 transition-all"
                           title="Edit details"
                         >
                           <NotebookPen size={13} />
@@ -7273,7 +7266,7 @@ function MockInterview({
           <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 shrink-0 bg-white">
             <div>
               <div className="flex items-center gap-3">
-                <span className="inline-flex items-center rounded-full bg-slate-900 px-2.5 py-0.5 text-[11px] font-bold text-white">
+                <span className="inline-flex items-center rounded-full bg-slate-50 px-2.5 py-0.5 text-[11px] font-bold text-white">
                   {interviewType}
                 </span>
                 <h1 className="text-lg font-black text-slate-900">{company} Mock Session</h1>
@@ -7408,7 +7401,7 @@ function MockInterview({
 
       {/* ── Setup Form Overlay Modal ── */}
       {showSetup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md p-4 animate-fadeIn">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-100 backdrop-blur-md p-4 animate-fadeIn">
           <div className="w-full max-w-xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-2xl relative overflow-hidden">
             <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-teal-100/50 blur-3xl pointer-events-none" />
 
@@ -7493,8 +7486,8 @@ function MockInterview({
 
       {/* ── Mock History Dashboard ── */}
       {sessions.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center border border-white/5 bg-slate-900/20 rounded-[2rem] p-8 max-w-xl mx-auto">
-          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-500/10 text-teal-300 border border-teal-500/20 shadow-glow">
+        <div className="flex flex-col items-center justify-center py-20 text-center border border-slate-200 bg-slate-50 rounded-[2rem] p-8 max-w-xl mx-auto">
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-500/10 text-teal-700 border border-teal-500/20 shadow-glow">
             <UserRound size={28} />
           </div>
           <h2 className="text-lg font-black text-white">No Mock Interviews Yet</h2>
@@ -7511,7 +7504,7 @@ function MockInterview({
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {sessions.map((s) => (
-            <div key={s.id} className="rounded-[2rem] border border-white/10 bg-slate-900/40 p-5 hover:border-teal-500/30 transition-all flex flex-col justify-between group relative overflow-hidden">
+            <div key={s.id} className="rounded-[2rem] border border-slate-200 bg-slate-50 p-5 hover:border-teal-500/30 transition-all flex flex-col justify-between group relative overflow-hidden">
               <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-teal-600/5 blur-2xl pointer-events-none" />
 
               <div>
@@ -7524,21 +7517,21 @@ function MockInterview({
                 <p className="text-xs text-slate-400 font-medium mt-1">{s.company}</p>
 
                 <div className="mt-4 grid grid-cols-2 gap-2 text-center text-[10px] text-slate-500 font-bold uppercase shrink-0">
-                  <div className="rounded-xl bg-white/[0.02] p-2 border border-white/5">
-                    <span className="text-slate-300 text-xs block mb-0.5">{s.history?.length || 0}</span>
+                  <div className="rounded-xl bg-slate-50 p-2 border border-slate-200">
+                    <span className="text-slate-700 text-xs block mb-0.5">{s.history?.length || 0}</span>
                     Questions
                   </div>
-                  <div className="rounded-xl bg-white/[0.02] p-2 border border-white/5">
-                    <span className="text-slate-300 text-xs block mb-0.5">{s.duration || '0m'}</span>
+                  <div className="rounded-xl bg-slate-50 p-2 border border-slate-200">
+                    <span className="text-slate-700 text-xs block mb-0.5">{s.duration || '0m'}</span>
                     Duration
                   </div>
                 </div>
               </div>
 
-              <div className="flex gap-2.5 mt-5 pt-3 border-t border-white/5">
+              <div className="flex gap-2.5 mt-5 pt-3 border-t border-slate-200">
                 <button
                   onClick={() => setViewingSession(s)}
-                  className="flex-1 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 py-2 text-xs font-bold text-slate-200 hover:text-white transition-all text-center"
+                  className="flex-1 rounded-xl bg-slate-50 hover:bg-slate-50 border border-slate-200 py-2 text-xs font-bold text-slate-200 hover:text-white transition-all text-center"
                 >
                   Review Q&A
                 </button>
@@ -7561,9 +7554,9 @@ function MockInterview({
       {/* ── Detailed Review Modal ── */}
       {viewingSession && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md animate-fadeIn">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[2rem] border border-white/10 bg-slate-950 p-6 shadow-soft flex flex-col justify-between">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[2rem] border border-slate-200 bg-white p-6 shadow-soft flex flex-col justify-between">
             <div>
-              <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4 shrink-0">
+              <div className="mb-4 flex items-center justify-between border-b border-slate-200 pb-4 shrink-0">
                 <div>
                   <h2 className="text-base font-black text-white">Mock Interview Transcript</h2>
                   <p className="text-[10px] text-slate-400 font-semibold mt-1">
@@ -7581,16 +7574,16 @@ function MockInterview({
               <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
                 {viewingSession.history && viewingSession.history.length > 0 ? (
                   viewingSession.history.map((qa: any, idx: number) => (
-                    <div key={idx} className="rounded-2xl border border-white/5 bg-white/[0.015] p-4 text-xs space-y-2">
-                      <div className="font-bold text-teal-400">Q{idx + 1}: {qa.question}</div>
-                      <div className="text-slate-300 pl-2 border-l border-white/10">A: {qa.answer}</div>
+                    <div key={idx} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs space-y-2">
+                      <div className="font-bold text-teal-600">Q{idx + 1}: {qa.question}</div>
+                      <div className="text-slate-700 pl-2 border-l border-slate-200">A: {qa.answer}</div>
 
-                      <div className="grid gap-3 md:grid-cols-2 pt-2 mt-2 border-t border-white/5">
-                        <div className="bg-teal-500/5 p-3 rounded-xl leading-5 text-slate-300">
-                          <span className="font-bold text-teal-400 block mb-1">AI Feedback</span>
+                      <div className="grid gap-3 md:grid-cols-2 pt-2 mt-2 border-t border-slate-200">
+                        <div className="bg-teal-500/5 p-3 rounded-xl leading-5 text-slate-700">
+                          <span className="font-bold text-teal-600 block mb-1">AI Feedback</span>
                           {qa.feedback}
                         </div>
-                        <div className="bg-sky-500/5 p-3 rounded-xl leading-5 text-slate-300">
+                        <div className="bg-sky-500/5 p-3 rounded-xl leading-5 text-slate-700">
                           <span className="font-bold text-sky-400 block mb-1">Suggested Model Answer</span>
                           {qa.suggested}
                         </div>
@@ -7603,10 +7596,10 @@ function MockInterview({
               </div>
             </div>
 
-            <div className="mt-6 border-t border-white/5 pt-4 flex justify-end shrink-0">
+            <div className="mt-6 border-t border-slate-200 pt-4 flex justify-end shrink-0">
               <button
                 onClick={() => setViewingSession(null)}
-                className="rounded-xl border border-white/10 bg-white/[0.04] px-6 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/[0.08] hover:text-white transition-all"
+                className="rounded-xl border border-slate-200 bg-slate-50 px-6 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-white transition-all"
               >
                 Close Review
               </button>
@@ -8273,7 +8266,7 @@ function LiveSession({
 
       {/* ── Screen share / system audio authorization request modal ── */}
       {!sysAudio.stream && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50 backdrop-blur-md p-4">
           <div className="w-full max-w-lg rounded-[2rem] border border-slate-200 bg-white p-8 shadow-2xl text-center relative overflow-hidden">
             {/* Visual background glow */}
             <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-teal-600/10 blur-3xl pointer-events-none" />
@@ -8332,7 +8325,7 @@ function LiveSession({
                 <AlertCircle size={14} className="shrink-0 mt-0.5" />
                 <div>
                   <span className="font-bold">Connection Blocked:</span>
-                  <p className="mt-0.5 text-slate-300 leading-normal">{sysAudio.statusMsg}</p>
+                  <p className="mt-0.5 text-slate-700 leading-normal">{sysAudio.statusMsg}</p>
                 </div>
               </div>
             )}
@@ -8341,7 +8334,7 @@ function LiveSession({
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={handleExitClick}
-                className="flex-1 rounded-xl border border-white/10 bg-white/[0.04] py-3 text-sm font-bold text-slate-300 hover:bg-white/[0.08] hover:text-white transition-all"
+                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-white transition-all"
               >
                 Exit Session
               </button>
@@ -8659,7 +8652,7 @@ function LiveSession({
                     </div>
                     <div className="pl-1">
                       <FormattedAnswer text={stream.text} />
-                      <span className="animate-pulse text-teal-400 ml-1 text-sm">▍</span>
+                      <span className="animate-pulse text-teal-600 ml-1 text-sm">▍</span>
                     </div>
                   </div>
                 </div>
@@ -8694,7 +8687,7 @@ function LiveSession({
               disabled={stream.busy}
               className="w-full flex items-center justify-center gap-2 rounded-xl bg-teal-600 py-3.5 text-sm font-bold text-white hover:bg-teal-500 shadow-glow disabled:opacity-50 transition-all"
             >
-              <Sparkles size={16} className="text-teal-400" />
+              <Sparkles size={16} className="text-teal-600" />
               {stream.busy ? 'Generating Answer...' : 'Answer'}
             </button>
           </div>
@@ -8896,7 +8889,7 @@ function ResumeIntelligence() {
             onDrop={handleDrop}
             className={`flex h-48 flex-col items-center justify-center rounded-3xl border-2 border-dashed transition-all ${dragging
               ? 'border-teal-500 bg-teal-500/10 scale-[0.99]'
-              : 'border-white/10 bg-white/[0.02] hover:border-teal-400/30 hover:bg-teal-500/5'
+              : 'border-slate-200 bg-slate-50 hover:border-teal-400/30 hover:bg-teal-500/5'
               } text-center relative`}
           >
             <input
@@ -8906,8 +8899,8 @@ function ResumeIntelligence() {
               onChange={handleFileChange}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
-            <Upload size={36} className={`mb-3 ${dragging ? 'text-teal-400 animate-bounce' : 'text-slate-500'}`} />
-            <h3 className="text-base font-black text-white">Drag & Drop Resumes Here</h3>
+            <Upload size={36} className={`mb-3 ${dragging ? 'text-teal-600 animate-bounce' : 'text-slate-500'}`} />
+            <h3 className="text-base font-black text-slate-900">Drag & Drop Resumes Here</h3>
             <p className="mt-1 text-xs text-slate-500">Supports PDF, DOCX, TXT up to 10MB (or click to browse)</p>
           </div>
 
@@ -8925,11 +8918,11 @@ function ResumeIntelligence() {
                     key={r.id}
                     className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${r.active
                       ? 'border-teal-500/30 bg-teal-500/5'
-                      : 'border-white/5 bg-white/[0.01] hover:bg-white/[0.03]'
+                      : 'border-slate-200 bg-slate-50 hover:bg-slate-50'
                       }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`p-2.5 rounded-xl ${r.active ? 'bg-teal-500/10 text-teal-300' : 'bg-slate-800 text-slate-400'}`}>
+                      <div className={`p-2.5 rounded-xl ${r.active ? 'bg-teal-500/10 text-teal-700' : 'bg-slate-100 text-slate-400'}`}>
                         <FileText size={20} />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -8941,8 +8934,8 @@ function ResumeIntelligence() {
                       <button
                         onClick={() => toggleActive(r.id)}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${r.active
-                          ? 'bg-teal-600/20 text-teal-300 border border-teal-500/40 shadow-[0_0_8px_rgba(16,185,129,0.1)]'
-                          : 'bg-slate-800 text-slate-400 hover:text-white border border-slate-700 hover:border-slate-600'
+                          ? 'bg-teal-600/20 text-teal-700 border border-teal-500/40 shadow-[0_0_8px_rgba(16,185,129,0.1)]'
+                          : 'bg-slate-100 text-slate-400 hover:text-white border border-slate-700 hover:border-slate-600'
                           }`}
                       >
                         {r.active ? 'Active' : 'Make Active'}
@@ -8970,7 +8963,7 @@ function ResumeIntelligence() {
                 <p className="text-xs text-slate-400 mb-3 truncate max-w-[260px]" title={activeResume.name}>Analyzing: {activeResume.name}</p>
                 
                 {/* Tabs */}
-                <div className="flex flex-wrap gap-1.5 border-b border-white/10 pb-3 mb-4">
+                <div className="flex flex-wrap gap-1.5 border-b border-slate-200 pb-3 mb-4">
                   {[
                     { id: 'intro', label: 'AI Intro' },
                     { id: 'summary', label: 'Summary' },
@@ -8984,7 +8977,7 @@ function ResumeIntelligence() {
                       onClick={() => setPreviewTab(tab.id)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                         previewTab === tab.id
-                          ? 'bg-teal-600/20 text-teal-300 border border-teal-500/30'
+                          ? 'bg-teal-600/20 text-teal-700 border border-teal-500/30'
                           : 'bg-white/5 text-slate-400 hover:text-white border border-transparent'
                       }`}
                     >
@@ -9015,12 +9008,12 @@ function ResumeIntelligence() {
                         else text = activeResume.parsed_content;
                         navigator.clipboard.writeText(text || '');
                       }}
-                      className="text-[10px] text-teal-400 hover:text-teal-300 font-bold bg-white/5 px-2 py-0.5 rounded transition-all cursor-pointer"
+                      className="text-[10px] text-teal-600 hover:text-teal-700 font-bold bg-white/5 px-2 py-0.5 rounded transition-all cursor-pointer"
                     >
                       Copy Content
                     </button>
                   </div>
-                  <div className="h-[320px] overflow-y-auto rounded-xl border border-white/10 bg-slate-950 p-4 text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
+                  <div className="h-[320px] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 text-xs text-slate-700 leading-relaxed whitespace-pre-wrap">
                     {previewTab === 'intro' && (activeResume.introduction || 'Generating AI speakable introduction... Please wait.')}
                     {previewTab === 'summary' && (activeResume.professional_summary || 'Generating professional summary... Please wait.')}
                     {previewTab === 'journey' && (activeResume.career_journey || 'Generating career journey... Please wait.')}
@@ -9050,7 +9043,7 @@ function CompanyIntelligence() {
         ['Amazon', 'Leadership Principles + System Design', 'Hard', 'Ownership, Dive Deep, Bias for Action'],
         ['Google', 'DSA + Distributed Systems', 'Hard', 'Scalability, correctness, tradeoffs'],
         ['Microsoft', 'Behavioral + Practical Design', 'Medium', 'Collaboration, practical design, clarity'],
-      ].map(([name, focus, level, notes]) => <Card key={name}><h2 className="text-2xl font-black">{name}</h2><p className="mt-3 text-sm text-slate-400">{focus}</p><div className="mt-5 flex gap-2"><Badge tone={level === 'Hard' ? 'amber' : 'sky'}>{level}</Badge><Badge>Likely Questions</Badge></div><p className="mt-5 text-sm leading-6 text-slate-300">{notes}</p></Card>)}
+      ].map(([name, focus, level, notes]) => <Card key={name}><h2 className="text-2xl font-black">{name}</h2><p className="mt-3 text-sm text-slate-400">{focus}</p><div className="mt-5 flex gap-2"><Badge tone={level === 'Hard' ? 'amber' : 'sky'}>{level}</Badge><Badge>Likely Questions</Badge></div><p className="mt-5 text-sm leading-6 text-slate-700">{notes}</p></Card>)}
     </div>
   </Page>;
 }
@@ -9058,8 +9051,8 @@ function CompanyIntelligence() {
 function ScreenshotLab() {
   return <Page title="Screenshot Lab" subtitle="Upload interview screenshots and extract questions, code, SQL, or diagrams.">
     <section className="grid gap-6 xl:grid-cols-2">
-      <Card><div className="flex h-96 flex-col items-center justify-center rounded-3xl border border-dashed border-teal-400/30 bg-teal-500/8 text-center"><ImageIcon size={48} className="text-teal-300" /><h2 className="mt-5 text-xl font-black">Drop Screenshot Here</h2><p className="mt-2 max-w-sm text-sm text-slate-400">Supports coding platforms, system design diagrams, SQL tables, and browser interview prompts.</p><Button className="mt-5">Upload Screenshot</Button></div></Card>
-      <Card><h2 className="text-xl font-black">Detected Output Preview</h2><div className="mt-5 space-y-4"><Output k="Question Type" v="System Design" /><Output k="Detected Question" v="Design a realtime notification service." /><Output k="Difficulty" v="Senior" /><div className="rounded-3xl bg-slate-950/70 p-5 text-sm leading-7 text-slate-300">Recommended answer will appear here after image processing.</div></div></Card>
+      <Card><div className="flex h-96 flex-col items-center justify-center rounded-3xl border border-dashed border-teal-400/30 bg-teal-500/8 text-center"><ImageIcon size={48} className="text-teal-700" /><h2 className="mt-5 text-xl font-black">Drop Screenshot Here</h2><p className="mt-2 max-w-sm text-sm text-slate-400">Supports coding platforms, system design diagrams, SQL tables, and browser interview prompts.</p><Button className="mt-5">Upload Screenshot</Button></div></Card>
+      <Card><h2 className="text-xl font-black">Detected Output Preview</h2><div className="mt-5 space-y-4"><Output k="Question Type" v="System Design" /><Output k="Detected Question" v="Design a realtime notification service." /><Output k="Difficulty" v="Senior" /><div className="rounded-3xl bg-white p-5 text-sm leading-7 text-slate-700">Recommended answer will appear here after image processing.</div></div></Card>
     </section>
   </Page>;
 }
@@ -9367,12 +9360,12 @@ function Knowledge() {
 
   return (
     <Page title="Knowledge Base" subtitle="Manage your reference documents and prompt templates. Active resources are fed into the live session behavior and context layers.">
-      <div className="flex border-b border-white/10 mb-6 max-w-xl shrink-0">
+      <div className="flex border-b border-slate-200 mb-6 max-w-xl shrink-0">
         <button
           onClick={() => setTab('docs')}
           className={`flex-1 py-3 text-sm font-black transition-all flex items-center justify-center gap-2 ${tab === 'docs'
-            ? 'border-b-2 border-teal-500 text-teal-300 bg-teal-500/5'
-            : 'text-slate-500 hover:text-slate-300'
+            ? 'border-b-2 border-teal-500 text-teal-700 bg-teal-500/5'
+            : 'text-slate-500 hover:text-slate-700'
             }`}
         >
           <FileText size={16} /> Reference Docs
@@ -9380,8 +9373,8 @@ function Knowledge() {
         <button
           onClick={() => setTab('prompts')}
           className={`flex-1 py-3 text-sm font-black transition-all flex items-center justify-center gap-2 ${tab === 'prompts'
-            ? 'border-b-2 border-teal-500 text-teal-300 bg-teal-500/5'
-            : 'text-slate-500 hover:text-slate-300'
+            ? 'border-b-2 border-teal-500 text-teal-700 bg-teal-500/5'
+            : 'text-slate-500 hover:text-slate-700'
             }`}
         >
           <Library size={16} /> Prompt Templates
@@ -9397,7 +9390,7 @@ function Knowledge() {
               onDrop={handleDocDrop}
               className={`flex h-48 flex-col items-center justify-center rounded-3xl border-2 border-dashed transition-all ${docDragging
                 ? 'border-teal-500 bg-teal-500/10 scale-[0.99]'
-                : 'border-white/10 bg-white/[0.02] hover:border-teal-400/30 hover:bg-teal-500/5'
+                : 'border-slate-200 bg-slate-50 hover:border-teal-400/30 hover:bg-teal-500/5'
                 } text-center relative`}
             >
               <input
@@ -9406,8 +9399,8 @@ function Knowledge() {
                 onChange={handleDocFileChange}
                 className="absolute inset-0 opacity-0 cursor-pointer"
               />
-              <Upload size={36} className={`mb-3 ${docDragging ? 'text-teal-400 animate-bounce' : 'text-slate-500'}`} />
-              <h3 className="text-base font-black text-white">Drag & Drop Documents Here</h3>
+              <Upload size={36} className={`mb-3 ${docDragging ? 'text-teal-600 animate-bounce' : 'text-slate-500'}`} />
+              <h3 className="text-base font-black text-slate-900">Drag & Drop Documents Here</h3>
               <p className="mt-1 text-xs text-slate-500">Supports PDF, DOCX, TXT, MD up to 15MB (or click to browse)</p>
             </div>
 
@@ -9429,15 +9422,15 @@ function Knowledge() {
                           ? 'border-teal-500 bg-teal-500/10'
                           : d.active
                             ? 'border-teal-500/30 bg-teal-500/5'
-                            : 'border-white/5 bg-white/[0.01] hover:bg-white/[0.03]'
+                            : 'border-slate-200 bg-slate-50 hover:bg-slate-50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`p-2.5 rounded-xl ${d.active ? 'bg-teal-500/15 text-teal-300' : 'bg-slate-800 text-slate-400'}`}>
+                        <div className={`p-2.5 rounded-xl ${d.active ? 'bg-teal-500/15 text-teal-700' : 'bg-slate-100 text-slate-400'}`}>
                           <FileText size={20} />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="text-sm font-bold text-white truncate max-w-[240px]" title={d.name}>{d.name}</div>
+                          <div className="text-sm font-bold text-slate-900 truncate max-w-[240px]" title={d.name}>{d.name}</div>
                           <div className="text-xs text-slate-500 mt-0.5">{d.size} • Uploaded {d.uploadDate}</div>
                         </div>
                       </div>
@@ -9485,7 +9478,7 @@ function Knowledge() {
                           Copy Text
                         </button>
                       </div>
-                      <div className="h-32 overflow-y-auto rounded-xl border border-white/10 bg-slate-950 p-3 text-[11px] font-mono text-slate-300 leading-relaxed whitespace-pre-wrap">
+                      <div className="h-32 overflow-y-auto rounded-xl border border-slate-200 bg-white p-3 text-[11px] font-mono text-slate-700 leading-relaxed whitespace-pre-wrap">
                         {previewDoc.content || 'No text content available.'}
                       </div>
                     </div>
@@ -9505,12 +9498,12 @@ function Knowledge() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-400">Total Active Reference Docs</span>
-                  <span className="font-bold text-white">{docs.filter(d => d.active).length} files</span>
+                  <span className="font-bold text-slate-900">{docs.filter(d => d.active).length} files</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-400">Total Index Size</span>
                   <span className="font-bold text-white">
-                    {(docs.reduce((acc, d) => acc + (d.name.endsWith('.pdf') ? 1000 : 25), 0) / 1024).toFixed(2)} MB
+                    {(docs.reduce((acc, d) => acc + ((d.name || '').endsWith('.pdf') ? 1000 : 25), 0) / 1024).toFixed(2)} MB
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
@@ -9519,8 +9512,8 @@ function Knowledge() {
                 </div>
               </div>
             </div>
-            <div className="mt-8 pt-5 border-t border-white/5 text-xs text-slate-500 leading-5">
-              💡 <strong className="text-slate-300">Tip:</strong> Activating more documents increases the variety of matching context, but keep it targeted to the specific job description for maximum answer relevancy.
+            <div className="mt-8 pt-5 border-t border-slate-200 text-xs text-slate-500 leading-5">
+              💡 <strong className="text-slate-700">Tip:</strong> Activating more documents increases the variety of matching context, but keep it targeted to the specific job description for maximum answer relevancy.
             </div>
           </Card>
         </div>
@@ -9536,7 +9529,7 @@ function Knowledge() {
                 onDrop={handlePromptDrop}
                 className={`flex h-64 flex-col items-center justify-center rounded-3xl border-2 border-dashed transition-all ${promptDragging
                   ? 'border-teal-500 bg-teal-500/10 scale-[0.99]'
-                  : 'border-white/10 bg-white/[0.02] hover:border-teal-400/30 hover:bg-teal-500/5'
+                  : 'border-slate-200 bg-slate-50 hover:border-teal-400/30 hover:bg-teal-500/5'
                   } text-center p-4 relative`}
               >
                 <input
@@ -9546,8 +9539,8 @@ function Knowledge() {
                   onChange={handlePromptFileChange}
                   className="absolute inset-0 opacity-0 cursor-pointer"
                 />
-                <Upload size={32} className={`mb-3 ${promptDragging ? 'text-teal-400 animate-bounce' : 'text-slate-500'}`} />
-                <h3 className="text-sm font-black text-white">Drag & Drop Prompt Files</h3>
+                <Upload size={32} className={`mb-3 ${promptDragging ? 'text-teal-600 animate-bounce' : 'text-slate-500'}`} />
+                <h3 className="text-sm font-black text-slate-900">Drag & Drop Prompt Files</h3>
                 <p className="mt-1 text-xs text-slate-500 max-w-[150px] mx-auto">Drop template files (.txt, .md) to import them instantly (or click to browse)</p>
               </div>
 
@@ -9560,7 +9553,7 @@ function Knowledge() {
                       placeholder="Template Title (e.g. Behavioral STAR)"
                       value={promptTitleInput}
                       onChange={e => setPromptTitleInput(e.target.value)}
-                      className="w-full text-xs rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 outline-none focus:border-teal-500/50 text-white placeholder:text-slate-600"
+                      className="w-full text-xs rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-teal-500/50 text-white placeholder:text-slate-600"
                     />
                   </div>
                   <div>
@@ -9569,7 +9562,7 @@ function Knowledge() {
                       rows={4}
                       value={promptContentInput}
                       onChange={e => setPromptContentInput(e.target.value)}
-                      className="w-full text-xs resize-none rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 outline-none focus:border-teal-500/50 text-white placeholder:text-slate-600"
+                      className="w-full text-xs resize-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-teal-500/50 text-white placeholder:text-slate-600"
                     />
                   </div>
                 </div>
@@ -9597,16 +9590,16 @@ function Knowledge() {
                       key={p.id}
                       className={`p-4 rounded-2xl border transition-all ${p.active
                         ? 'border-teal-500/30 bg-teal-500/5'
-                        : 'border-white/5 bg-white/[0.01] hover:bg-white/[0.03]'
+                        : 'border-slate-200 bg-slate-50 hover:bg-slate-50'
                         }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <div className={`p-2.5 rounded-xl ${p.active ? 'bg-teal-500/15 text-teal-300' : 'bg-slate-800 text-slate-400'}`}>
+                          <div className={`p-2.5 rounded-xl ${p.active ? 'bg-teal-500/15 text-teal-700' : 'bg-slate-100 text-slate-400'}`}>
                             <Library size={18} />
                           </div>
                           <div>
-                            <div className="text-sm font-bold text-white">{p.title}</div>
+                            <div className="text-sm font-bold text-slate-900">{p.title}</div>
                             <div className="text-xs text-slate-500 mt-0.5">Added {p.uploadDate}</div>
                           </div>
                         </div>
@@ -9629,7 +9622,7 @@ function Knowledge() {
                           </button>
                         </div>
                       </div>
-                      <p className="mt-3 text-xs leading-5 text-slate-400 bg-black/40 rounded-xl p-3 border border-white/5 whitespace-pre-wrap">{p.content}</p>
+                      <p className="mt-3 text-xs leading-5 text-slate-400 bg-slate-100 rounded-xl p-3 border border-slate-200 whitespace-pre-wrap">{p.content}</p>
                     </div>
                   ))
                 )}
@@ -9644,7 +9637,7 @@ function Knowledge() {
               <div className="rounded-3xl border border-teal-400/15 bg-teal-500/8 p-5 mb-6">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-black text-sm">Active Templates</span>
-                  <span className="font-bold text-teal-300">{prompts.filter(p => p.active).length} Injected</span>
+                  <span className="font-bold text-teal-700">{prompts.filter(p => p.active).length} Injected</span>
                 </div>
                 <div className="text-xs text-slate-400">These will combine in the system instruction buffer during live streaming.</div>
               </div>
@@ -9659,8 +9652,8 @@ function Knowledge() {
                 </div>
               </div>
             </div>
-            <div className="mt-8 pt-5 border-t border-white/5 text-xs text-slate-500 leading-5">
-              💡 <strong className="text-slate-300">Prompt Style:</strong> Keep system prompts short and imperative (e.g. "Do not output intro commentary", "Use markdown tables for metrics").
+            <div className="mt-8 pt-5 border-t border-slate-200 text-xs text-slate-500 leading-5">
+              💡 <strong className="text-slate-700">Prompt Style:</strong> Keep system prompts short and imperative (e.g. "Do not output intro commentary", "Use markdown tables for metrics").
             </div>
           </Card>
         </div>
@@ -9698,11 +9691,11 @@ function Analytics() {
       <section className="mt-6 grid gap-6 xl:grid-cols-[1.3fr_.7fr]">
         <Card>
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-black text-white">Score Progression (Last 6 Sessions)</h3>
+            <h3 className="text-lg font-black text-slate-900">Score Progression (Last 6 Sessions)</h3>
             <Badge tone="teal">Interactive Engaged</Badge>
           </div>
 
-          <div className="relative w-full h-60 bg-slate-950/60 rounded-2xl p-4 border border-white/5 flex items-center justify-center">
+          <div className="relative w-full h-60 bg-white rounded-2xl p-4 border border-slate-200 flex items-center justify-center">
             <svg viewBox="0 0 500 200" className="w-full h-full overflow-visible">
               <defs>
                 <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
@@ -9749,9 +9742,9 @@ function Analytics() {
 
         <Card className="flex flex-col justify-between">
           <div>
-            <h3 className="text-lg font-black text-white mb-4">Competency Breakdown</h3>
+            <h3 className="text-lg font-black text-slate-900 mb-4">Competency Breakdown</h3>
 
-            <div className="relative w-full h-44 bg-slate-950/60 rounded-2xl p-4 border border-white/5 flex items-center justify-center">
+            <div className="relative w-full h-44 bg-white rounded-2xl p-4 border border-slate-200 flex items-center justify-center">
               <svg viewBox="0 0 300 120" className="w-full h-full overflow-visible">
                 <text x="0" y="15" fill="white" fontSize="9" fontWeight="bold">System Design</text>
                 <rect x="0" y="22" width="220" height="7" rx="3.5" fill="rgba(255,255,255,0.05)" />
@@ -9776,18 +9769,18 @@ function Analytics() {
             </div>
           </div>
           <div className="mt-3 text-[11px] text-slate-500 leading-normal">
-            Your strongest dimension is <strong className="text-slate-300">System Design</strong>, while <strong className="text-slate-300">Database & SQL</strong> has the largest room for gain.
+            Your strongest dimension is <strong className="text-slate-700">System Design</strong>, while <strong className="text-slate-700">Database & SQL</strong> has the largest room for gain.
           </div>
         </Card>
       </section>
 
       <section className="mt-6 grid gap-6 md:grid-cols-2">
         <Card className="border-l-4 border-teal-500">
-          <h4 className="text-sm font-black text-teal-300 uppercase tracking-wide flex items-center gap-1.5">
+          <h4 className="text-sm font-black text-teal-700 uppercase tracking-wide flex items-center gap-1.5">
             <CheckCircle2 size={14} /> Strong Areas
           </h4>
-          <ul className="mt-3 space-y-2.5 text-xs text-slate-300 leading-5">
-            <li>• <strong className="text-white">Kafka Queueing:</strong> Perfect details on retention settings and dead-letter pipelines.</li>
+          <ul className="mt-3 space-y-2.5 text-xs text-slate-700 leading-5">
+            <li>• <strong className="text-slate-900">Kafka Queueing:</strong> Perfect details on retention settings and dead-letter pipelines.</li>
             <li>• <strong className="text-white">In-memory caching:</strong> Correct callouts on write-through strategies vs cache-aside.</li>
             <li>• <strong className="text-white">STAR Metric quantification:</strong> Increased score by 18% by framing impact in latency reductions.</li>
           </ul>
@@ -9797,7 +9790,7 @@ function Analytics() {
           <h4 className="text-sm font-black text-amber-300 uppercase tracking-wide flex items-center gap-1.5">
             <Target size={14} /> Action Items to Improve
           </h4>
-          <ul className="mt-3 space-y-2.5 text-xs text-slate-300 leading-5">
+          <ul className="mt-3 space-y-2.5 text-xs text-slate-700 leading-5">
             <li>• <strong className="text-white">Capacity Estimates:</strong> Practice computing storage requirements for a URL shortener mock.</li>
             <li>• <strong className="text-white">SQL deep join plans:</strong> Memorize execution plan indicators for index scans vs index seeks.</li>
             <li>• <strong className="text-white">System failure handles:</strong> Add robust circuit-breakers discussions in system design.</li>
@@ -9811,8 +9804,8 @@ function Analytics() {
 function SessionReplay() {
   return <Page title="Session Replay" subtitle="Replay questions, answers, feedback, and improvement points.">
     <div className="grid gap-6 xl:grid-cols-[.7fr_1.3fr]">
-      <Card><h2 className="text-xl font-black">Timeline</h2>{['Question 1', 'Question 2', 'Question 3', 'Question 4'].map((x, i) => <div key={x} className="mt-4 rounded-2xl bg-white/[0.035] p-4"><div className="font-bold">{x}</div><div className="text-xs text-slate-500">00:{(i + 1) * 8}</div></div>)}</Card>
-      <Card><h2 className="text-xl font-black">Replay Detail</h2><p className="mt-4 leading-7 text-slate-300">Question: How would you design a scalable URL shortener?</p><div className="mt-5 rounded-3xl bg-slate-950/70 p-5 text-sm leading-7 text-slate-300">Feedback: Strong high-level structure. Improve by adding capacity estimation and failure handling.</div></Card>
+      <Card><h2 className="text-xl font-black">Timeline</h2>{['Question 1', 'Question 2', 'Question 3', 'Question 4'].map((x, i) => <div key={x} className="mt-4 rounded-2xl bg-slate-50 p-4"><div className="font-bold">{x}</div><div className="text-xs text-slate-500">00:{(i + 1) * 8}</div></div>)}</Card>
+      <Card><h2 className="text-xl font-black">Replay Detail</h2><p className="mt-4 leading-7 text-slate-700">Question: How would you design a scalable URL shortener?</p><div className="mt-5 rounded-3xl bg-white p-5 text-sm leading-7 text-slate-700">Feedback: Strong high-level structure. Improve by adding capacity estimation and failure handling.</div></Card>
     </div>
   </Page>;
 }
@@ -9960,13 +9953,13 @@ function Billing() {
                     <span className="text-sm text-slate-500 line-through">{plan.originalPrice}</span>
                   )}
                   {plan.discount && (
-                    <span className="text-[10px] text-teal-400 font-bold bg-teal-500/10 px-2 py-0.5 rounded-lg border border-teal-500/20">
+                    <span className="text-[10px] text-teal-600 font-bold bg-teal-500/10 px-2 py-0.5 rounded-lg border border-teal-500/20">
                       {plan.discount}
                     </span>
                   )}
                 </div>
                 <p className="text-xs text-slate-400 leading-relaxed">{plan.desc}</p>
-                <div className="text-[10px] text-slate-500 font-bold bg-white/[0.02] border border-white/5 py-1 px-2.5 rounded-lg w-max">
+                <div className="text-[10px] text-slate-500 font-bold bg-slate-50 border border-slate-200 py-1 px-2.5 rounded-lg w-max">
                   {plan.validity}
                 </div>
               </div>
@@ -10005,7 +9998,7 @@ function Billing() {
                     <span className="text-xs text-slate-500">/{plan.period}</span>
                   )}
                   {plan.discount && (
-                    <span className="text-[10px] text-teal-400 font-bold bg-teal-500/10 px-2 py-0.5 rounded-lg border border-teal-500/20">
+                    <span className="text-[10px] text-teal-600 font-bold bg-teal-500/10 px-2 py-0.5 rounded-lg border border-teal-500/20">
                       {plan.discount}
                     </span>
                   )}
@@ -10038,7 +10031,7 @@ function SessionSummary({ onHome, onReplay }: { onHome: () => void; onReplay: ()
 }
 
 function Page({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
-  return <main className="px-5 py-7 lg:px-8 flex-1 overflow-y-auto min-h-0"><div className="mb-8"><p className="text-sm font-semibold text-teal-300">Sutra AI</p><h1 className="mt-2 text-4xl font-black text-white">{title}</h1><p className="mt-2 text-slate-400">{subtitle}</p></div>{children}</main>;
+  return <main className="px-5 py-7 lg:px-8 flex-1 overflow-y-auto min-h-0"><div className="mb-8"><p className="text-sm font-semibold text-teal-700">Sutra AI</p><h1 className="mt-2 text-4xl font-black text-white">{title}</h1><p className="mt-2 text-slate-400">{subtitle}</p></div>{children}</main>;
 }
 
 function useStream() {
@@ -10093,19 +10086,19 @@ function useStream() {
 }
 
 function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
-  return <div><label className="mb-2 block text-sm font-bold">{label}</label><input value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm outline-none" /></div>;
+  return <div><label className="mb-2 block text-sm font-bold">{label}</label><input value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none" /></div>;
 }
 
 function Select({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: string[] }) {
-  return <div><label className="mb-2 block text-sm font-bold">{label}</label><select value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm outline-none">{options.map((o) => <option className="bg-slate-950" key={o}>{o}</option>)}</select></div>;
+  return <div><label className="mb-2 block text-sm font-bold">{label}</label><select value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none">{options.map((o) => <option className="bg-white" key={o}>{o}</option>)}</select></div>;
 }
 
 function Tool({ icon: Icon, label }: { icon: any; label: string }) {
-  return <button className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-xs font-bold text-slate-200 hover:bg-white/[0.08]"><Icon size={15} />{label}</button>;
+  return <button className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold text-slate-200 hover:bg-slate-50"><Icon size={15} />{label}</button>;
 }
 
 function Plan({ label, value }: { label: string; value: number }) {
-  return <div><div className="mb-2 flex justify-between text-sm"><span className="text-slate-300">{label}</span><span>{value}%</span></div><Progress value={value} /></div>;
+  return <div><div className="mb-2 flex justify-between text-sm"><span className="text-slate-700">{label}</span><span>{value}%</span></div><Progress value={value} /></div>;
 }
 
 function Output({ k, v }: { k: string; v: string }) {
@@ -10256,9 +10249,9 @@ function renderHighlightedCode(code: string, lang: string = 'code') {
       if (comment) {
         tokens.push(<span key={keyIdx++} className="text-slate-500 italic">{comment}</span>);
       } else if (stringToken) {
-        tokens.push(<span key={keyIdx++} className="text-teal-400 font-medium">{stringToken}</span>);
+        tokens.push(<span key={keyIdx++} className="text-teal-600 font-medium">{stringToken}</span>);
       } else if (keyword) {
-        tokens.push(<span key={keyIdx++} className="text-teal-400 font-bold">{keyword}</span>);
+        tokens.push(<span key={keyIdx++} className="text-teal-600 font-bold">{keyword}</span>);
       } else if (numberToken) {
         tokens.push(<span key={keyIdx++} className="text-amber-400">{numberToken}</span>);
       } else if (funcName) {
@@ -10269,7 +10262,7 @@ function renderHighlightedCode(code: string, lang: string = 'code') {
         tokens.push(<span key={keyIdx++} className="text-pink-400 font-medium">{operator}</span>);
       } else if (identifier) {
         if (identifier === 'self' || identifier === 'None' || identifier === 'true' || identifier === 'false' || identifier === 'null') {
-          tokens.push(<span key={keyIdx++} className="text-teal-400 font-semibold">{identifier}</span>);
+          tokens.push(<span key={keyIdx++} className="text-teal-600 font-semibold">{identifier}</span>);
         } else {
           tokens.push(identifier);
         }
@@ -10296,16 +10289,16 @@ function FormattedAnswer({ text }: { text: string }) {
           return (
             <div key={index} className="my-4 overflow-hidden rounded-xl border border-teal-500/30 bg-[#05060f] shadow-lg font-mono text-xs ring-1 ring-teal-500/10">
               <div className="flex items-center justify-between bg-teal-950/20 px-4 py-2 border-b border-teal-500/20">
-                <span className="text-[10px] uppercase tracking-wider text-teal-300 font-extrabold">{segment.lang || 'code'}</span>
+                <span className="text-[10px] uppercase tracking-wider text-teal-700 font-extrabold">{segment.lang || 'code'}</span>
                 <button
                   type="button"
                   onClick={() => navigator.clipboard.writeText(segment.content.trim())}
-                  className="rounded-md border border-teal-500/20 bg-teal-950/40 px-2 py-1 text-[10px] font-bold text-teal-300 hover:border-teal-500 hover:text-white hover:bg-teal-900 transition-all cursor-pointer"
+                  className="rounded-md border border-teal-500/20 bg-teal-950/40 px-2 py-1 text-[10px] font-bold text-teal-700 hover:border-teal-500 hover:text-white hover:bg-teal-900 transition-all cursor-pointer"
                 >
                   Copy
                 </button>
               </div>
-              <pre className="p-4 overflow-x-auto text-slate-300 font-mono whitespace-pre-wrap bg-[#05060f]" style={{ whiteSpace: 'pre-wrap' }}>
+              <pre className="p-4 overflow-x-auto text-slate-700 font-mono whitespace-pre-wrap bg-[#05060f]" style={{ whiteSpace: 'pre-wrap' }}>
                 <code className="whitespace-pre-wrap" style={{ whiteSpace: 'pre-wrap' }}>{renderHighlightedCode(segment.content.trimEnd(), segment.lang)}</code>
               </pre>
             </div>
@@ -10332,7 +10325,7 @@ function FormattedAnswer({ text }: { text: string }) {
                   return (
                     <div key={lIdx} className="flex items-start gap-2.5 pl-1 my-1 animate-fadeIn" style={{ paddingLeft: `${indentCount * 8}px` }}>
                       <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-600 shadow-[0_0_8px_rgba(139,92,246,0.5)]" />
-                      <p className="text-slate-300 whitespace-pre-wrap">
+                      <p className="text-slate-700 whitespace-pre-wrap">
                         {renderBoldText(content)}
                       </p>
                     </div>
