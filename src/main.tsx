@@ -3066,6 +3066,15 @@ function Landing({
   };
   const handleSimulatorMouseLeave = () => setTilt({ x: 0, y: 0 });
 
+  // Navbar scroll-to-capsule
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+
   useEffect(() => {
     let timeout: any;
     const cycle = () => {
@@ -3093,7 +3102,7 @@ function Landing({
   useEffect(() => {
     const prevBg = document.body.style.background;
     const prevColor = document.body.style.color;
-    document.body.style.background = 'linear-gradient(180deg, #eff6ff 0%, #ffffff 45%, #f0fdf4 80%, #ffffff 100%)';
+    document.body.style.background = 'linear-gradient(135deg, #d1faf5 0%, #f8fffd 25%, #fffdf7 55%, #ffecd8 80%, #f0fdf4 100%)';
     document.body.style.backgroundAttachment = 'fixed';
     document.body.style.color = '#0f172a';
     return () => {
@@ -3231,7 +3240,7 @@ function Landing({
   };
 
   return (
-    <div className="min-h-screen !text-slate-900 flex flex-col relative overflow-hidden font-sans" style={{ background: '#ffffff' }}>
+    <div className="min-h-screen !text-slate-900 flex flex-col relative overflow-x-hidden font-sans">
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes audioWave {
           0%, 100% { transform: scaleY(0.35); }
@@ -3243,11 +3252,15 @@ function Landing({
         }
       `}} />
 
-      {/* === BASE CANVAS: Clean white with a soft blue wash at top === */}
-      <div className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(180deg, #eff6ff 0%, #ffffff 45%, #f0fdf4 80%, #ffffff 100%)' }} />
+      {/* === BASE CANVAS: Rich gradient mesh — vivid teal top-left, warm peach bottom-right === */}
+      <div className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(135deg, #b2f5ea 0%, #e6fffa 20%, #fffdf7 50%, #fef3c7 78%, #d1faf5 100%)' }} />
+      {/* Peach glow anchor — top-right corner */}
+      <div className="pointer-events-none absolute -top-32 -right-32 h-[700px] w-[700px] rounded-full" style={{ background: 'radial-gradient(circle at 60% 40%, rgba(251,146,60,0.25) 0%, rgba(253,186,116,0.15) 45%, transparent 68%)', filter: 'blur(60px)' }} />
+      {/* Teal glow anchor — bottom-left corner */}
+      <div className="pointer-events-none absolute -bottom-40 -left-32 h-[800px] w-[800px] rounded-full" style={{ background: 'radial-gradient(circle at 40% 60%, rgba(13,148,136,0.30) 0%, rgba(20,184,166,0.18) 50%, transparent 72%)', filter: 'blur(80px)' }} />
 
-      {/* === AURA ORBS — matched to page accent colors === */}
-      {/* Top-left: Blue — matches CTA button (teal-600) */}
+      {/* === AURA ORBS — teal, mint, soft violet: AI product look === */}
+      {/* Top-left: Teal — primary brand color */}
       <motion.div
         animate={{
           x: [0, 40, -25, 15, 0],
@@ -3261,12 +3274,12 @@ function Landing({
         }}
         className="pointer-events-none absolute -top-32 -left-24 h-[650px] w-[650px] rounded-full"
         style={{
-          background: 'radial-gradient(circle at 35% 35%, #2563eb 0%, #3b82f6 18%, rgba(59,130,246,0.35) 45%, transparent 68%)',
-          filter: 'blur(70px)',
-          opacity: 0.22
+          background: 'radial-gradient(circle at 35% 35%, #0d9488 0%, #14b8a6 18%, rgba(20,184,166,0.35) 50%, transparent 70%)',
+          filter: 'blur(80px)',
+          opacity: 0.35
         }}
       />
-      {/* Top-right: Amber/Orange — matches logo */}
+      {/* Top-right: Soft violet — depth accent */}
       <motion.div
         animate={{
           x: [0, -30, 20, -40, 0],
@@ -3280,12 +3293,12 @@ function Landing({
         }}
         className="pointer-events-none absolute -top-16 right-[-60px] h-[550px] w-[550px] rounded-full"
         style={{
-          background: 'radial-gradient(circle at 60% 35%, #f59e0b 0%, #f97316 18%, rgba(249,115,22,0.3) 45%, transparent 68%)',
+          background: 'radial-gradient(circle at 60% 35%, #7c3aed 0%, #8b5cf6 18%, rgba(139,92,246,0.3) 45%, transparent 68%)',
           filter: 'blur(75px)',
-          opacity: 0.18
+          opacity: 0.22
         }}
       />
-      {/* Center-right: Blue again, secondary glow */}
+      {/* Center-right: Teal echo */}
       <motion.div
         animate={{
           x: [0, 50, -30, 20, 0],
@@ -3299,12 +3312,12 @@ function Landing({
         }}
         className="pointer-events-none absolute top-[20%] -right-20 h-[700px] w-[600px] rounded-full"
         style={{
-          background: 'radial-gradient(circle at 65% 40%, #1d4ed8 0%, #2563eb 15%, rgba(37,99,235,0.2) 50%, transparent 70%)',
+          background: 'radial-gradient(circle at 65% 40%, #0f766e 0%, #14b8a6 15%, rgba(20,184,166,0.15) 50%, transparent 70%)',
           filter: 'blur(90px)',
-          opacity: 0.18
+          opacity: 0.15
         }}
       />
-      {/* Mid-left: teal — matches live indicators & badges */}
+      {/* Mid-left: Mint — fresh secondary accent */}
       <motion.div
         animate={{
           x: [0, -45, 35, -20, 0],
@@ -3318,12 +3331,12 @@ function Landing({
         }}
         className="pointer-events-none absolute top-[35%] -left-28 h-[550px] w-[550px] rounded-full"
         style={{
-          background: 'radial-gradient(circle at 30% 50%, #059669 0%, #10b981 18%, rgba(16,185,129,0.25) 48%, transparent 68%)',
+          background: 'radial-gradient(circle at 30% 50%, #34d399 0%, #6ee7b7 18%, rgba(110,231,183,0.25) 48%, transparent 68%)',
           filter: 'blur(80px)',
-          opacity: 0.2
+          opacity: 0.28
         }}
       />
-      {/* Bottom-center: Soft blue sweep */}
+      {/* Bottom-center: Soft violet sweep */}
       <motion.div
         animate={{
           x: [0, 35, -35, 15, 0],
@@ -3337,12 +3350,12 @@ function Landing({
         }}
         className="pointer-events-none absolute bottom-[0%] left-[15%] h-[500px] w-[800px] rounded-full"
         style={{
-          background: 'radial-gradient(ellipse at 50% 60%, #3b82f6 0%, rgba(59,130,246,0.3) 35%, transparent 65%)',
+          background: 'radial-gradient(ellipse at 50% 60%, #6d28d9 0%, rgba(109,40,217,0.25) 38%, transparent 65%)',
           filter: 'blur(90px)',
-          opacity: 0.15
+          opacity: 0.09
         }}
       />
-      {/* Bottom-right: Amber accent echo */}
+      {/* Bottom-right: Teal warmth */}
       <motion.div
         animate={{
           x: [0, -25, 45, -15, 0],
@@ -3356,69 +3369,110 @@ function Landing({
         }}
         className="pointer-events-none absolute -bottom-20 right-[5%] h-[420px] w-[420px] rounded-full"
         style={{
-          background: 'radial-gradient(circle, #f59e0b 0%, rgba(245,158,11,0.3) 38%, transparent 65%)',
+          background: 'radial-gradient(circle, #0d9488 0%, rgba(13,148,136,0.25) 40%, transparent 65%)',
           filter: 'blur(65px)',
-          opacity: 0.16
+          opacity: 0.14
         }}
       />
 
       {/* === HERO SPOTLIGHT: Directional white light from top keeps text readable === */}
-      <div className="pointer-events-none absolute top-0 left-0 right-0 h-[700px]" style={{ background: 'radial-gradient(ellipse 90% 60% at 50% 0%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 40%, transparent 100%)' }} />
+      <div className="pointer-events-none absolute top-0 left-0 right-0 h-[700px]" style={{ background: 'radial-gradient(ellipse 90% 60% at 50% 0%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.65) 40%, transparent 100%)' }} />
 
-      {/* === DOT GRID: teal-tinted to match CTA === */}
-      <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, rgba(37,99,235,0.12) 1px, transparent 1px)', backgroundSize: '30px 30px', maskImage: 'radial-gradient(ellipse 85% 55% at 50% 10%, black 10%, rgba(0,0,0,0.35) 45%, transparent 75%)', opacity: 0.9 }} />
+      {/* === DOT GRID: Teal-tinted to match brand === */}
+      <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, rgba(13,148,136,0.10) 1px, transparent 1px)', backgroundSize: '28px 28px', maskImage: 'radial-gradient(ellipse 90% 65% at 50% 15%, black 10%, rgba(0,0,0,0.25) 50%, transparent 80%)', opacity: 0.85 }} />
 
-      {/* === TOP ACCENT LINE: teal-to-amber matches brand === */}
-      <div className="pointer-events-none absolute top-0 inset-x-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent 0%, #3b82f6 25%, #2563eb 45%, #f59e0b 65%, #f97316 80%, transparent 100%)' }} />
+      {/* === NOISE / GRAIN overlay: Kills the flat-vector look, adds tactile depth === */}
+      <svg className="pointer-events-none absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.028 }}>
+        <filter id="grain-filter">
+          <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch" />
+          <feColorMatrix type="saturate" values="0" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#grain-filter)" />
+      </svg>
 
-      {/* Navbar — sticky glass bar */}
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200/60 bg-white/80 backdrop-blur-xl shadow-[0_1px_20px_rgba(0,0,0,0.06)] transition-all">
-        <div className="mx-auto w-full max-w-7xl px-6 py-4 flex items-center justify-between">
+      {/* === TOP ACCENT LINE: teal-to-violet matches new brand palette === */}
+      <div className="pointer-events-none absolute top-0 inset-x-0 h-[2px]" style={{ background: 'linear-gradient(to right, transparent 0%, #14b8a6 20%, #0d9488 45%, #7c3aed 70%, transparent 100%)' }} />
+
+      {/* Navbar — fixed, morphs into floating capsule on scroll */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 w-full flex justify-center transition-all duration-700 ease-in-out ${
+          scrolled ? 'py-3' : 'py-0 border-b border-slate-200/60'
+        }`}
+        style={{
+          background: scrolled ? 'transparent' : 'rgba(255,255,255,0.85)',
+          backdropFilter: scrolled ? 'none' : 'blur(20px)',
+          boxShadow: scrolled ? 'none' : '0 1px 20px rgba(0,0,0,0.06)',
+        }}
+      >
+        <div
+          className="flex items-center justify-between transition-all duration-700 ease-in-out"
+          style={{
+            width: scrolled ? 'min(760px, 92vw)' : '100%',
+            maxWidth: scrolled ? 'min(760px, 92vw)' : '80rem',
+            padding: scrolled ? '10px 20px' : '16px 24px',
+            borderRadius: scrolled ? '9999px' : '0px',
+            background: scrolled ? 'rgba(255,255,255,0.94)' : 'transparent',
+            backdropFilter: scrolled ? 'blur(24px)' : 'none',
+            boxShadow: scrolled
+              ? '0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)'
+              : 'none',
+            border: scrolled ? '1px solid rgba(226,232,240,0.8)' : 'none',
+          }}
+        >
           {/* Brand */}
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-600 shadow-[0_4px_12px_rgba(245,158,11,0.35)]">
-              <SutraLogo size={18} className="text-white" />
+            <div
+              className="flex items-center justify-center rounded-xl bg-teal-600 transition-all duration-700"
+              style={{ width: scrolled ? '30px' : '36px', height: scrolled ? '30px' : '36px', boxShadow: '0 4px 12px rgba(13,148,136,0.35)' }}
+            >
+              <SutraLogo size={scrolled ? 14 : 18} className="text-white" />
             </div>
-            <span className="font-display text-lg font-bold tracking-tight !text-slate-900">
+            <span
+              className="font-display font-bold tracking-tight !text-slate-900 transition-all duration-700"
+              style={{ fontSize: scrolled ? '15px' : '18px' }}
+            >
               Sutra <span className="text-teal-500">AI</span>
             </span>
           </div>
 
-          {/* Nav links — match actual landing page sections */}
-          <nav className="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-500">
-            <a href="#simulator" className="hover:text-teal-600 transition-colors duration-200 cursor-pointer">Live Interview</a>
-            <a href="#how-it-works" className="hover:text-teal-600 transition-colors duration-200 cursor-pointer">How It Works</a>
-            <a href="#features" className="hover:text-teal-600 transition-colors duration-200 cursor-pointer">Features</a>
-            <a href="#reviews" className="hover:text-teal-600 transition-colors duration-200 cursor-pointer">Reviews</a>
-            <a href="#pricing" className="hover:text-teal-600 transition-colors duration-200 cursor-pointer">Pricing</a>
-            <a href="#showcase-video" className="hover:text-teal-600 transition-colors duration-200 cursor-pointer">Watch Demo</a>
+          {/* Nav links */}
+          <nav
+            className="hidden md:flex items-center transition-all duration-700"
+            style={{ gap: scrolled ? '20px' : '28px', fontSize: scrolled ? '12px' : '14px' }}
+          >
+            {[['#simulator','Live Interview'],['#how-it-works','How It Works'],['#features','Features'],['#reviews','Reviews'],['#pricing','Pricing'],['#showcase-video','Watch Demo']].map(([href, label]) => (
+              <a key={href} href={href} className="font-semibold text-slate-500 hover:text-teal-600 transition-colors duration-200 cursor-pointer whitespace-nowrap">{label}</a>
+            ))}
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center" style={{ gap: scrolled ? '8px' : '12px' }}>
             <button
               onClick={onSignIn}
-              className="text-sm font-semibold text-slate-600 hover:text-teal-700 transition-colors cursor-pointer"
+              className="font-semibold text-slate-600 hover:text-teal-700 transition-colors cursor-pointer"
+              style={{ fontSize: scrolled ? '12px' : '14px' }}
             >
               Log in
             </button>
             <button
               onClick={onStart}
-              className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white cursor-pointer transition-all duration-200 hover:-translate-y-px active:translate-y-0"
+              className="inline-flex items-center gap-1.5 rounded-full font-bold text-white cursor-pointer transition-all duration-500 hover:-translate-y-px active:translate-y-0 whitespace-nowrap"
               style={{
+                fontSize: scrolled ? '11px' : '14px',
+                padding: scrolled ? '7px 16px' : '10px 20px',
                 background: 'linear-gradient(135deg, #0d9488 0%, #059669 100%)',
                 boxShadow: '0 4px 14px rgba(13,148,136,0.35), inset 0 1px 0 rgba(255,255,255,0.15)'
               }}
             >
-              Start Free Session <ArrowRight size={14} />
+              {scrolled ? 'Get Started' : 'Start Free Session'} <ArrowRight size={scrolled ? 12 : 14} />
             </button>
           </div>
         </div>
       </header>
 
 
-      {/* Main Container */}
-      <main className="relative z-10 flex-1">
+      {/* Main Container — top padding to clear fixed navbar */}
+      <main className="relative z-10 flex-1 pt-[68px]">
         
         {/* Hero Section */}
         <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, type: "spring", bounce: 0.3 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-12 md:py-20 grid items-center gap-12 lg:grid-cols-[1.1fr_.9fr]">
@@ -3428,6 +3482,7 @@ function Landing({
               <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-ping" />
               <span>Sutra 2.0 Engine Live</span>
             </div>
+
 
             {/* Dynamic Segmented Switch */}
             <div className="mb-6 flex items-center gap-1 rounded-2xl border border-slate-200/80 bg-slate-100 p-1">
@@ -3546,8 +3601,10 @@ function Landing({
             onMouseLeave={handleSimulatorMouseLeave}
             onMouseUp={() => setTilt({ x: 0, y: 0 })}
           >
-            {/* Subtle blue/teal background glow */}
-            <div className="absolute -inset-2 rounded-3xl bg-teal-600 opacity-[0.08] blur-2xl animate-pulse" />
+            {/* Deeper directional glow behind mockup — grounds the screenshot visually */}
+            <div className="absolute -inset-6 rounded-3xl" style={{ background: 'radial-gradient(ellipse 80% 70% at 50% 55%, rgba(13,148,136,0.22) 0%, rgba(20,184,166,0.10) 50%, transparent 80%)', filter: 'blur(32px)' }} />
+            <div className="absolute -inset-2 rounded-3xl bg-teal-600 opacity-[0.07] blur-2xl animate-pulse" />
+            
             
             {activeMode === 'prep' ? (
               // PREP MODE MOCKUP
