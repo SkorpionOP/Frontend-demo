@@ -9,18 +9,26 @@ import {
   SlidersHorizontal, CheckCircle2, Crown, Zap, Target, Layers, ScreenShare, AlertCircle, ExternalLink,
   Volume2, VolumeX, Activity, MonitorSpeaker, HelpCircle, ChevronDown, ChevronUp, ChevronRight, Cpu,
   Laptop, Globe, Monitor, ArrowRight, PlayCircle as MonitorPlay, EyeOff, BellOff,
-  Trash, Edit3, MessageSquare, Check, Video, Settings as SettingsIcon
+  Trash, Edit3, MessageSquare, Check, Video, Settings as SettingsIcon, CreditCard
 } from 'lucide-react';
 import './styles/globals.css';
 import { signInWithGoogle, logOut, type AppUser, isFirebaseConfigured } from './firebase';
 
 
 
-export const SutraLogo = ({ size = 24, className = "text-white" }: { size?: number, className?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M12 0C12 7 17 12 24 12C17 12 12 17 12 24C12 17 7 12 0 12C7 12 12 7 12 0ZM12 4C12 8 16 12 20 12C16 12 12 16 12 20C12 16 8 12 4 12C8 12 12 8 12 4Z" fill="currentColor" fillRule="evenodd" />
-  </svg>
+import sutraLogoImg from './assets/Logo.png';
+
+export const SutraLogo = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
+  <img
+    src={sutraLogoImg}
+    alt="Sutra AI Logo"
+    width={size}
+    height={size}
+    className={className}
+    style={{ objectFit: 'contain', display: 'block' }}
+  />
 );
+
 
 export function getCurrentUserKeys() {
   try {
@@ -71,8 +79,10 @@ type Screen =
   | 'Knowledge'
   | 'Settings'
   | 'Billing'
+  | 'Suggestions'
   | 'Help'
-  | 'Admin';
+  | 'Admin'
+  | 'Sync';
 
 type SessionType = 'Interview' | 'Coding' | 'HR' | 'Interview+Coding';
 
@@ -105,6 +115,33 @@ type TranscriptItem = {
   finalText?: string;
 };
 
+export type Suggestion = {
+  id: string;
+  userId: string;
+  text: string;
+  createdAt: string;
+  source: string;
+};
+
+export const saveSuggestion = (text: string, source: string, userId: string = 'anonymous') => {
+  try {
+    const existing = localStorage.getItem('sutra-suggestions');
+    const suggestions: Suggestion[] = existing ? JSON.parse(existing) : [];
+    const newSuggestion: Suggestion = {
+      id: Date.now().toString(),
+      userId,
+      text,
+      createdAt: new Date().toLocaleString(),
+      source
+    };
+    suggestions.unshift(newSuggestion);
+    localStorage.setItem('sutra-suggestions', JSON.stringify(suggestions));
+  } catch (e) {
+    console.error("Failed to save suggestion", e);
+  }
+};
+
+
 const modelOptions = [
   { value: 'gpt-4.1', label: 'GPT-4.1 (Premium)' },
   { value: 'gpt-4.1-mini', label: 'GPT-4.1-mini' },
@@ -130,15 +167,74 @@ const defaultConfig: SessionConfig = {
   selectedSessionId: '',
 };
 
-const nav = [
-  { label: 'Dashboard', icon: LayoutDashboard, screen: 'Dashboard' },
-  { label: 'Live Session', icon: Mic, screen: 'Live Session' },
-  { label: 'Mock Interview', icon: UserRound, screen: 'Mock Interview' },
-  { label: 'Recent Sessions', icon: PlayCircle, screen: 'Recent Sessions' },
-  { label: 'Resumes', icon: FileText, screen: 'Resume Intelligence' },
-  { label: 'Knowledge', icon: Brain, screen: 'Knowledge' },
-  { label: 'Help', icon: HelpCircle, screen: 'Help' },
-];
+export const SuggestionModal = ({ isOpen, onClose, source, onComplete }: { isOpen: boolean, onClose: () => void, source: string, onComplete?: () => void }) => {
+  const [text, setText] = useState('');
+  if (!isOpen) return null;
+  const handleSubmit = () => {
+    const keys = getCurrentUserKeys();
+    saveSuggestion(text, source, keys.userId || 'anonymous');
+    setText('');
+    onClose();
+    if (onComplete) onComplete();
+  };
+  const handleSkip = () => {
+    setText('');
+    onClose();
+    if (onComplete) onComplete();
+  };
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl w-full max-w-md p-6 relative shadow-2xl border border-slate-200">
+        <button onClick={handleSkip} className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 cursor-pointer transition-colors">
+          <X size={20} />
+        </button>
+        <h3 className="text-xl font-bold text-slate-900 mb-1 font-display">Leave a Suggestion</h3>
+        <p className="text-sm text-slate-500 mb-5 font-medium">How can we improve {source}?</p>
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-900 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all resize-none mb-5"
+          placeholder="Your feedback..."
+        />
+        <div className="flex justify-end items-center gap-4">
+          <button onClick={handleSkip} className="text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors cursor-pointer">Skip</button>
+          <button onClick={handleSubmit} disabled={!text.trim()} className="px-5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold text-sm transition-colors disabled:opacity-50 cursor-pointer shadow-sm">Submit</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+export let ADMIN_EMAILS = ['kirankumar82054@gmail.com', 'omkarvenkat07@gmail.com'];
+export const setAdminEmails = (emails: string[]) => { ADMIN_EMAILS = emails; };
+export const isAdminUser = (email: string | null | undefined) => !!email && ADMIN_EMAILS.includes(email);
+
+export function parseVideoUrl(url: string) {
+  if (!url) return { type: 'youtube', id: 'dQw4w9WgXcQ' };
+  const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
+  if (ytMatch) return { type: 'youtube', id: ytMatch[1] };
+  if (url.length === 11 && !url.includes('/') && !url.includes('.')) return { type: 'youtube', id: url };
+  return { type: 'direct', url };
+}
+
+export const getNav = (isAdmin: boolean) => {
+  const base = [
+    { label: 'Dashboard', icon: LayoutDashboard, screen: 'Dashboard' },
+    { label: 'Live Session', icon: Mic, screen: 'Live Session' },
+    { label: 'Mock Interview', icon: UserRound, screen: 'Mock Interview' },
+    { label: 'Recent Sessions', icon: PlayCircle, screen: 'Recent Sessions' },
+    { label: 'Resumes', icon: FileText, screen: 'Resume Intelligence' },
+    { label: 'Knowledge', icon: Brain, screen: 'Knowledge' },
+    { label: 'Help', icon: HelpCircle, screen: 'Help' },
+    { label: 'Billing', icon: CreditCard, screen: 'Billing' },
+    { label: 'Suggestions', icon: MessageSquare, screen: 'Suggestions' },
+  ];
+  if (isAdmin) {
+    base.push({ label: 'Admin Console', icon: Crown, screen: 'Admin' });
+  }
+  return base;
+};
 
 const sessionTypes = [
   { label: 'Interview+Coding', value: 'Interview', icon: Briefcase, desc: 'General interview prep' },
@@ -733,13 +829,6 @@ function LoginPage({ onLoginSuccess }: { onLoginSuccess: (u: AppUser) => void })
             <span>{loading ? 'Authenticating...' : 'Sign in with Google'}</span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => onLoginSuccess({ uid: 'admin', email: 'admin@sutra.ai', displayName: 'Admin User', isMock: true } as any)}
-            className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 active:scale-98 px-5 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 shadow-sm transition-all cursor-pointer"
-          >
-            <span>🔑 Log in as Admin Bypass</span>
-          </button>
 
           <p className="mt-6 text-center text-[10px] text-slate-400 leading-normal font-semibold">
             Secure Google authentication protocol active. Data synced with your active local dashboard profile.
@@ -761,6 +850,7 @@ interface AdminPanelProps {
   shorts: any[];
   setShorts: React.Dispatch<React.SetStateAction<any[]>>;
   onBack: () => void;
+  currentUser: any;
 }
 
 function AdminPanel({
@@ -772,9 +862,92 @@ function AdminPanel({
   setSupportTickets,
   shorts,
   setShorts,
-  onBack
+  onBack,
+  currentUser
 }: AdminPanelProps) {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'reviews' | 'video' | 'tickets' | 'shorts'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'reviews' | 'video' | 'tickets' | 'shorts' | 'suggestions' | 'admins'>('dashboard');
+  const [suggestions, setSuggestions] = useState<Suggestion[]>(() => {
+    try {
+      const saved = localStorage.getItem('sutra-suggestions');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+
+  // Admins state
+  const [adminEmailList, setAdminEmailList] = useState<string[]>(ADMIN_EMAILS);
+  const [newAdminEmail, setNewAdminEmail] = useState('');
+  const [isAddingAdmin, setIsAddingAdmin] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === 'admins') {
+      fetch(`${API_BASE}/api/admins`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            setAdminEmailList(data);
+            setAdminEmails(data);
+          }
+        })
+        .catch(err => console.error("Error fetching admins", err));
+    }
+  }, [activeTab]);
+
+  const handleAddAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAdminEmail || !newAdminEmail.includes('@')) return;
+    if (adminEmailList.includes(newAdminEmail)) {
+      alert("Admin already exists!");
+      return;
+    }
+    setIsAddingAdmin(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/admins`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newAdminEmail })
+      });
+      if (res.ok) {
+        setAdminEmailList([...adminEmailList, newAdminEmail]);
+        setAdminEmails([...adminEmailList, newAdminEmail]);
+        setNewAdminEmail('');
+      } else {
+        const error = await res.json();
+        alert(error.detail || "Failed to add admin");
+      }
+    } catch (err) {
+      alert("Error adding admin");
+    } finally {
+      setIsAddingAdmin(false);
+    }
+  };
+
+  const handleRemoveAdmin = async (emailToRemove: string) => {
+    if (emailToRemove === currentUser?.email) {
+      alert("You cannot remove yourself!");
+      return;
+    }
+    if (adminEmailList.length <= 1) {
+      alert("You cannot remove the last admin!");
+      return;
+    }
+    if (!confirm(`Are you sure you want to remove ${emailToRemove} as admin?`)) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/admins/${emailToRemove}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        const newList = adminEmailList.filter(e => e !== emailToRemove);
+        setAdminEmailList(newList);
+        setAdminEmails(newList);
+      } else {
+        const error = await res.json();
+        alert(error.detail || "Failed to remove admin");
+      }
+    } catch (err) {
+      alert("Error removing admin");
+    }
+  };
 
   // Review Form States
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
@@ -904,37 +1077,8 @@ function AdminPanel({
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] !text-slate-900 flex flex-col font-sans relative overflow-hidden">
-      {/* Drifting Aura Lights */}
-      <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-teal-100/40 blur-[130px] z-0" />
-      <div className="pointer-events-none absolute bottom-20 right-1/4 h-[500px] w-[500px] rounded-full bg-teal-50/50 blur-[120px] z-0" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(circle_at_50%_30%,black_60%,transparent_100%)] opacity-85 z-0" />
-
-      {/* Header */}
-      <header className="relative z-10 bg-white/85 backdrop-blur-md border-b border-slate-200/80 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-600 shadow-[0_4px_12px_rgba(245,158,11,0.25)]">
-            <SutraLogo size={18} className="text-white" />
-          </div>
-          <div>
-            <h1 className="text-sm font-bold !text-slate-900 leading-none">Sutra AI</h1>
-            <span className="text-[10px] text-orange-600 font-extrabold uppercase tracking-wider block mt-0.5">Admin Console</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs bg-slate-100 border border-slate-200 text-slate-600 font-bold px-2.5 py-1 rounded-lg">Mock Database Active</span>
-          <button 
-            onClick={onBack}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:!text-slate-900 transition-all cursor-pointer shadow-sm"
-          >
-            ← View Landing
-          </button>
-        </div>
-      </header>
-
-      {/* Main Workspace */}
-      <div className="relative z-10 flex-1 flex flex-col md:flex-row">
-        {/* Admin Sidebar Navigation */}
+    <div className="flex-1 flex flex-col md:flex-row h-full w-full overflow-hidden">
+      {/* Admin Sidebar Navigation */}
         <aside className="w-full md:w-64 bg-white/70 backdrop-blur-md border-r border-slate-200 p-4 space-y-1.5">
           {[
             { id: 'dashboard', label: 'Dashboard Overview', icon: LayoutDashboard },
@@ -942,6 +1086,8 @@ function AdminPanel({
             { id: 'shorts', label: 'Manage Shorts', icon: Video },
             { id: 'video', label: 'Video Showcase', icon: Video },
             { id: 'tickets', label: 'Support Hub', icon: MessageSquare, badge: supportTickets.filter(t => t.status !== 'Resolved').length },
+            { id: 'suggestions', label: 'User Suggestions', icon: HelpCircle, badge: suggestions.length },
+            { id: 'admins', label: 'Manage Admins', icon: ShieldCheck },
           ].map(tab => {
             const Icon = tab.icon;
             const active = activeTab === tab.id;
@@ -1305,12 +1451,25 @@ function AdminPanel({
                   <PlayCircle size={14} className="text-teal-500" /> Admin Console Preview
                 </h3>
                 <div className="aspect-video bg-black rounded-xl overflow-hidden border border-slate-200">
-                  <video
-                    key={appVideoUrl}
-                    src={appVideoUrl}
-                    controls
-                    className="w-full h-full object-contain"
-                  />
+                  {(() => {
+                    const video = parseVideoUrl(appVideoUrl);
+                    return video.type === 'youtube' ? (
+                      <iframe
+                        key={appVideoUrl}
+                        src={`https://www.youtube.com/embed/${video.id}?modestbranding=1&rel=0`}
+                        className="w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <video
+                        key={appVideoUrl}
+                        src={video.url}
+                        controls
+                        className="w-full h-full object-contain"
+                      />
+                    );
+                  })()}
                 </div>
                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-3 rounded-xl">
                   <div className="h-2 w-2 rounded-full bg-teal-500 animate-pulse" />
@@ -1321,6 +1480,32 @@ function AdminPanel({
           )}
 
           {/* TAB 4: CUSTOMER SUPPORT HUB */}
+          {activeTab === 'suggestions' && (
+            <div className="space-y-6">
+              <div className="text-left">
+                <h2 className="text-xl font-extrabold !text-slate-900">User Suggestions & Feedback</h2>
+                <p className="text-xs text-slate-500 mt-1">Review feedback submitted by users across the platform.</p>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-2xl p-6">
+                {suggestions.length === 0 ? (
+                  <div className="text-center py-10 text-slate-500 text-sm font-semibold">No suggestions yet.</div>
+                ) : (
+                  <div className="space-y-4">
+                    {suggestions.map((s, idx) => (
+                      <div key={s.id || idx} className="p-4 border border-slate-200 rounded-xl text-left bg-slate-50">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-xs font-bold text-teal-700 bg-teal-50 px-2 py-1 rounded-md border border-teal-100">{s.source}</span>
+                          <span className="text-[10px] text-slate-400 font-semibold">{s.createdAt}</span>
+                        </div>
+                        <p className="text-sm text-slate-700 whitespace-pre-wrap">{s.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {activeTab === 'tickets' && (
             <div className="h-[74vh] flex flex-col md:flex-row border border-slate-200 bg-white rounded-2xl overflow-hidden shadow-sm">
               {/* Left Column: Tickets List */}
@@ -1470,7 +1655,145 @@ function AdminPanel({
               </div>
             </div>
           )}
+
+          {activeTab === 'admins' && (
+            <div className="space-y-6">
+              <div className="text-left">
+                <h2 className="text-xl font-extrabold !text-slate-900">Manage Admins</h2>
+                <p className="text-xs text-slate-500 mt-1">Add or remove administrator access to this console.</p>
+              </div>
+
+              <div className="bg-white border border-slate-200 rounded-2xl p-6">
+                <h3 className="text-xs font-bold !text-slate-900 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Authorized Emails</h3>
+                <div className="space-y-3 mb-6">
+                  {adminEmailList.map((email) => (
+                    <div key={email} className="flex justify-between items-center bg-slate-50 border border-slate-100 p-3 rounded-xl">
+                      <div className="flex items-center gap-3 text-left">
+                        <div className="bg-teal-100 text-teal-600 p-2 rounded-lg">
+                          <ShieldCheck size={16} />
+                        </div>
+                        <span className="text-sm font-semibold text-slate-700">{email}</span>
+                        {email === currentUser?.email && (
+                          <span className="text-[10px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded border border-teal-100">You</span>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveAdmin(email)}
+                        className={`p-2 rounded-lg transition-colors ${
+                          email === currentUser?.email || adminEmailList.length <= 1 
+                          ? 'text-slate-300 cursor-not-allowed' 
+                          : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'
+                        }`}
+                        disabled={email === currentUser?.email || adminEmailList.length <= 1}
+                        title={email === currentUser?.email ? "Cannot remove yourself" : adminEmailList.length <= 1 ? "Cannot remove last admin" : "Remove Admin"}
+                      >
+                        <Trash size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <form onSubmit={handleAddAdmin} className="flex gap-3">
+                  <input
+                    type="email"
+                    value={newAdminEmail}
+                    onChange={(e) => setNewAdminEmail(e.target.value)}
+                    placeholder="New admin email address..."
+                    className="flex-1 text-sm rounded-xl border border-slate-200 px-4 py-2 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 outline-none transition-all"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={isAddingAdmin || !newAdminEmail.includes('@')}
+                    className="flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white px-5 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50"
+                  >
+                    <Plus size={16} />
+                    {isAddingAdmin ? 'Adding...' : 'Add Admin'}
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
         </main>
+    </div>
+  );
+}
+
+function SyncPage({ user }: { user: AppUser | null }) {
+  const [status, setStatus] = useState("Syncing with desktop app...");
+  const [details, setDetails] = useState("");
+  const [isSuccess, setIsSuccess] = useState<boolean | null>(null);
+
+  const queryParams = new URLSearchParams(window.location.search);
+  const port = queryParams.get('port') || '48999';
+
+  useEffect(() => {
+    if (!user) {
+      setStatus("Please log in first. Redirecting to login...");
+      setIsSuccess(false);
+      const timer = setTimeout(() => {
+        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+
+    const currentUser = {
+      email: user.email,
+      token: localStorage.getItem('login-token') || 'mock-secure-token-12345'
+    };
+
+    fetch(`http://127.0.0.1:${port}/auth-callback?email=${encodeURIComponent(currentUser.email)}&token=${encodeURIComponent(currentUser.token)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setStatus("Success! Desktop application is now unlocked.");
+          setDetails("You can safely close this browser tab and return to the desktop app.");
+          setIsSuccess(true);
+        } else {
+          setStatus("Authorization failed.");
+          setDetails(data.message || "The desktop application rejected the authentication request.");
+          setIsSuccess(false);
+        }
+      })
+      .catch(err => {
+        console.error("Desktop app is not running:", err);
+        setStatus("Error: Could not reach desktop application.");
+        setDetails("Make sure the desktop application is running on your computer, then try again.");
+        setIsSuccess(false);
+      });
+  }, [user, port]);
+
+  return (
+    <div className="relative flex min-h-screen items-center justify-center bg-slate-950 overflow-hidden text-white font-sans">
+      <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-violet-600/10 blur-[120px]" />
+      <div className="absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-cyan-600/10 blur-[120px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:3rem_3rem]" />
+      <div className="relative z-10 w-full max-w-md p-6">
+        <div className="rounded-[2.5rem] border border-white/10 bg-slate-900/60 p-8 shadow-glow backdrop-blur-xl border-t-white/15 animate-fadeIn">
+          <div className="flex flex-col items-center text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-soft">
+              {isSuccess === true ? (
+                <CheckCircle2 size={32} className="text-emerald-400" />
+              ) : isSuccess === false ? (
+                <AlertCircle size={32} className="text-rose-400" />
+              ) : (
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              )}
+            </div>
+            <h1 className="text-2xl font-black tracking-tight text-white">
+              Stealth Account Sync
+            </h1>
+            <p className="mt-4 text-sm font-medium text-slate-200">
+              {status}
+            </p>
+            {details && (
+              <p className="mt-2 text-xs text-slate-400">
+                {details}
+              </p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1487,14 +1810,35 @@ function App() {
   });
 
   const [screen, setScreen] = useState<Screen>(() => {
+    // If the path is /sync, load the Sync page
+    if (window.location.pathname === '/sync') {
+      return 'Sync';
+    }
+    if (window.location.pathname === '/login') {
+      return 'Login';
+    }
     // If user is already logged in (from localStorage), go to Dashboard; else show Landing
     try {
       const saved = localStorage.getItem('logged-in-user');
       return saved ? 'Dashboard' : 'Landing';
-    } catch {
+    } catch (e) {
       return 'Landing';
     }
   });
+
+  const [adminEmailsState, setAdminEmailsState] = useState<string[]>(ADMIN_EMAILS);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/admins`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setAdminEmails(data);
+          setAdminEmailsState(data);
+        }
+      })
+      .catch(err => console.error("Failed to load admins", err));
+  }, []);
   const [config, setConfig] = useState<SessionConfig>(defaultConfig);
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
@@ -1548,7 +1892,7 @@ function App() {
 
   // Showcase Video URL state
   const [appVideoUrl, setAppVideoUrl] = useState<string>(() => {
-    return localStorage.getItem('sutra-landing-video') || 'https://www.w3schools.com/html/mov_bbb.mp4';
+    return localStorage.getItem('sutra-landing-video') || 'dQw4w9WgXcQ';
   });
 
   // Persist video URL
@@ -2289,6 +2633,10 @@ function App() {
     };
   }, []);
 
+  if (screen === 'Sync') {
+    return <SyncPage user={user} />;
+  }
+
   if (screen === 'Landing') {
     return <Landing
       onSignIn={() => setScreen('Login')}
@@ -2300,23 +2648,18 @@ function App() {
     />;
   }
 
-  if (screen === 'Admin') {
-    return <AdminPanel
-      reviews={reviews}
-      setReviews={setReviews}
-      appVideoUrl={appVideoUrl}
-      setAppVideoUrl={setAppVideoUrl}
-      supportTickets={supportTickets}
-      setSupportTickets={setSupportTickets}
-      shorts={shorts}
-      setShorts={setShorts}
-      onBack={() => setScreen('Landing')}
-    />;
-  }
 
   if (!user || screen === 'Login') {
     return <LoginPage onLoginSuccess={(u) => {
       setUser(u);
+      
+      const queryParams = new URLSearchParams(window.location.search);
+      const redirectUrl = queryParams.get('redirect');
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+        return;
+      }
+
       if (u.email === 'admin@sutra.ai' || u.uid === 'admin') {
         setScreen('Admin');
       } else {
@@ -2360,7 +2703,7 @@ function App() {
               setScreen('Billing');
               return;
             }
-            const item = nav.find(n => n.label === v);
+            const item = getNav(isAdminUser(user?.email)).find(n => n.label === v);
             if (item) {
               setShowHelpChatbot(false);
               if (item.screen === 'Live Session') {
@@ -2398,6 +2741,21 @@ function App() {
             deleteSession={deleteSession}
             openDetail={openDetail}
             config={config}
+          />
+        )}
+
+        {screen === 'Admin' && (
+          <AdminPanel
+            reviews={reviews}
+            setReviews={setReviews}
+            appVideoUrl={appVideoUrl}
+            setAppVideoUrl={setAppVideoUrl}
+            supportTickets={supportTickets}
+            setSupportTickets={setSupportTickets}
+            shorts={shorts}
+            setShorts={setShorts}
+            onBack={() => setScreen('Dashboard')}
+            currentUser={user}
           />
         )}
 
@@ -2484,6 +2842,7 @@ function App() {
         {screen === 'Knowledge' && <Knowledge />}
         {screen === 'Settings' && <Settings />}
         {screen === 'Billing' && <Billing />}
+        {screen === 'Suggestions' && <SuggestionsPage />}
       </div>
 
       {detailSession && (
@@ -2645,9 +3004,13 @@ function App() {
             {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 bg-slate-50">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/10 text-teal-700">
-                  <SutraLogo size={18} />
-                </div>
+                <img
+                  src={sutraLogoImg}
+                  alt="Sutra AI"
+                  width={32}
+                  height={32}
+                  style={{ objectFit: 'contain' }}
+                />
                 <div>
                   <h4 className="text-sm font-black text-slate-900">Sutra AI Support AI</h4>
                   <div className="flex items-center gap-1.5 mt-0.5">
@@ -3013,6 +3376,7 @@ function Landing({
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const video = parseVideoUrl(appVideoUrl);
 
   const handlePlayClick = () => {
     setIsVideoPlaying(true);
@@ -3026,7 +3390,7 @@ function Landing({
   const [hoveredLoop, setHoveredLoop] = useState<number | null>(null);
 
   // Pricing state
-  const [landingPricingTab, setLandingPricingTab] = useState<'periods' | 'credits'>('periods');
+  const [landingPricingTab, setLandingPricingTab] = useState<'periods' | 'credits' | 'lifetime'>('periods');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   // Stealth section demo animation
@@ -3103,10 +3467,11 @@ function Landing({
     const prevBg = document.body.style.background;
     const prevColor = document.body.style.color;
     document.body.style.background = 'linear-gradient(135deg, #d1faf5 0%, #f8fffd 25%, #fffdf7 55%, #ffecd8 80%, #f0fdf4 100%)';
-    document.body.style.backgroundAttachment = 'fixed';
+    document.body.style.backgroundAttachment = 'scroll';
     document.body.style.color = '#0f172a';
     return () => {
       document.body.style.background = prevBg;
+      document.body.style.backgroundAttachment = '';
       document.body.style.color = prevColor;
     };
   }, []);
@@ -3240,7 +3605,7 @@ function Landing({
   };
 
   return (
-    <div className="min-h-screen !text-slate-900 flex flex-col relative overflow-x-hidden font-sans">
+    <div className="min-h-screen !text-slate-900 flex flex-col relative overflow-hidden font-sans">
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes audioWave {
           0%, 100% { transform: scaleY(0.35); }
@@ -3407,9 +3772,9 @@ function Landing({
         <div
           className="flex items-center justify-between transition-all duration-700 ease-in-out"
           style={{
-            width: scrolled ? 'min(760px, 92vw)' : '100%',
-            maxWidth: scrolled ? 'min(760px, 92vw)' : '80rem',
-            padding: scrolled ? '10px 20px' : '16px 24px',
+          width: scrolled ? 'min(820px, 92vw)' : '100%',
+            maxWidth: scrolled ? 'min(820px, 92vw)' : '80rem',
+            padding: scrolled ? '10px 24px' : '12px 32px',
             borderRadius: scrolled ? '9999px' : '0px',
             background: scrolled ? 'rgba(255,255,255,0.94)' : 'transparent',
             backdropFilter: scrolled ? 'blur(24px)' : 'none',
@@ -3421,18 +3786,25 @@ function Landing({
         >
           {/* Brand */}
           <div className="flex items-center gap-3">
-            <div
-              className="flex items-center justify-center rounded-xl bg-teal-600 transition-all duration-700"
-              style={{ width: scrolled ? '30px' : '36px', height: scrolled ? '30px' : '36px', boxShadow: '0 4px 12px rgba(13,148,136,0.35)' }}
-            >
-              <SutraLogo size={scrolled ? 14 : 18} className="text-white" />
+            <img
+              src={sutraLogoImg}
+              alt="Sutra AI"
+              style={{ width: scrolled ? '40px' : '58px', height: scrolled ? '40px' : '58px', objectFit: 'contain', transition: 'all 0.7s' }}
+            />
+            <div className="transition-all duration-700">
+              <span
+                className="font-display font-black tracking-tight !text-slate-900 transition-all duration-700 block"
+                style={{ fontSize: scrolled ? '20px' : '30px', lineHeight: 1 }}
+              >
+                Sutra <span className="text-teal-500">AI</span>
+              </span>
+              <span
+                className="font-bold text-slate-400 tracking-wider uppercase block transition-all duration-700"
+                style={{ fontSize: scrolled ? '8px' : '10px', marginTop: '2px' }}
+              >
+                Clarity in every answer
+              </span>
             </div>
-            <span
-              className="font-display font-bold tracking-tight !text-slate-900 transition-all duration-700"
-              style={{ fontSize: scrolled ? '15px' : '18px' }}
-            >
-              Sutra <span className="text-teal-500">AI</span>
-            </span>
           </div>
 
           {/* Nav links */}
@@ -3440,7 +3812,7 @@ function Landing({
             className="hidden md:flex items-center transition-all duration-700"
             style={{ gap: scrolled ? '20px' : '28px', fontSize: scrolled ? '12px' : '14px' }}
           >
-            {[['#simulator','Live Interview'],['#how-it-works','How It Works'],['#features','Features'],['#reviews','Reviews'],['#pricing','Pricing'],['#showcase-video','Watch Demo']].map(([href, label]) => (
+            {[['#showcase-video','Watch Demo'],['#how-it-works','How It Works'],['#features','Features'],['#reviews','Reviews'],['#pricing','Pricing']].map(([href, label]) => (
               <a key={href} href={href} className="font-semibold text-slate-500 hover:text-teal-600 transition-colors duration-200 cursor-pointer whitespace-nowrap">{label}</a>
             ))}
           </nav>
@@ -3472,7 +3844,7 @@ function Landing({
 
 
       {/* Main Container — top padding to clear fixed navbar */}
-      <main className="relative z-10 flex-1 pt-[68px]">
+      <main className="relative z-10 flex-1 pt-[88px]">
         
         {/* Hero Section */}
         <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, type: "spring", bounce: 0.3 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-12 md:py-20 grid items-center gap-12 lg:grid-cols-[1.1fr_.9fr]">
@@ -3519,6 +3891,13 @@ function Landing({
             <p className="mt-6 max-w-xl text-slate-650 text-base sm:text-lg leading-relaxed font-semibold" style={{ color: '#475569' }}>
               Sutra AI is the only platform built as a native desktop overlay. Practice with structured voice mock interviews before, and perform flawlessly during live calls — without anyone ever knowing it's there.
             </p>
+            <div className="mt-4 max-w-lg flex items-center gap-3 bg-gradient-to-r from-amber-50 to-teal-50 border border-amber-200/60 rounded-2xl px-5 py-3.5 shadow-sm">
+              <img src={sutraLogoImg} alt="" width={28} height={28} style={{ objectFit: 'contain', flexShrink: 0 }} />
+              <div>
+                <p className="text-sm font-black text-teal-700 leading-tight">Clarity in every answer. <span className="text-slate-900">Confidence in every interview.</span></p>
+                <p className="text-[10px] text-slate-400 font-semibold mt-0.5 uppercase tracking-wider">The Sutra AI Promise</p>
+              </div>
+            </div>
             <p className="mt-2 text-xs text-slate-500 font-bold flex items-center gap-1.5">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse" />
               Built for Glances, Not Reading. Speak like a human, not a teleprompter.
@@ -4034,9 +4413,7 @@ function Landing({
                   </AnimatePresence>
 
                   <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-800">
-                    <div className="flex h-5 w-5 items-center justify-center rounded-md bg-teal-600">
-                      <SutraLogo size={10} className="text-white" />
-                    </div>
+                    <img src={sutraLogoImg} alt="Sutra AI" width={16} height={16} style={{ objectFit: 'contain' }} />
                     <span className="text-[10px] font-bold text-slate-700">Sutra AI Overlay</span>
                     <motion.span
                       className="ml-auto h-1.5 w-1.5 rounded-full"
@@ -4321,31 +4698,59 @@ function Landing({
             </p>
           </div>
 
+
           {/* Ambient glow behind the player, matching the hero mockup treatment */}
           <div className="relative max-w-3xl mx-auto">
             <div className="absolute -inset-3 rounded-[2rem] bg-teal-600 opacity-[0.12] blur-2xl" />
 
-            <div className="relative rounded-3xl bg-white border border-slate-800 p-2.5 shadow-[0_25px_60px_rgba(15,23,42,0.35)] overflow-hidden aspect-video group">
-              <video 
-                ref={videoRef}
-                key={appVideoUrl}
-                src={appVideoUrl}
-                controls={isVideoPlaying}
-                onPause={() => setIsVideoPlaying(false)}
-                className="w-full h-full object-contain rounded-2xl"
-              />
+            <div className="relative rounded-3xl bg-slate-900 border border-slate-700/60 p-2.5 shadow-[0_25px_60px_rgba(15,23,42,0.35)] overflow-hidden aspect-video group">
+              {isVideoPlaying ? (
+                video.type === 'youtube' ? (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${video.id}?autoplay=1&modestbranding=1&rel=0&playsinline=1`}
+                    className="w-full h-full rounded-2xl border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video
+                    src={video.url}
+                    controls
+                    autoPlay
+                    className="w-full h-full rounded-2xl border-0 object-contain bg-black"
+                  />
+                )
+              ) : (
+                <>
+                  {/* Thumbnail */}
+                  {video.type === 'youtube' ? (
+                    <img
+                      src={`https://img.youtube.com/vi/${video.id}/maxresdefault.jpg`}
+                      alt="Sutra AI Demo"
+                      className="absolute inset-0 w-full h-full object-cover rounded-2xl"
+                      onError={(e) => { (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`; }}
+                    />
+                  ) : (
+                    <video src={video.url} className="absolute inset-0 w-full h-full object-cover rounded-2xl bg-black" />
+                  )}
+                  {/* Dark scrim */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/10 rounded-2xl" />
 
-              {/* Custom play overlay — shown until first play, keeps the frame clean/branded */}
-              {!isVideoPlaying && (
-                <button
-                  onClick={handlePlayClick}
-                  className="absolute inset-2.5 flex items-center justify-center rounded-2xl bg-white hover:bg-white transition-colors duration-300 cursor-pointer"
-                  aria-label="Play video"
-                >
-                  <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-xl transition-transform duration-300 group-hover:scale-110">
-                    <PlayCircle size={32} className="text-teal-600 ml-1" fill="currentColor" fillOpacity={0.12} />
-                  </div>
-                </button>
+                  {/* Branded play button overlay */}
+                  <button
+                    onClick={handlePlayClick}
+                    className="absolute inset-0 flex flex-col items-center justify-center gap-4 rounded-2xl cursor-pointer group/play"
+                    aria-label="Play Sutra AI demo"
+                  >
+                    <div className="relative">
+                      <div className="absolute -inset-3 rounded-full bg-teal-500/30 blur-lg animate-pulse" />
+                      <div className="relative h-20 w-20 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-2xl transition-all duration-300 group-hover/play:scale-110 group-hover/play:bg-white">
+                        <PlayCircle size={36} className="text-teal-600 ml-1" fill="currentColor" fillOpacity={0.15} />
+                      </div>
+                    </div>
+                    <span className="text-white/90 text-sm font-bold tracking-wide drop-shadow-md">Watch the full demo</span>
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -4428,7 +4833,7 @@ function Landing({
         </motion.section>
 
         {/* Features Section */}
-        <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.6, type: "spring", bounce: 0.2 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-24 mt-12 text-center overflow-hidden">
+        <motion.section id="features" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.6, type: "spring", bounce: 0.2 }} className="relative z-10 mx-auto w-full max-w-7xl px-6 py-24 mt-12 text-center overflow-hidden">
 
           {/* Faint background mesh — gives the section depth without competing with the cards */}
           <div className="pointer-events-none absolute inset-0 -z-10 [background:radial-gradient(circle_at_20%_20%,rgba(37,99,235,0.05),transparent_40%),radial-gradient(circle_at_80%_60%,rgba(139,92,246,0.05),transparent_40%)]" />
@@ -4917,6 +5322,24 @@ function Landing({
                     Session Credits
                   </span>
                 </button>
+                <button
+                  onClick={() => setLandingPricingTab('lifetime')}
+                  className="relative px-5 py-2.5 text-sm font-bold rounded-xl transition-colors duration-200 cursor-pointer capitalize z-10 flex items-center gap-1.5"
+                  style={{ color: landingPricingTab === 'lifetime' ? '#ffffff' : '#64748b' }}
+                >
+                  {landingPricingTab === 'lifetime' && (
+                    <motion.div
+                      layoutId="landing-pricing-tab-indicator"
+                      className="absolute inset-0 rounded-xl"
+                      style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)' }}
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-1.5">
+                    <Crown size={12} />
+                    Lifetime
+                  </span>
+                </button>
               </motion.div>
             </div>
 
@@ -4929,8 +5352,98 @@ function Landing({
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto items-stretch mb-16">
-                  {(landingPricingTab === 'periods' ? [
+                <div className={`grid gap-6 ${landingPricingTab === 'lifetime' ? 'md:grid-cols-1 max-w-4xl' : 'md:grid-cols-3 max-w-5xl'} mx-auto items-stretch mb-16`}>
+                  {landingPricingTab === 'lifetime' ? (
+                    <motion.div
+                      key="lifetime"
+                      initial={{ opacity: 0, y: 24 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4 }}
+                      className="relative rounded-3xl overflow-hidden"
+                      style={{ border: '2px solid #f59e0b', boxShadow: '0 20px 60px rgba(245,158,11,0.2), 0 0 0 1px rgba(245,158,11,0.1)' }}
+                    >
+                      {/* Golden top bar */}
+                      <div className="h-1.5 w-full" style={{ background: 'linear-gradient(to right, #d97706, #f59e0b, #fbbf24, #f59e0b, #d97706)' }} />
+
+                      {/* Golden ambient glow */}
+                      <div className="absolute -inset-px rounded-3xl pointer-events-none" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(251,191,36,0.15) 0%, transparent 60%)' }} />
+
+                      {/* Badge */}
+                      <div className="absolute top-6 right-6">
+                        <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-black tracking-wider" style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)', color: '#fff' }}>
+                          <Crown size={9} /> Limited Offer
+                        </span>
+                      </div>
+
+                      <div className="bg-white p-8 md:p-10 flex flex-col md:flex-row gap-10 items-start">
+                        {/* Left: info */}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="h-12 w-12 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)', boxShadow: '0 8px 20px rgba(245,158,11,0.35)' }}>
+                              <Crown size={22} className="text-white" />
+                            </div>
+                            <div>
+                              <h3 className="font-display text-2xl font-black !text-slate-900">Lifetime Plan</h3>
+                              <p className="text-slate-400 text-xs font-medium">Pay once. Use forever. No renewals.</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-baseline gap-2 mt-6 mb-2">
+                            <span className="text-sm text-slate-400 line-through font-semibold">$599</span>
+                            <span className="text-5xl font-black" style={{ color: '#d97706' }}>$299</span>
+                            <span className="text-slate-400 text-sm font-medium">one-time</span>
+                            <span className="ml-2 inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-black" style={{ background: 'rgba(245,158,11,0.1)', color: '#d97706', border: '1px solid rgba(245,158,11,0.25)' }}>50% OFF</span>
+                          </div>
+                          <p className="text-xs text-slate-400 font-medium mb-6">Billed once — access forever, including all future updates.</p>
+
+                          <div className="h-px bg-slate-100 mb-6" />
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {[
+                              'Unlimited AI interviews — forever',
+                              'All future feature updates included',
+                              'Premium AI model access',
+                              'Unlimited history & analytics',
+                              'Dedicated lifetime support channel',
+                              'Early access to every new tool',
+                              'Custom AI persona & tone settings',
+                              'Private beta feature access',
+                            ].map((f) => (
+                              <div key={f} className="flex items-start gap-2.5 text-sm text-slate-600 font-medium">
+                                <div className="mt-0.5 h-4 w-4 rounded-full flex items-center justify-center shrink-0" style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.35)' }}>
+                                  <Check size={9} style={{ color: '#d97706' }} />
+                                </div>
+                                {f.includes('forever') || f.includes('Unlimited') ? <span className="font-bold !text-slate-900">{f}</span> : f}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Right: CTA block */}
+                        <div className="md:w-64 shrink-0 flex flex-col gap-4">
+                          <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(217,119,6,0.06) 100%)', border: '1px solid rgba(245,158,11,0.2)' }}>
+                            <p className="text-xs font-bold text-amber-700 mb-1 uppercase tracking-wider">What you get</p>
+                            <p className="text-sm font-semibold text-slate-700 leading-relaxed">Full platform access with zero recurring payments. Land your dream job — and keep using Sutra AI even after.</p>
+                          </div>
+                          <div className="rounded-2xl p-4 flex items-start gap-2.5" style={{ background: '#f0fdf4', border: '1px solid rgba(16,185,129,0.2)' }}>
+                            <CheckCircle2 size={15} className="text-emerald-500 shrink-0 mt-0.5" />
+                            <p className="text-xs font-semibold text-emerald-700">30-day money-back guarantee. No questions asked.</p>
+                          </div>
+                          <button
+                            onClick={onSignIn}
+                            className="w-full py-4 rounded-2xl text-sm font-black cursor-pointer transition-all duration-200 hover:-translate-y-px active:scale-[0.98] text-white relative overflow-hidden group"
+                            style={{ background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #d97706 100%)', backgroundSize: '200% auto', boxShadow: '0 8px 24px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.2)' }}
+                          >
+                            <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12" />
+                            <span className="relative flex items-center justify-center gap-2">
+                              <Crown size={14} /> Get Lifetime Access
+                            </span>
+                          </button>
+                          <p className="text-center text-[11px] text-slate-400 font-medium">One payment · Access forever · No subscriptions</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ) : (landingPricingTab === 'periods' ? [
                     {
                       name: 'Weekly Plan',
                       desc: 'Short-term intensive mock prep',
@@ -5287,12 +5800,19 @@ function Landing({
           
           {/* Brand info */}
           <div className="space-y-4 md:col-span-2">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-teal-600 shadow-sm">
-                <SutraLogo size={14} className="text-white" />
-              </div>
-              <span className="font-display font-bold text-sm !text-slate-900">Sutra AI</span>
+          <div className="flex items-center gap-2.5">
+            <img
+              src={sutraLogoImg}
+              alt="Sutra AI"
+              width={32}
+              height={32}
+              style={{ objectFit: 'contain' }}
+            />
+            <div>
+              <span className="font-display font-black text-base !text-slate-900">Sutra AI</span>
+              <div className="text-[9px] text-slate-400 font-bold tracking-wider uppercase">Clarity in every answer</div>
             </div>
+          </div>
             <p className="leading-relaxed text-slate-500 font-medium max-w-xs">
               The AI Operating System for Interviews.
             </p>
@@ -5338,13 +5858,7 @@ function Landing({
           <div className="flex gap-4">
             <a href="mailto:support@sutra.ai" className="hover:text-slate-600 transition-colors">Support</a>
             <a href="https://github.com" target="_blank" className="hover:text-slate-600 transition-colors">GitHub project</a>
-            <button
-              type="button"
-              onClick={() => setScreen('Admin')}
-              className="hover:text-slate-600 transition-colors text-slate-400 font-semibold cursor-pointer text-xs bg-transparent border-none p-0 inline-flex items-center gap-1"
-            >
-              🔑 Admin Console
-            </button>
+
           </div>
         </div>
       </footer>
@@ -5369,17 +5883,21 @@ function Sidebar({ active, onNavigate, onLogout, showHelpChatbot }: { active: st
           onClick={() => onNavigate('Dashboard')}
           className="flex items-center gap-3 px-2 hover:opacity-80 transition-all cursor-pointer select-none"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600 shadow-[0_4px_12px_rgba(245,158,11,0.3)]">
-            <SutraLogo size={22} className="text-white" />
-          </div>
+          <img
+            src={sutraLogoImg}
+            alt="Sutra AI"
+            width={44}
+            height={44}
+            style={{ objectFit: 'contain', flexShrink: 0 }}
+          />
           <div>
-            <div className="text-base font-bold !text-slate-900 leading-tight">Sutra <span className="text-teal-500">AI</span></div>
-            <div className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Interview OS</div>
+            <div className="text-xl font-black !text-slate-900 leading-tight">Sutra <span className="text-teal-500">AI</span></div>
+            <div className="text-[9px] text-slate-400 font-bold tracking-wider uppercase">Clarity · Confidence · Performance</div>
           </div>
         </div>
 
         <nav className="space-y-1.5 w-full">
-          {nav.map((item) => {
+          {getNav(isAdminUser(keys.userEmail)).map((item) => {
             const Icon = item.icon;
             const selected = item.label === 'Help' ? showHelpChatbot : (active === item.screen && !showHelpChatbot);
             return (
@@ -5541,6 +6059,8 @@ function Dashboard({
     } catch { return 0; }
   })();
 
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
+
   const readinessScore = Math.round(
     10 +
     (activeResumeName ? 30 : 0) +
@@ -5598,7 +6118,8 @@ function Dashboard({
   ];
 
   return (
-    <main className="px-6 py-8 flex-1 overflow-y-auto space-y-6 relative z-10 text-left">
+    <>
+      <main className="px-6 py-8 flex-1 overflow-y-auto space-y-6 relative z-10 text-left">
       
       {/* ── Welcome Header ── */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-5">
@@ -5789,11 +6310,29 @@ function Dashboard({
             </div>
           </div>
 
-        </div>
+          {/* Suggestions Widget */}
+          <div className="glass rounded-2xl border border-slate-200 p-6 space-y-4">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Feedback</h3>
+            <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Help us improve the platform by leaving your suggestions.</p>
+            <button 
+              onClick={() => setShowSuggestionModal(true)}
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-teal-50 border border-teal-200 py-2.5 text-xs font-bold text-teal-700 hover:bg-teal-100 hover:text-teal-800 transition-colors cursor-pointer"
+            >
+              <MessageSquare size={14} /> Leave a Suggestion
+            </button>
+          </div>
 
+        </div>
       </div>
 
+
     </main>
+      <SuggestionModal 
+        isOpen={showSuggestionModal} 
+        onClose={() => setShowSuggestionModal(false)}
+        source="Dashboard"
+      />
+    </>
   );
 }
 
@@ -6969,6 +7508,7 @@ function MockInterview({
   const [webcamStream, setWebcamStream] = useState<MediaStream | null>(null);
   const [showSetup, setShowSetup] = useState(false);
   const [viewingSession, setViewingSession] = useState<any | null>(null);
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
 
   const keys = getCurrentUserKeys();
   const mockInterviewsKey = keys.userId ? `user-mock-interviews-${keys.userId}` : 'user-mock-interviews';
@@ -7336,7 +7876,7 @@ function MockInterview({
                 <span className="font-semibold">{formatTime(sessionTime)}</span>
               </div>
               <button
-                onClick={endAndSaveSession}
+                onClick={() => setShowSuggestionModal(true)}
                 className="rounded-md bg-rose-600 hover:bg-rose-500 px-4 py-1.5 text-xs font-bold text-white transition-all shadow-sm"
               >
                 End & Save
@@ -7664,6 +8204,12 @@ function MockInterview({
           </div>
         </div>
       )}
+      <SuggestionModal 
+        isOpen={showSuggestionModal} 
+        onClose={() => setShowSuggestionModal(false)}
+        source="Mock Interview"
+        onComplete={endAndSaveSession}
+      />
     </Page>
   );
 }
@@ -7682,12 +8228,21 @@ function RecentSessionsPage({
   deleteSession,
   openDetail
 }: RecentSessionsPageProps) {
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   return (
     <Page title="Recent Sessions" subtitle="View details, edit info, delete, or review transcripts of your past live sessions.">
       <Card className="w-full">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-slate-900">Recent Live Sessions</h2>
-          <Badge tone="teal">{sessionsList.length} total</Badge>
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-slate-900">Recent Live Sessions</h2>
+            <Badge tone="teal">{sessionsList.length} total</Badge>
+          </div>
+          <button 
+            onClick={() => setShowFeedbackModal(true)}
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-lg transition-colors cursor-pointer"
+          >
+            <MessageSquare size={14} /> Leave Feedback
+          </button>
         </div>
 
         <RecentSessionsTable
@@ -7704,6 +8259,11 @@ function RecentSessionsPage({
           openDetail={openDetail}
         />
       </Card>
+      <SuggestionModal 
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+        source="Recent Sessions"
+      />
     </Page>
   );
 }
@@ -7923,6 +8483,7 @@ function LiveSession({
   const [shutterFlash, setShutterFlash] = useState(false);
   const [manualMessage, setManualMessage] = useState('');
   const [qaHistory, setQaHistory] = useState<Array<{ question: string; answer: string; responseTime?: string }>>([]);
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
 
   // Pre-warm debounce timer ref
   const prewarmTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -7941,7 +8502,7 @@ function LiveSession({
   }, [idx]);
 
   const handleExitClick = () => {
-    onFinish(qaHistory);
+    setShowSuggestionModal(true);
   };
 
   // Fire pre-warm as soon as the interviewer starts forming a question
@@ -8577,9 +9138,13 @@ function LiveSession({
         {/* Right Header */}
         <div className="flex items-center justify-between border-b border-slate-200 bg-white px-5 py-3 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-600 shadow-sm">
-              <SutraLogo size={16} className="text-white" />
-            </div>
+            <img
+              src={sutraLogoImg}
+              alt="Sutra AI"
+              width={36}
+              height={36}
+              style={{ objectFit: 'contain' }}
+            />
             <span className="text-base font-black text-slate-900">Sutra AI</span>
           </div>
 
@@ -8640,8 +9205,8 @@ function LiveSession({
         <div className="flex-1 min-h-0 overflow-y-auto p-5 bg-white">
           {qaHistory.length === 0 && !stream.text ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-600 border border-teal-500/20 shadow-[0_4px_12px_rgba(245,158,11,0.2)]">
-                <SutraLogo size={26} className="text-white" />
+              <div className="mb-4 flex h-16 w-16 items-center justify-center">
+                <img src={sutraLogoImg} alt="Sutra AI" width={60} height={60} style={{ objectFit: 'contain' }} />
               </div>
               <p className="text-sm font-semibold text-slate-700">No messages yet.</p>
               <p className="text-xs text-slate-500 mt-1">Click "Answer" to start!</p>
@@ -8752,6 +9317,12 @@ function LiveSession({
       </div>
 
       {shutterFlash && <div className="fixed inset-0 bg-white z-[9999] pointer-events-none" />}
+      <SuggestionModal 
+        isOpen={showSuggestionModal} 
+        onClose={() => setShowSuggestionModal(false)}
+        source="Live Session"
+        onComplete={() => onFinish(qaHistory)}
+      />
     </div>
   );
 }
@@ -9880,6 +10451,31 @@ function Settings() {
       ].map(([a, b]) => <Card key={a}><p className="text-sm text-slate-500">{a}</p><h2 className="mt-2 text-xl font-black text-white">{b}</h2></Card>)}
     </div>
   </Page>;
+}
+
+function SuggestionsPage() {
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
+  return (
+    <Page title="Suggestions & Feedback" subtitle="Your feedback helps shape Sutra AI. Let us know how we can improve.">
+      <div className="pt-6 max-w-3xl animate-fadeIn space-y-6">
+        <div className="glass rounded-2xl border border-slate-200 p-8 space-y-4 bg-white/50">
+           <h2 className="text-xl font-bold text-slate-900">Have an idea or spotted a bug?</h2>
+           <p className="text-sm text-slate-500 mb-6">Open the feedback form to submit your suggestions directly to the team.</p>
+           <button 
+             onClick={() => setShowSuggestionModal(true)}
+             className="flex items-center justify-center gap-2 rounded-xl bg-teal-50 border border-teal-200 py-3 px-6 text-sm font-bold text-teal-700 hover:bg-teal-100 transition-colors cursor-pointer w-full md:w-auto"
+           >
+             <MessageSquare size={16} /> Open Feedback Form
+           </button>
+        </div>
+      </div>
+      <SuggestionModal 
+        isOpen={showSuggestionModal} 
+        onClose={() => setShowSuggestionModal(false)}
+        source="Dashboard"
+      />
+    </Page>
+  );
 }
 
 function Billing() {
