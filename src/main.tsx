@@ -7272,9 +7272,9 @@ function StartSessionWizard({ open, onClose, onLaunch }: { open: boolean; onClos
 }
 
 // Keep old component stubs to avoid breaking references (not rendered anymore)
-function WizardSession({ c, setC }: { c: SessionConfig; setC: (c: SessionConfig) => void }) { return <div />; }
-function WizardContext({ c, setC }: { c: SessionConfig; setC: React.Dispatch<React.SetStateAction<SessionConfig>> }) { return <div />; }
-function WizardBehavior({ c, setC }: { c: SessionConfig; setC: (c: SessionConfig) => void }) { return <div />; }
+function WizardSession(_props: { c: SessionConfig; setC: (c: SessionConfig) => void }) { return <div />; }
+function WizardContext(_props: { c: SessionConfig; setC: React.Dispatch<React.SetStateAction<SessionConfig>> }) { return <div />; }
+function WizardBehavior(_props: { c: SessionConfig; setC: (c: SessionConfig) => void }) { return <div />; }
 function WizardReview({ c }: { c: SessionConfig }) { return <div />; }
 
 
@@ -10771,7 +10771,6 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
 }
 
 const toneMap = {
-  teal: 'bg-teal-50 text-teal-600 ring-teal-100/50',
   teal: 'bg-teal-50 text-teal-600 ring-teal-100/50',
   amber: 'bg-amber-50 text-amber-600 ring-amber-100/50',
   sky: 'bg-sky-50 text-sky-600 ring-sky-100/50',
